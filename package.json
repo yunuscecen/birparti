@@ -1,0 +1,16 @@
+{
+  "name": "birparti",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bir Parti MERN web platformu",
+  "scripts": {
+    "dev": "concurrently -n FRONTEND,BACKEND \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "start:backend": "npm run start --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
