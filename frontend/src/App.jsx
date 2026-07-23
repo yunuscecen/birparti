@@ -6,6 +6,10 @@ import PlaceholderPage from "./pages/PlaceholderPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ContentPage from "./pages/ContentPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AccountPage from "./pages/AccountPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 const App = () => {
   return (
     <Routes>
@@ -75,27 +79,34 @@ const App = () => {
           }
         />
 
-        <Route
-          path="/giris"
-          element={
-            <PlaceholderPage
-              eyebrow="Üye hesabı"
-              title="Giriş Yap"
-              description="Güvenli üyelik ve kimlik doğrulama sistemi backend aşamasında bağlanacak."
-            />
-          }
-        />
+       <Route
+  path="/giris"
+  element={<LoginPage />}
+/>
 
-        <Route
-          path="/kayit"
-          element={
-            <PlaceholderPage
-              eyebrow="Birlik sensin"
-              title="Üye Ol"
-              description="Kayıt olan kullanıcılar talep oluşturabilecek, forum yorumlarına katılabilecek ve izin verilirse konu açabilecek."
-            />
-          }
-        />
+<Route
+  path="/kayit"
+  element={<RegisterPage />}
+/>
+
+<Route
+  path="/hesabim"
+  element={
+    <ProtectedRoute>
+      <AccountPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/sifremi-unuttum"
+  element={
+    <PlaceholderPage
+      eyebrow="Hesap güvenliği"
+      title="Şifremi Unuttum"
+      description="Şifre sıfırlama bağlantısı bir sonraki aşamada e-posta servisine bağlanacak."
+    />
+  }
+/>
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>

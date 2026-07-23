@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import projectRoutes from "./routes/projectRoutes.js";
 import pageRoutes from "./routes/pageRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -70,6 +71,7 @@ const apiLimiter = rateLimit({
 app.use("/api", apiLimiter);
 app.use("/api", projectRoutes);
 app.use("/api", pageRoutes);
+app.use("/api", authRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -88,13 +90,28 @@ app.use((req, res) => {
 });
 
 // eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
   console.error(error);
 
+  if (error.code === 11000) {
+    return res.status(409).json({
+      success: false,
+      message: "Bu bilgiyle daha önce bir kayıt oluşturulmuş.",
+    });
+  }
+
   res.status(error.statusCode || 500).json({
     success: false,
+
     message:
-      error.message || "Sunucu tarafında beklenmeyen bir hata oluştu.",
+      error.message ||
+      "Sunucu tarafında beklenmeyen bir hata oluştu.",
+
+    ...(error.details && {
+      details: error.details,
+    }),
+
     ...(process.env.NODE_ENV === "development" && {
       stack: error.stack,
     }),
