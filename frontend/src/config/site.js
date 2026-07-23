@@ -1,12 +1,14 @@
 export const siteConfig = {
   name: "BİR PARTİ",
   shortName: "Bir Parti",
+  description: "Bu bir parti sitesi değil. Bu bir vicdan çağrısı.",
   email: "bilgi@birparti.com",
 
-  navigation: [
+  primaryNavigation: [
     {
       label: "Ana Sayfa",
       path: "/",
+      end: true,
     },
     {
       label: "Projelerimiz",
@@ -34,8 +36,21 @@ export const siteConfig = {
     },
   ],
 
-  donationButton: {
+  auth: {
+    loginLabel: "Giriş Yap",
+    loginPath: "/giris",
+    registerLabel: "Üye Ol",
+    registerPath: "/kayit",
+  },
+
+  donation: {
     label: "Bir Damla Ol",
     path: "/bagis",
+  },
+
+  footer: {
+    primaryText: "Bu bir parti sitesi değil.",
+    secondaryText: "Bu bir vicdan çağrısı.",
+    copyright: `© ${new Date().getFullYear()} BİR PARTİ | Tüm hakları saklıdır.`,
   },
 };

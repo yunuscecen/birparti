@@ -4,7 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
-
+import projectRoutes from "./routes/projectRoutes.js";
+import pageRoutes from "./routes/pageRoutes.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -67,6 +68,8 @@ const apiLimiter = rateLimit({
 });
 
 app.use("/api", apiLimiter);
+app.use("/api", projectRoutes);
+app.use("/api", pageRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
