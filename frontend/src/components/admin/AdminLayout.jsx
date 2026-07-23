@@ -4,6 +4,7 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
+  FileText,
   Newspaper,
   Settings,
   Users,
@@ -31,6 +32,11 @@ const adminNavigation = [
     path: "/admin/uyeler",
     icon: Users,
   },
+  {
+  label: "Sayfa Yönetimi",
+  path: "/admin/sayfalar",
+  icon: FileText,
+},
   {
     label: "Projeler",
     path: "/admin/projeler",

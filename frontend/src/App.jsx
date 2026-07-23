@@ -18,6 +18,8 @@ import AdminProjectCategoriesPage from "./pages/admin/AdminProjectCategoriesPage
 import AdminProjectsPage from "./pages/admin/AdminProjectsPage";
 import AdminProjectCreatePage from "./pages/admin/AdminProjectCreatePage";
 import AdminProjectEditPage from "./pages/admin/AdminProjectEditPage";
+import AdminPagesPage from "./pages/admin/AdminPagesPage";
+import AdminPageEditPage from "./pages/admin/AdminPageEditPage";
 
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
@@ -168,6 +170,15 @@ const App = () => {
 <Route
   path="projeler/:projectId/duzenle"
   element={<AdminProjectEditPage />}
+/>
+<Route
+  path="sayfalar"
+  element={<AdminPagesPage />}
+/>
+
+<Route
+  path="sayfalar/:slug/duzenle"
+  element={<AdminPageEditPage />}
 />
       </Route>
     </Routes>

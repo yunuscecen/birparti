@@ -9,6 +9,7 @@ import pageRoutes from "./routes/pageRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import adminProjectRoutes from "./routes/adminProjectRoutes.js";
+import adminPageRoutes from "./routes/adminPageRoutes.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -76,6 +77,7 @@ app.use("/api", pageRoutes);
 app.use("/api", authRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", adminProjectRoutes);
+app.use("/api", adminPageRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
