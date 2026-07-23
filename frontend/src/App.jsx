@@ -1,39 +1,57 @@
 import { Route, Routes } from "react-router-dom";
+
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminRoute from "./components/auth/AdminRoute";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
+
+import AccountPage from "./pages/AccountPage";
+import ContentPage from "./pages/ContentPage";
 import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
-import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
-import ContentPage from "./pages/ContentPage";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import AccountPage from "./pages/AccountPage";
-import LoginPage from "./pages/LoginPage";
+import ProjectsPage from "./pages/ProjectsPage";
 import RegisterPage from "./pages/RegisterPage";
+import AdminProjectCategoriesPage from "./pages/admin/AdminProjectCategoriesPage";
+import AdminProjectsPage from "./pages/admin/AdminProjectsPage";
+import AdminProjectCreatePage from "./pages/admin/AdminProjectCreatePage";
+import AdminProjectEditPage from "./pages/admin/AdminProjectEditPage";
+
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
+
 const App = () => {
   return (
     <Routes>
+      {/* Herkese açık sayfalar ve üye alanı */}
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
 
-       <Route
-  path="/projelerimiz"
-  element={<ProjectsPage />}
-/>
-
-<Route
-  path="/projelerimiz/:slug"
-  element={<ProjectDetailPage />}
-/>
+        <Route
+          path="/projelerimiz"
+          element={<ProjectsPage />}
+        />
 
         <Route
-  path="/biz-kimiz"
-  element={<ContentPage fixedSlug="biz-kimiz" />}
-/>
+          path="/projelerimiz/:slug"
+          element={<ProjectDetailPage />}
+        />
+
         <Route
-  path="/neye-karsiyiz"
-  element={<ContentPage fixedSlug="neye-karsiyiz" />}
-/>
+          path="/biz-kimiz"
+          element={
+            <ContentPage fixedSlug="biz-kimiz" />
+          }
+        />
+
+        <Route
+          path="/neye-karsiyiz"
+          element={
+            <ContentPage fixedSlug="neye-karsiyiz" />
+          }
+        />
 
         <Route
           path="/blog"
@@ -79,36 +97,78 @@ const App = () => {
           }
         />
 
-       <Route
-  path="/giris"
-  element={<LoginPage />}
+        <Route
+          path="/giris"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/kayit"
+          element={<RegisterPage />}
+        />
+
+        <Route
+          path="/sifremi-unuttum"
+          element={
+            <PlaceholderPage
+              eyebrow="Hesap güvenliği"
+              title="Şifremi Unuttum"
+              description="Şifre sıfırlama bağlantısı bir sonraki aşamada e-posta servisine bağlanacak."
+            />
+          }
+        />
+
+        <Route
+          path="/hesabim"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="*"
+          element={<NotFoundPage />}
+        />
+      </Route>
+
+      {/* Admin paneli MainLayout dışında kalmalı */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route
+  path="projeler"
+  element={<AdminProjectsPage />}
 />
 
 <Route
-  path="/kayit"
-  element={<RegisterPage />}
+  path="proje-kategorileri"
+  element={<AdminProjectCategoriesPage />}
+/>
+        <Route
+          index
+          element={<AdminDashboardPage />}
+        />
+
+        <Route
+          path="uyeler"
+          element={<AdminUsersPage />}
+        />
+        <Route
+  path="projeler/yeni"
+  element={<AdminProjectCreatePage />}
 />
 
 <Route
-  path="/hesabim"
-  element={
-    <ProtectedRoute>
-      <AccountPage />
-    </ProtectedRoute>
-  }
+  path="projeler/:projectId/duzenle"
+  element={<AdminProjectEditPage />}
 />
-<Route
-  path="/sifremi-unuttum"
-  element={
-    <PlaceholderPage
-      eyebrow="Hesap güvenliği"
-      title="Şifremi Unuttum"
-      description="Şifre sıfırlama bağlantısı bir sonraki aşamada e-posta servisine bağlanacak."
-    />
-  }
-/>
-
-        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );

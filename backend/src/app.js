@@ -7,6 +7,8 @@ import rateLimit from "express-rate-limit";
 import projectRoutes from "./routes/projectRoutes.js";
 import pageRoutes from "./routes/pageRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import adminProjectRoutes from "./routes/adminProjectRoutes.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -72,6 +74,8 @@ app.use("/api", apiLimiter);
 app.use("/api", projectRoutes);
 app.use("/api", pageRoutes);
 app.use("/api", authRoutes);
+app.use("/api", adminRoutes);
+app.use("/api", adminProjectRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({

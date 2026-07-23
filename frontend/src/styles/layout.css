@@ -271,9 +271,10 @@
     font-size: 0.78rem;
   }
 
-  .site-header__login span {
-    display: none;
-  }
+  .site-header__login span,
+.site-header__admin span {
+  display: none;
+}
 }
 
 @media (max-width: 960px) {
@@ -352,10 +353,10 @@
   }
 
   .site-header__login,
-  .site-header__donation {
-    display: none;
-  }
-
+.site-header__admin,
+.site-header__donation {
+  display: none;
+}
   .site-header__menu-button {
     display: inline-flex;
     width: 46px;
@@ -388,4 +389,29 @@
   .site-footer {
     padding-top: 55px;
   }
+}
+
+.site-header__admin {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 1px solid rgba(36, 83, 173, 0.12);
+  border-radius: 999px;
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.site-header__admin:hover {
+  background: var(--color-primary-200);
+  color: var(--color-primary-800);
 }

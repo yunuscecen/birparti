@@ -10,6 +10,20 @@ import ButtonLink from "../components/common/ButtonLink";
 import Container from "../components/common/Container";
 import { getProjectBySlug } from "../services/projectService";
 
+const setMetaDescription = (description = "") => {
+  let meta = document.querySelector(
+    'meta[name="description"]'
+  );
+
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute("name", "description");
+    document.head.appendChild(meta);
+  }
+
+  meta.setAttribute("content", description);
+};
+
 const formatDate = (date) => {
   if (!date) {
     return "";
@@ -34,17 +48,29 @@ const ProjectDetailPage = () => {
 
   const project = projectQuery.data?.data;
 
-  useEffect(() => {
-    if (project?.seo?.title) {
-      document.title = project.seo.title;
-    } else if (project?.title) {
-      document.title = `${project.title} | Bir Parti`;
-    }
+useEffect(() => {
+  if (!project) {
+    return;
+  }
 
-    return () => {
-      document.title = "Bir Parti";
-    };
-  }, [project]);
+  document.title =
+    project.seo?.title ||
+    `${project.title} | Bir Parti`;
+
+  setMetaDescription(
+    project.seo?.description ||
+    project.summary ||
+    "Bir Parti projesi"
+  );
+
+  return () => {
+    document.title = "Bir Parti";
+
+    setMetaDescription(
+      "Bir Parti — Bu bir parti sitesi değil. Bu bir vicdan çağrısı."
+    );
+  };
+}, [project]);
 
   if (projectQuery.isLoading) {
     return (

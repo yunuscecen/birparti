@@ -1,21 +1,46 @@
 import { useEffect, useState } from "react";
-import { Menu, UserRound, X } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Menu,
+  UserRound,
+  X,
+} from "lucide-react";
+import {
+  NavLink,
+  useLocation,
+} from "react-router-dom";
+
 import { siteConfig } from "../../config/site";
+import { useAuth } from "../../context/AuthContext";
 import ButtonLink from "../common/ButtonLink";
 import Container from "../common/Container";
 import Logo from "./Logo";
 
+const adminRoles = ["admin", "superAdmin"];
+
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] =
+    useState(false);
+
   const location = useLocation();
+
+  const {
+    user,
+    isAuthenticated,
+    isAuthReady,
+  } = useAuth();
+
+  const hasAdminAccess =
+    isAuthenticated &&
+    adminRoles.includes(user?.role);
 
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "";
+    document.body.style.overflow =
+      isMenuOpen ? "hidden" : "";
 
     return () => {
       document.body.style.overflow = "";
@@ -30,7 +55,9 @@ const Header = () => {
         <nav
           id="main-navigation"
           className={`site-navigation ${
-            isMenuOpen ? "site-navigation--open" : ""
+            isMenuOpen
+              ? "site-navigation--open"
+              : ""
           }`}
           aria-label="Ana menü"
         >
@@ -48,31 +75,59 @@ const Header = () => {
           </div>
 
           <div className="site-navigation__links">
-            {siteConfig.primaryNavigation.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.end}
-                className={({ isActive }) =>
-                  `site-navigation__link ${
-                    isActive ? "site-navigation__link--active" : ""
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {siteConfig.primaryNavigation.map(
+              (item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `site-navigation__link ${
+                      isActive
+                        ? "site-navigation__link--active"
+                        : ""
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              )
+            )}
           </div>
 
           <div className="site-navigation__mobile-actions">
-            <ButtonLink
-              to={siteConfig.auth.loginPath}
-              variant="ghost"
-              className="site-navigation__mobile-button"
-            >
-              <UserRound size={18} />
-              {siteConfig.auth.loginLabel}
-            </ButtonLink>
+            {isAuthReady && isAuthenticated ? (
+              <>
+                {hasAdminAccess && (
+                  <ButtonLink
+                    to="/admin"
+                    variant="secondary"
+                    className="site-navigation__mobile-button"
+                  >
+                    <LayoutDashboard size={18} />
+                    Yönetim Paneli
+                  </ButtonLink>
+                )}
+
+                <ButtonLink
+                  to="/hesabim"
+                  variant="ghost"
+                  className="site-navigation__mobile-button"
+                >
+                  <UserRound size={18} />
+                  Hesabım
+                </ButtonLink>
+              </>
+            ) : (
+              <ButtonLink
+                to={siteConfig.auth.loginPath}
+                variant="ghost"
+                className="site-navigation__mobile-button"
+              >
+                <UserRound size={18} />
+                {siteConfig.auth.loginLabel}
+              </ButtonLink>
+            )}
 
             <ButtonLink
               to={siteConfig.donation.path}
@@ -84,13 +139,37 @@ const Header = () => {
         </nav>
 
         <div className="site-header__actions">
-          <NavLink
-            to={siteConfig.auth.loginPath}
-            className="site-header__login"
-          >
-            <UserRound size={18} />
-            <span>{siteConfig.auth.loginLabel}</span>
-          </NavLink>
+          {isAuthReady && isAuthenticated ? (
+            <>
+              {hasAdminAccess && (
+                <NavLink
+                  to="/admin"
+                  className="site-header__admin"
+                >
+                  <LayoutDashboard size={18} />
+                  <span>Yönetim</span>
+                </NavLink>
+              )}
+
+              <NavLink
+                to="/hesabim"
+                className="site-header__login"
+              >
+                <UserRound size={18} />
+                <span>Hesabım</span>
+              </NavLink>
+            </>
+          ) : (
+            <NavLink
+              to={siteConfig.auth.loginPath}
+              className="site-header__login"
+            >
+              <UserRound size={18} />
+              <span>
+                {siteConfig.auth.loginLabel}
+              </span>
+            </NavLink>
+          )}
 
           <ButtonLink
             to={siteConfig.donation.path}
