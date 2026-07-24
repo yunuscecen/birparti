@@ -7,7 +7,7 @@ import MainLayout from "./components/layout/MainLayout";
 
 import AccountPage from "./pages/AccountPage";
 import ContentPage from "./pages/ContentPage";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/Homepage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
