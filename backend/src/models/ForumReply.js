@@ -79,7 +79,15 @@ const forumReplySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+deletedByAuthor: {
+  type: Boolean,
+  default: false,
+},
 
+deletedAt: {
+  type: Date,
+  default: null,
+},
     editedAt: {
       type: Date,
       default: null,

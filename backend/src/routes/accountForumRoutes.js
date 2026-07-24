@@ -13,6 +13,8 @@ import {
 } from "../controllers/accountForumNotificationController.js";
 import validateRequest from "../middleware/validateRequest.js";
 import {
+  deleteMyForumReply,
+  deleteMyForumTopic,
   getMyForumReplyForEdit,
   getMyForumTopicForEdit,
   updateMyForumReply,
@@ -98,4 +100,16 @@ router.patch(
   ),
   updateMyForumReply
 );
+
+
+router.delete(
+  "/account/forum/topics/:topicId",
+  deleteMyForumTopic
+);
+
+router.delete(
+  "/account/forum/replies/:replyId",
+  deleteMyForumReply
+);
+
 export default router;

@@ -85,7 +85,15 @@ editedAt: {
   type: Date,
   default: null,
 },
+deletedByAuthor: {
+  type: Boolean,
+  default: false,
+},
 
+deletedAt: {
+  type: Date,
+  default: null,
+},
     lastReplyAt: {
       type: Date,
       default: null,

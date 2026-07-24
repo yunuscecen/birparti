@@ -169,3 +169,24 @@ export const updateMyForumReply =
 
     return response.data.data;
   };
+
+
+  export const deleteMyForumTopic =
+  async (topicId) => {
+    const response =
+      await api.delete(
+        `/account/forum/topics/${topicId}`
+      );
+
+    return response.data;
+  };
+
+export const deleteMyForumReply =
+  async (replyId) => {
+    const response =
+      await api.delete(
+        `/account/forum/replies/${replyId}`
+      );
+
+    return response.data;
+  };

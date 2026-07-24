@@ -8,15 +8,18 @@ import {
   FileText,
   Pencil,
   Lock,
+  Trash2,
   MessageCircle,
 } from "lucide-react";
 
 import {
   useEffect,
+  useState,
 } from "react";
-
 import {
+  useMutation,
   useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 
 import {
@@ -27,6 +30,8 @@ import {
 import Container from "../components/common/Container";
 
 import {
+  deleteMyForumReply,
+  deleteMyForumTopic,
   getMyForumOverview,
   getMyForumReplies,
   getMyForumTopics,
@@ -66,6 +71,16 @@ const formatDate = (
 
 const MyForumActivityPage =
   () => {
+    const queryClient =
+  useQueryClient();
+
+const [
+  feedback,
+  setFeedback,
+] = useState({
+  type: "",
+  message: "",
+});
     const [
       searchParams,
       setSearchParams,
@@ -146,6 +161,165 @@ const MyForumActivityPage =
         enabled:
           tab === "replies",
       });
+
+const refreshForumActivity =
+  async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: [
+          "my-forum-overview",
+        ],
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "my-forum-topics",
+        ],
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "my-forum-replies",
+        ],
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "forum-topics",
+        ],
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "forum-topic",
+        ],
+      }),
+    ]);
+  };
+
+const deleteTopicMutation =
+  useMutation({
+    mutationFn:
+      deleteMyForumTopic,
+
+    onSuccess: async (
+      response
+    ) => {
+      setFeedback({
+        type: "success",
+
+        message:
+          response?.message ||
+          "Forum konusu silindi.",
+      });
+
+      await refreshForumActivity();
+    },
+
+    onError: (error) => {
+      setFeedback({
+        type: "error",
+
+        message:
+          error?.response?.data
+            ?.message ||
+          error?.message ||
+          "Forum konusu silinemedi.",
+      });
+    },
+  });
+
+const deleteReplyMutation =
+  useMutation({
+    mutationFn:
+      deleteMyForumReply,
+
+    onSuccess: async (
+      response
+    ) => {
+      setFeedback({
+        type: "success",
+
+        message:
+          response?.message ||
+          "Forum yanıtı silindi.",
+      });
+
+      await refreshForumActivity();
+    },
+
+    onError: (error) => {
+      setFeedback({
+        type: "error",
+
+        message:
+          error?.response?.data
+            ?.message ||
+          error?.message ||
+          "Forum yanıtı silinemedi.",
+      });
+    },
+  });
+
+const handleDeleteTopic = (
+  topic
+) => {
+  const hasReplies =
+    Number(
+      topic.replyCount || 0
+    ) > 0;
+
+  if (hasReplies) {
+    setFeedback({
+      type: "error",
+
+      message:
+        "Yanıt bulunan bir forum konusu kullanıcı tarafından silinemez.",
+    });
+
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      `“${topic.title}” başlıklı konuyu silmek istediğinize emin misiniz?`
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setFeedback({
+    type: "",
+    message: "",
+  });
+
+  deleteTopicMutation.mutate(
+    topic._id
+  );
+};
+
+const handleDeleteReply = (
+  reply
+) => {
+  const confirmed =
+    window.confirm(
+      "Bu forum yanıtını silmek istediğinize emin misiniz?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setFeedback({
+    type: "",
+    message: "",
+  });
+
+  deleteReplyMutation.mutate(
+    reply._id
+  );
+};
 
     const updateParams = (
       updates
@@ -310,7 +484,31 @@ const MyForumActivityPage =
                 </strong>
               </article>
             </div>
+{feedback.message && (
+  <div
+    className={`account-forum-feedback ${
+      feedback.type === "error"
+        ? "account-forum-feedback--error"
+        : ""
+    }`}
+  >
+    <span>
+      {feedback.message}
+    </span>
 
+    <button
+      type="button"
+      onClick={() =>
+        setFeedback({
+          type: "",
+          message: "",
+        })
+      }
+    >
+      Kapat
+    </button>
+  </div>
+)}
             <div className="account-forum-panel">
               <div className="account-forum-tabs">
                 <button
@@ -463,16 +661,19 @@ const MyForumActivityPage =
                               )}
                             </span>
 
-                            <span
-                              className={`account-forum-status account-forum-status--${topic.status}`}
-                            >
-                              {
-                                topicStatusLabels[
-                                  topic
-                                    .status
-                                ]
-                              }
-                            </span>
+                       <span
+  className={`account-forum-status ${
+    topic.deletedByAuthor
+      ? "account-forum-status--deleted"
+      : `account-forum-status--${topic.status}`
+  }`}
+>
+  {topic.deletedByAuthor
+    ? "Silindi"
+    : topicStatusLabels[
+        topic.status
+      ]}
+</span>
                           </div>
 
                           <h2>
@@ -519,25 +720,49 @@ const MyForumActivityPage =
 ].includes(
   topic.status
 ) && (
-  <div className="account-forum-item__actions">
-    <Link
-      to={`/hesabim/forum-konusu/${topic._id}/duzenle`}
-      className="account-forum-link"
-    >
-      <Pencil size={16} />
-      Düzenle
-    </Link>
+<div className="account-forum-item__actions">
+  <Link
+    to={`/hesabim/forum-konusu/${topic._id}/duzenle`}
+    className="account-forum-link"
+  >
+    <Pencil size={16} />
+    Düzenle
+  </Link>
 
-    <Link
-      to={`/forum/${topic.slug}`}
-      className="account-forum-link"
-    >
-      <ExternalLink
-        size={16}
-      />
-      Konuyu Aç
-    </Link>
-  </div>
+  <Link
+    to={`/forum/${topic.slug}`}
+    className="account-forum-link"
+  >
+    <ExternalLink size={16} />
+    Konuyu Aç
+  </Link>
+
+  <button
+    type="button"
+    className="account-forum-delete-button"
+    disabled={
+      deleteTopicMutation.isPending ||
+      Number(
+        topic.replyCount || 0
+      ) > 0
+    }
+    title={
+      Number(
+        topic.replyCount || 0
+      ) > 0
+        ? "Yanıt bulunan konu silinemez."
+        : "Konuyu sil"
+    }
+    onClick={() =>
+      handleDeleteTopic(
+        topic
+      )
+    }
+  >
+    <Trash2 size={16} />
+    Sil
+  </button>
+</div>
 )}
                       </article>
                     )
@@ -592,16 +817,19 @@ const MyForumActivityPage =
                               )}
                             </span>
 
-                            <span
-                              className={`account-forum-status account-forum-status--reply-${reply.status}`}
-                            >
-                              {
-                                replyStatusLabels[
-                                  reply
-                                    .status
-                                ]
-                              }
-                            </span>
+                           <span
+  className={`account-forum-status ${
+    reply.deletedByAuthor
+      ? "account-forum-status--deleted"
+      : `account-forum-status--reply-${reply.status}`
+  }`}
+>
+  {reply.deletedByAuthor
+    ? "Silindi"
+    : replyStatusLabels[
+        reply.status
+      ]}
+</span>
                           </div>
 
                           <h2>
@@ -641,28 +869,42 @@ const MyForumActivityPage =
   ].includes(
     reply.topic.status
   ) && (
-    <div className="account-forum-item__actions">
-      <Link
-        to={`/hesabim/forum-yaniti/${reply._id}/duzenle`}
-        className="account-forum-link"
-      >
-        <Pencil size={16} />
-        Düzenle
-      </Link>
+  <div className="account-forum-item__actions">
+  <Link
+    to={`/hesabim/forum-yaniti/${reply._id}/duzenle`}
+    className="account-forum-link"
+  >
+    <Pencil size={16} />
+    Düzenle
+  </Link>
 
-      <Link
-        to={
-          `/forum/${reply.topic.slug}` +
-          `#yanit-${reply._id}`
-        }
-        className="account-forum-link"
-      >
-        <ExternalLink
-          size={16}
-        />
-        Yanıta Git
-      </Link>
-    </div>
+  <Link
+    to={
+      `/forum/${reply.topic.slug}` +
+      `#yanit-${reply._id}`
+    }
+    className="account-forum-link"
+  >
+    <ExternalLink size={16} />
+    Yanıta Git
+  </Link>
+
+  <button
+    type="button"
+    className="account-forum-delete-button"
+    disabled={
+      deleteReplyMutation.isPending
+    }
+    onClick={() =>
+      handleDeleteReply(
+        reply
+      )
+    }
+  >
+    <Trash2 size={16} />
+    Sil
+  </button>
+</div>
   )}
                       </article>
                     )

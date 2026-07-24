@@ -412,3 +412,99 @@
     flex: 1;
   }
 }
+
+
+.account-forum-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  background: rgba(
+    36,
+    133,
+    89,
+    0.1
+  );
+  color: #24734f;
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+}
+
+.account-forum-feedback--error {
+  background: rgba(
+    177,
+    45,
+    70,
+    0.1
+  );
+  color: #9f2941;
+}
+
+.account-forum-feedback button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.account-forum-delete-button {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 0 12px;
+  border: 1px solid
+    rgba(177, 45, 70, 0.12);
+  border-radius: 9px;
+  background: rgba(
+    177,
+    45,
+    70,
+    0.07
+  );
+  color: #9f2941;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.account-forum-delete-button:hover:not(
+    :disabled
+  ) {
+  background: rgba(
+    177,
+    45,
+    70,
+    0.13
+  );
+}
+
+.account-forum-delete-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.43;
+}
+
+.account-forum-status--deleted {
+  background: rgba(
+    177,
+    45,
+    70,
+    0.1
+  );
+  color: #9f2941 !important;
+}
+
+@media (max-width: 640px) {
+  .account-forum-item__actions
+    .account-forum-delete-button {
+    flex: 1;
+  }
+}
