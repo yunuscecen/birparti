@@ -55,3 +55,24 @@ export const adminForumReplyModerationSchema = z.object({
     "deleted",
   ]),
 });
+
+
+export const adminForumReportReviewSchema =
+  z.object({
+    status: z.enum([
+      "pending",
+      "reviewed",
+      "dismissed",
+      "action_taken",
+    ]),
+
+    resolutionNote: z
+      .string()
+      .trim()
+      .max(
+        1500,
+        "Yönetici notu en fazla 1500 karakter olabilir."
+      )
+      .optional()
+      .default(""),
+  });

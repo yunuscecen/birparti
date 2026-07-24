@@ -3,6 +3,7 @@ import {
   AtSign,
   CornerUpLeft,
   Eye,
+  Flag,
   Lock,
   LogIn,
   MessageCircle,
@@ -28,6 +29,7 @@ import {
 } from "react-router-dom";
 
 import Container from "../components/common/Container";
+import ForumReportModal from "../components/forum/ForumReportModal";
 import { useAuth } from "../context/AuthContext";
 
 import {
@@ -69,9 +71,10 @@ const ForumTopicDetailPage = () => {
   const queryClient =
     useQueryClient();
 
-  const {
-    isAuthenticated,
-  } = useAuth();
+const {
+  user,
+  isAuthenticated,
+} = useAuth();
 
   const [
     replyBody,
@@ -91,6 +94,10 @@ const ForumTopicDetailPage = () => {
     replyError,
     setReplyError,
   ] = useState("");
+  const [
+  reportTarget,
+  setReportTarget,
+] = useState(null);
 
   const topicQuery = useQuery({
     queryKey: [
@@ -116,6 +123,44 @@ const ForumTopicDetailPage = () => {
 
   const pagination =
     topicQuery.data?.pagination;
+
+    const currentUserId = String(
+  user?.id ||
+  user?._id ||
+  ""
+);
+
+const canReportContent = (
+  authorId
+) => {
+  if (
+    !isAuthenticated ||
+    !currentUserId
+  ) {
+    return false;
+  }
+
+  return (
+    String(authorId || "") !==
+    currentUserId
+  );
+};
+
+const openReportModal = ({
+  targetType,
+  targetId,
+  targetLabel,
+}) => {
+  setReportTarget({
+    targetType,
+    targetId,
+    targetLabel,
+  });
+};
+
+const closeReportModal = () => {
+  setReportTarget(null);
+};
 
   useEffect(() => {
     if (!topic) {
@@ -249,6 +294,17 @@ const ForumTopicDetailPage = () => {
             "forum-topics",
           ],
         });
+        queryClient.invalidateQueries({
+  queryKey: [
+    "my-forum-overview",
+  ],
+});
+
+queryClient.invalidateQueries({
+  queryKey: [
+    "my-forum-replies",
+  ],
+});
 
         setReplyBody("");
         setReplyTarget(null);
@@ -548,6 +604,25 @@ const ForumTopicDetailPage = () => {
               <Eye size={15} />
               {topic.viewCount || 0}
             </span>
+            {canReportContent(
+  topic.authorInfo?.id
+) && (
+  <button
+    type="button"
+    className="forum-report-button"
+    onClick={() =>
+      openReportModal({
+        targetType: "topic",
+        targetId: topic._id,
+        targetLabel:
+          "Bu forum konusunu bildir",
+      })
+    }
+  >
+    <Flag size={14} />
+    Konuyu Bildir
+  </button>
+)}
           </div>
         </Container>
       </section>
@@ -602,7 +677,10 @@ const ForumTopicDetailPage = () => {
                   className="forum-thread"
                   key={reply._id}
                 >
-                  <article className="forum-message">
+                  <article
+  id={`yanit-${reply._id}`}
+  className="forum-message"
+>
                     <header>
                       <strong>
                         {reply.authorInfo
@@ -640,10 +718,36 @@ const ForumTopicDetailPage = () => {
                     </div>
 
                     <footer className="forum-message__footer">
-                      {renderReplyAction(
-                        reply
-                      )}
-                    </footer>
+  <div className="forum-message__actions">
+    {renderReplyAction(
+      reply
+    )}
+
+    {canReportContent(
+      reply.authorInfo?.id
+    ) && (
+      <button
+        type="button"
+        className="forum-report-button"
+        onClick={() =>
+          openReportModal({
+            targetType:
+              "reply",
+
+            targetId:
+              reply._id,
+
+            targetLabel:
+              "Bu forum yanıtını bildir",
+          })
+        }
+      >
+        <Flag size={14} />
+        Bildir
+      </button>
+    )}
+  </div>
+</footer>
                   </article>
 
                   {replyTarget?.id ===
@@ -663,7 +767,10 @@ const ForumTopicDetailPage = () => {
                               childReply._id
                             }
                           >
-                            <article className="forum-message forum-message--child">
+                            <article
+  id={`yanit-${childReply._id}`}
+  className="forum-message forum-message--child"
+>
                               <header>
                                 <strong>
                                   {childReply
@@ -729,11 +836,37 @@ const ForumTopicDetailPage = () => {
                                   )}
                               </div>
 
-                              <footer className="forum-message__footer">
-                                {renderReplyAction(
-                                  childReply
-                                )}
-                              </footer>
+                          <footer className="forum-message__footer">
+  <div className="forum-message__actions">
+    {renderReplyAction(
+      childReply
+    )}
+
+    {canReportContent(
+      childReply.authorInfo?.id
+    ) && (
+      <button
+        type="button"
+        className="forum-report-button"
+        onClick={() =>
+          openReportModal({
+            targetType:
+              "reply",
+
+            targetId:
+              childReply._id,
+
+            targetLabel:
+              "Bu forum cevabını bildir",
+          })
+        }
+      >
+        <Flag size={14} />
+        Bildir
+      </button>
+    )}
+  </div>
+</footer>
                             </article>
 
                             {replyTarget?.id ===
@@ -818,6 +951,23 @@ const ForumTopicDetailPage = () => {
           </div>
         </Container>
       </section>
+      <ForumReportModal
+  isOpen={Boolean(
+    reportTarget
+  )}
+  onClose={
+    closeReportModal
+  }
+  targetType={
+    reportTarget?.targetType
+  }
+  targetId={
+    reportTarget?.targetId
+  }
+  targetLabel={
+    reportTarget?.targetLabel
+  }
+/>
     </div>
   );
 };

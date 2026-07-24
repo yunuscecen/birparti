@@ -4,6 +4,7 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
+   Flag,
   FileText,
   Newspaper,
   Settings,
@@ -28,6 +29,47 @@ const adminNavigation = [
     icon: Gauge,
     end: true,
   },
+   {
+  label: "Ana Sayfa",
+  path: "/admin/anasayfa",
+  icon: House,
+},
+ {
+    label: "Üye Yönetimi",
+    path: "/admin/uyeler",
+    icon: Users,
+  },
+
+  {
+  label: "Sayfa Yönetimi",
+  path: "/admin/sayfalar",
+  icon: FileText,
+},
+ {
+    label: "Projeler",
+    path: "/admin/projeler",
+    icon: FolderKanban,
+  },
+  {
+    label: "Proje Kategorileri",
+    path: "/admin/proje-kategorileri",
+    icon: Tags,
+  },
+  {
+  label: "Forum Konuları",
+  path: "/admin/forum",
+  icon: MessageSquareText,
+},
+{
+  label: "Forum Kategorileri",
+  path: "/admin/forum-kategorileri",
+  icon: Tags,
+},
+{
+  label: "Forum Bildirimleri",
+  path: "/admin/forum-bildirimleri",
+  icon: Flag,
+},
   {
   label: "Blog Yazıları",
   path: "/admin/blog",
@@ -38,41 +80,10 @@ const adminNavigation = [
   path: "/admin/blog-kategorileri",
   icon: Tags,
 },
-{
-  label: "Forum Konuları",
-  path: "/admin/forum",
-  icon: MessageSquareText,
-},
-{
-  label: "Forum Kategorileri",
-  path: "/admin/forum-kategorileri",
-  icon: Tags,
-},
-  {
-  label: "Ana Sayfa",
-  path: "/admin/anasayfa",
-  icon: House,
-},
-  {
-    label: "Üye Yönetimi",
-    path: "/admin/uyeler",
-    icon: Users,
-  },
-  {
-  label: "Sayfa Yönetimi",
-  path: "/admin/sayfalar",
-  icon: FileText,
-},
-  {
-    label: "Projeler",
-    path: "/admin/projeler",
-    icon: FolderKanban,
-  },
-  {
-    label: "Proje Kategorileri",
-    path: "/admin/proje-kategorileri",
-    icon: Tags,
-  },
+
+ 
+ 
+ 
 ];
 
 const futureNavigation = [

@@ -14,6 +14,12 @@ import {
 } from "../controllers/adminForumController.js";
 
 import {
+  getAdminForumReportOverview,
+  getAdminForumReports,
+  updateAdminForumReport,
+} from "../controllers/adminForumReportController.js";
+
+import {
   requireAuth,
   requireRole,
 } from "../middleware/authMiddleware.js";
@@ -23,6 +29,7 @@ import validateRequest from "../middleware/validateRequest.js";
 import {
   adminForumCategorySchema,
   adminForumReplyModerationSchema,
+  adminForumReportReviewSchema,
   adminForumTopicModerationSchema,
 } from "../validators/adminForumValidators.js";
 
@@ -88,6 +95,24 @@ router.patch(
   "/admin/forum/topics/:topicId/moderation",
   validateRequest(adminForumTopicModerationSchema),
   updateAdminForumTopicModeration
+);
+
+router.get(
+  "/admin/forum/reports/overview",
+  getAdminForumReportOverview
+);
+
+router.get(
+  "/admin/forum/reports",
+  getAdminForumReports
+);
+
+router.patch(
+  "/admin/forum/reports/:reportId",
+  validateRequest(
+    adminForumReportReviewSchema
+  ),
+  updateAdminForumReport
 );
 
 export default router;

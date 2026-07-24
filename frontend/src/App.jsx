@@ -35,6 +35,8 @@ import ForumTopicCreatePage from "./pages/ForumTopicCreatePage";
 import AdminForumCategoriesPage from "./pages/admin/AdminForumCategoriesPage";
 import AdminForumTopicsPage from "./pages/admin/AdminForumTopicsPage";
 import AdminForumTopicModerationPage from "./pages/admin/AdminForumTopicModerationPage";
+import MyForumActivityPage from "./pages/MyForumActivityPage";
+import AdminForumReportsPage from "./pages/admin/AdminForumReportsPage";
 
 const App = () => {
   return (
@@ -87,6 +89,15 @@ const App = () => {
   element={
     <ProtectedRoute>
       <ForumTopicCreatePage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/hesabim/forum-hareketlerim"
+  element={
+    <ProtectedRoute>
+      <MyForumActivityPage />
     </ProtectedRoute>
   }
 />
@@ -230,6 +241,12 @@ const App = () => {
 <Route
   path="forum-kategorileri"
   element={<AdminForumCategoriesPage />}
+/>
+<Route
+  path="forum-bildirimleri"
+  element={
+    <AdminForumReportsPage />
+  }
 />
 <Route
   path="forum/:topicId/moderasyon"

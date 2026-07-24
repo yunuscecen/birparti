@@ -7,6 +7,7 @@ import App from "./App";
 import "./styles/auth.css";
 import "./styles/admin.css";
 import "./styles/blog.css";
+import "./styles/accountForum.css";
 import "./styles/forum.css";
 import queryClient from "./config/queryClient";
 

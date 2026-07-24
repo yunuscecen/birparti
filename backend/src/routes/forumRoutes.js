@@ -12,6 +12,10 @@ import {
 } from "../controllers/forumInteractionController.js";
 
 import {
+  createForumReport,
+} from "../controllers/forumReportController.js";
+
+import {
   requireAuth,
 } from "../middleware/authMiddleware.js";
 
@@ -23,6 +27,7 @@ import validateRequest from "../middleware/validateRequest.js";
 
 import {
   createForumReplySchema,
+  createForumReportSchema,
   createForumTopicSchema,
 } from "../validators/forumValidators.js";
 
@@ -65,7 +70,14 @@ router.post(
   ),
   createForumReply
 );
-
+router.post(
+  "/forum-reports",
+  requireAuth,
+  validateRequest(
+    createForumReportSchema
+  ),
+  createForumReport
+);
 router.get(
   "/forum-topics/:slug",
   getPublicForumTopicBySlug

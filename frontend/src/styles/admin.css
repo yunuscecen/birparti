@@ -2044,3 +2044,254 @@
     justify-content: flex-start;
   }
 }
+
+
+.admin-forum-report-overview {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-forum-report-overview article {
+  display: grid;
+  gap: 7px;
+  padding: 19px;
+  border: 1px solid
+    rgba(23, 35, 63, 0.07);
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--color-primary-700);
+}
+
+.admin-forum-report-overview span,
+.admin-forum-report-overview strong {
+  font-family: var(
+    --font-body,
+    "Inter",
+    Arial,
+    sans-serif
+  );
+}
+
+.admin-forum-report-overview span {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.admin-forum-report-overview strong {
+  color: var(--color-primary-950);
+  font-size: 1.55rem;
+}
+
+.admin-forum-report-filters {
+  grid-template-columns:
+    minmax(250px, 1fr)
+    repeat(3, minmax(145px, 190px));
+}
+
+.admin-forum-report-list {
+  display: grid;
+  gap: 17px;
+  padding: 22px;
+}
+
+.admin-forum-report-card {
+  overflow: hidden;
+  border: 1px solid
+    rgba(23, 35, 63, 0.08);
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.admin-forum-report-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px 18px;
+  border-bottom: 1px solid
+    rgba(23, 35, 63, 0.06);
+  background: #f7f9fc;
+}
+
+.admin-forum-report-card__header > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-forum-report-card__header > span,
+.admin-forum-report-card__type {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.69rem;
+}
+
+.admin-forum-report-card__content {
+  display: grid;
+  gap: 19px;
+  padding: 20px;
+}
+
+.admin-forum-report-card__people {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.admin-forum-report-card__people > div {
+  display: grid;
+  gap: 4px;
+  padding: 13px;
+  border-radius: 10px;
+  background: #f7f9fc;
+}
+
+.admin-forum-report-card__people span,
+.admin-forum-report-card__people strong,
+.admin-forum-report-card__people small {
+  font-family: var(--font-body);
+}
+
+.admin-forum-report-card__people span,
+.admin-forum-report-card__people small {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+}
+
+.admin-forum-report-card__target > span,
+.admin-forum-report-card__reason > span {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+}
+
+.admin-forum-report-card__target h2 {
+  margin: 7px 0 9px;
+  color: var(--color-primary-950);
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+}
+
+.admin-forum-report-card__target p,
+.admin-forum-report-card__target blockquote,
+.admin-forum-report-card__reason p {
+  margin: 7px 0 0;
+  color: var(--color-text-soft);
+  font-family: var(--font-body);
+  font-size: 0.79rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.admin-forum-report-card__target blockquote {
+  padding: 13px;
+  border-left: 3px solid
+    rgba(36, 83, 173, 0.22);
+  background: #f8fafd;
+}
+
+.admin-forum-report-card__reason strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--color-primary-950);
+  font-family: var(--font-body);
+}
+
+.admin-forum-report-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.admin-forum-report-card__review {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 210px)
+    minmax(280px, 1fr)
+    auto;
+  align-items: end;
+  gap: 13px;
+  padding: 18px 20px;
+  border-top: 1px solid
+    rgba(23, 35, 63, 0.07);
+  background: #f8fafd;
+}
+
+.admin-forum-report-card__reviewer {
+  grid-column: 1 / -1;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+}
+
+.admin-status--report-pending {
+  background: rgba(199, 139, 31, 0.11);
+  color: #966615;
+}
+
+.admin-status--report-reviewed {
+  background: rgba(36, 83, 173, 0.1);
+  color: #2453ad;
+}
+
+.admin-status--report-dismissed {
+  background: rgba(84, 96, 117, 0.11);
+  color: #536075;
+}
+
+.admin-status--report-action_taken {
+  background: rgba(36, 133, 89, 0.1);
+  color: #24734f;
+}
+
+@media (max-width: 1100px) {
+  .admin-forum-report-overview {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-forum-report-filters {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-forum-report-filters
+    .admin-search {
+    grid-column: 1 / -1;
+  }
+
+  .admin-forum-report-card__review {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-forum-report-card__review
+    .admin-primary-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-forum-report-overview,
+  .admin-forum-report-filters,
+  .admin-forum-report-card__people,
+  .admin-forum-report-card__review {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-forum-report-filters
+    .admin-search,
+  .admin-forum-report-card__review
+    .admin-primary-button {
+    grid-column: auto;
+  }
+
+  .admin-forum-report-card__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

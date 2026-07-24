@@ -140,3 +140,69 @@ export const updateAdminForumReplyModeration =
 
     return response.data.data;
   };
+
+
+  export const getAdminForumReportOverview =
+  async () => {
+    const response =
+      await api.get(
+        "/admin/forum/reports/overview"
+      );
+
+    return response.data.data;
+  };
+
+export const getAdminForumReports =
+  async ({
+    page = 1,
+    search = "",
+    status = "",
+    targetType = "",
+    reason = "",
+  } = {}) => {
+    const response =
+      await api.get(
+        "/admin/forum/reports",
+        {
+          params: {
+            page,
+
+            ...(search && {
+              search,
+            }),
+
+            ...(status && {
+              status,
+            }),
+
+            ...(targetType && {
+              targetType,
+            }),
+
+            ...(reason && {
+              reason,
+            }),
+          },
+        }
+      );
+
+    return response.data.data;
+  };
+
+export const updateAdminForumReport =
+  async ({
+    reportId,
+    status,
+    resolutionNote = "",
+  }) => {
+    const response =
+      await api.patch(
+        `/admin/forum/reports/${reportId}`,
+        {
+          status,
+          resolutionNote,
+        }
+      );
+
+    return response.data.data;
+  };

@@ -118,37 +118,56 @@ const ForumTopicCreatePage = () => {
         getForumCategories,
     });
 
-  const createMutation =
-    useMutation({
-      mutationFn:
-        createForumTopic,
+const createMutation =
+  useMutation({
+    mutationFn:
+      createForumTopic,
 
-      onSuccess: async (
-        data
-      ) => {
-        await queryClient.invalidateQueries(
-          {
-            queryKey: [
-              "forum-topics",
-            ],
-          }
-        );
+    onSuccess: async (
+      data
+    ) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [
+            "forum-topics",
+          ],
+        }),
 
-        navigate(
-          `/forum/${data.topic.slug}`,
-          {
-            replace: true,
-          }
-        );
-      },
+        queryClient.invalidateQueries({
+          queryKey: [
+            "forum-categories",
+          ],
+        }),
 
-      onError: (error) => {
-        setFormError(
-          error.message ||
-            "Forum konusu oluşturulamadı."
-        );
-      },
-    });
+        queryClient.invalidateQueries({
+          queryKey: [
+            "my-forum-overview",
+          ],
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [
+            "my-forum-topics",
+          ],
+        }),
+      ]);
+
+      navigate(
+        `/forum/${data.topic.slug}`,
+        {
+          replace: true,
+        }
+      );
+    },
+
+    onError: (error) => {
+      setFormError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Forum konusu oluşturulamadı."
+      );
+    },
+  });
 
   const handleChange = (
     event

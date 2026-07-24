@@ -1,11 +1,18 @@
 import {
   LogOut,
   Mail,
+  MessageCircle,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
+
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
 import Container from "../components/common/Container";
 import { useAuth } from "../context/AuthContext";
 
@@ -48,12 +55,14 @@ const AccountPage = () => {
         <div className="account-page__heading">
           <p>Üye alanı</p>
 
-          <h1>Hoş geldiniz, {user.firstName}.</h1>
+          <h1>
+            Hoş geldiniz, {user.firstName}.
+          </h1>
 
           <span>
-            Üye panelinin talepler, forum ve bağış
-            bölümleri sonraki aşamalarda buraya
-            eklenecek.
+            Hesap bilgilerinizi ve forum
+            hareketlerinizi bu alandan
+            yönetebilirsiniz.
           </span>
         </div>
 
@@ -74,7 +83,9 @@ const AccountPage = () => {
           <div className="account-summary__status">
             <span>
               <ShieldCheck size={17} />
-              {roleLabels[user.role] || user.role}
+
+              {roleLabels[user.role] ||
+                user.role}
             </span>
 
             <span>
@@ -93,6 +104,29 @@ const AccountPage = () => {
             <LogOut size={18} />
             Çıkış Yap
           </button>
+        </div>
+
+        <div className="account-navigation">
+          <Link
+            to="/hesabim/forum-hareketlerim"
+            className="account-navigation__item"
+          >
+            <div className="account-navigation__icon">
+              <MessageCircle size={23} />
+            </div>
+
+            <div>
+              <strong>
+                Forum Hareketlerim
+              </strong>
+
+              <span>
+                Açtığınız konuları ve
+                yazdığınız yanıtları
+                görüntüleyin.
+              </span>
+            </div>
+          </Link>
         </div>
       </Container>
     </section>

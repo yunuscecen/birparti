@@ -59,3 +59,41 @@ export const createForumReplySchema = z.object({
     .optional()
     .default(null),
 });
+
+export const createForumReportSchema = z.object({
+  targetType: z.enum(["topic", "reply"], {
+    message: "Geçerli bir içerik türü seçilmelidir.",
+  }),
+
+  targetId: z
+    .string()
+    .trim()
+    .regex(
+      /^[a-f\d]{24}$/i,
+      "Bildirilen içerik kimliği geçerli değil."
+    ),
+
+  reason: z.enum(
+    [
+      "spam",
+      "harassment",
+      "hate",
+      "misinformation",
+      "personal_data",
+      "other",
+    ],
+    {
+      message: "Geçerli bir bildirim nedeni seçilmelidir.",
+    }
+  ),
+
+  description: z
+    .string()
+    .trim()
+    .max(
+      1000,
+      "Bildirim açıklaması en fazla 1000 karakter olabilir."
+    )
+    .optional()
+    .default(""),
+});

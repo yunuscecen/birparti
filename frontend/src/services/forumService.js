@@ -78,3 +78,25 @@ export const createForumReply =
 
     return response.data.data;
   };
+
+
+  export const reportForumContent =
+  async ({
+    targetType,
+    targetId,
+    reason,
+    description = "",
+  }) => {
+    const response =
+      await api.post(
+        "/forum-reports",
+        {
+          targetType,
+          targetId,
+          reason,
+          description,
+        }
+      );
+
+    return response.data.data;
+  };
