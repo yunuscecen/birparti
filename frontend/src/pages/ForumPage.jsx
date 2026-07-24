@@ -1,0 +1,429 @@
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Lock,
+  MessageCircle,
+  Pin,
+  Search,
+  Plus,
+} from "lucide-react";
+import {
+  useEffect,
+  useState,
+} from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Link,
+  useSearchParams,
+} from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Container from "../components/common/Container";
+import {
+  getForumCategories,
+  getForumTopics,
+} from "../services/forumService";
+
+const formatDate = (date) => {
+  if (!date) {
+    return "—";
+  }
+
+  return new Intl.DateTimeFormat("tr-TR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date));
+};
+
+const ForumPage = () => {
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+const {
+  user,
+  isAuthenticated,
+} = useAuth();
+
+const privilegedRoles = [
+  "moderator",
+  "admin",
+  "superAdmin",
+];
+
+const userPermissions =
+  Array.isArray(user?.permissions)
+    ? user.permissions
+    : user?.permissions &&
+        typeof user.permissions ===
+          "object"
+      ? Object.entries(
+          user.permissions
+        )
+          .filter(
+            ([, enabled]) =>
+              Boolean(enabled)
+          )
+          .map(
+            ([permission]) =>
+              permission
+          )
+      : [];
+
+const canCreateTopic =
+  isAuthenticated &&
+  (privilegedRoles.includes(
+    user?.role
+  ) ||
+    userPermissions.includes(
+      "forum:create-topic"
+    ));
+  const category =
+    searchParams.get("kategori") || "";
+
+  const search =
+    searchParams.get("arama") || "";
+
+  const page = Math.max(
+    Number(searchParams.get("sayfa")) || 1,
+    1
+  );
+
+  const [searchInput, setSearchInput] =
+    useState(search);
+
+  useEffect(() => {
+    document.title = "Forum | Bir Parti";
+
+    return () => {
+      document.title = "Bir Parti";
+    };
+  }, []);
+
+  const categoriesQuery = useQuery({
+    queryKey: ["forum-categories"],
+    queryFn: getForumCategories,
+  });
+
+  const topicsQuery = useQuery({
+    queryKey: [
+      "forum-topics",
+      page,
+      category,
+      search,
+    ],
+
+    queryFn: () =>
+      getForumTopics({
+        page,
+        category,
+        search,
+      }),
+  });
+
+  const updateSearchParams = (updates) => {
+    const nextParams =
+      new URLSearchParams(searchParams);
+
+    Object.entries(updates).forEach(
+      ([key, value]) => {
+        if (value) {
+          nextParams.set(key, String(value));
+        } else {
+          nextParams.delete(key);
+        }
+      }
+    );
+
+    setSearchParams(nextParams);
+  };
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+
+    updateSearchParams({
+      arama: searchInput.trim(),
+      sayfa: "",
+    });
+  };
+
+  const categories =
+    categoriesQuery.data?.categories || [];
+
+  const topics =
+    topicsQuery.data?.topics || [];
+
+  const pagination =
+    topicsQuery.data?.pagination;
+
+  return (
+    <div className="forum-page">
+      <section className="forum-hero">
+        <Container>
+          <p className="forum-hero__eyebrow">
+            Birlikte konuşalım
+          </p>
+
+          <h1>Forum</h1>
+
+          <p>
+            Görüşlerinizi paylaşın, farklı
+            düşünceleri dinleyin ve ortak çözümler
+            geliştirin.
+          </p>
+        </Container>
+      </section>
+
+      <section className="forum-content">
+        <Container className="forum-layout">
+          <aside className="forum-sidebar">
+            <div className="forum-sidebar__heading">
+              <h2>Kategoriler</h2>
+            </div>
+
+            <button
+              type="button"
+              className={
+                !category
+                  ? "forum-category forum-category--active"
+                  : "forum-category"
+              }
+              onClick={() =>
+                updateSearchParams({
+                  kategori: "",
+                  sayfa: "",
+                })
+              }
+            >
+              <span>Tüm Konular</span>
+
+              <strong>
+                {categories.reduce(
+                  (total, item) =>
+                    total +
+                    (item.topicCount || 0),
+                  0
+                )}
+              </strong>
+            </button>
+
+            {categories.map((item) => (
+              <button
+                type="button"
+                key={item._id}
+                className={
+                  category === item.slug
+                    ? "forum-category forum-category--active"
+                    : "forum-category"
+                }
+                onClick={() =>
+                  updateSearchParams({
+                    kategori: item.slug,
+                    sayfa: "",
+                  })
+                }
+              >
+                <span>
+                  <i
+                    style={{
+                      backgroundColor:
+                        item.color,
+                    }}
+                  />
+
+                  {item.name}
+                </span>
+
+                <strong>
+                  {item.topicCount || 0}
+                </strong>
+              </button>
+            ))}
+          </aside>
+
+        <main className="forum-main">
+  <div className="forum-main__toolbar">
+    <form
+      className="forum-search"
+      onSubmit={handleSearch}
+    >
+      <Search size={19} />
+
+      <input
+        type="search"
+        value={searchInput}
+        onChange={(event) =>
+          setSearchInput(
+            event.target.value
+          )
+        }
+        placeholder="Forum konularında ara..."
+      />
+
+      <button type="submit">
+        Ara
+      </button>
+    </form>
+
+    {canCreateTopic && (
+      <Link
+        to="/forum/yeni-konu"
+        className="forum-primary-button"
+      >
+        <Plus size={17} />
+        Yeni Konu
+      </Link>
+    )}
+  </div>
+
+            {topicsQuery.isLoading ? (
+              <div className="forum-state">
+                <span className="auth-spinner" />
+                <p>Forum konuları yükleniyor...</p>
+              </div>
+            ) : topicsQuery.isError ? (
+              <div className="forum-state">
+                <h2>Konular alınamadı.</h2>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    topicsQuery.refetch()
+                  }
+                >
+                  Tekrar Dene
+                </button>
+              </div>
+            ) : (
+              <div className="forum-topic-list">
+                {topics.map((topic) => (
+                  <article
+                    className="forum-topic-card"
+                    key={topic._id}
+                  >
+                    <div className="forum-topic-card__content">
+                      <div className="forum-topic-card__badges">
+                        {topic.isPinned && (
+                          <span>
+                            <Pin size={13} />
+                            Sabit
+                          </span>
+                        )}
+
+                        {topic.status ===
+                          "locked" && (
+                          <span>
+                            <Lock size={13} />
+                            Kilitli
+                          </span>
+                        )}
+
+                        <span>
+                          {topic.category?.name}
+                        </span>
+                      </div>
+
+                      <h2>
+                        <Link
+                          to={`/forum/${topic.slug}`}
+                        >
+                          {topic.title}
+                        </Link>
+                      </h2>
+
+                      <p>
+                        {topic.body.length > 220
+                          ? `${topic.body.slice(
+                              0,
+                              220
+                            )}…`
+                          : topic.body}
+                      </p>
+
+                      <div className="forum-topic-card__author">
+                        <span>
+                          {topic.authorInfo?.name ||
+                            "Bir Parti"}
+                        </span>
+
+                        <span>
+                          {formatDate(
+                            topic.lastActivityAt
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="forum-topic-card__stats">
+                      <span>
+                        <MessageCircle size={17} />
+                        {topic.replyCount || 0}
+                      </span>
+
+                      <span>
+                        <Eye size={17} />
+                        {topic.viewCount || 0}
+                      </span>
+                    </div>
+                  </article>
+                ))}
+
+                {topics.length === 0 && (
+                  <div className="forum-state">
+                    <h2>Konu bulunamadı.</h2>
+                    <p>
+                      Arama veya kategori seçimini
+                      değiştirerek tekrar deneyin.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {pagination &&
+              pagination.totalPages > 1 && (
+                <div className="forum-pagination">
+                  <button
+                    type="button"
+                    disabled={pagination.page <= 1}
+                    onClick={() =>
+                      updateSearchParams({
+                        sayfa:
+                          pagination.page - 1,
+                      })
+                    }
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+
+                  <strong>
+                    {pagination.page} /{" "}
+                    {pagination.totalPages}
+                  </strong>
+
+                  <button
+                    type="button"
+                    disabled={
+                      pagination.page >=
+                      pagination.totalPages
+                    }
+                    onClick={() =>
+                      updateSearchParams({
+                        sayfa:
+                          pagination.page + 1,
+                      })
+                    }
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              )}
+          </main>
+        </Container>
+      </section>
+    </div>
+  );
+};
+
+export default ForumPage;

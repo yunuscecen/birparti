@@ -38,6 +38,16 @@ const adminNavigation = [
   path: "/admin/blog-kategorileri",
   icon: Tags,
 },
+{
+  label: "Forum Konuları",
+  path: "/admin/forum",
+  icon: MessageSquareText,
+},
+{
+  label: "Forum Kategorileri",
+  path: "/admin/forum-kategorileri",
+  icon: Tags,
+},
   {
   label: "Ana Sayfa",
   path: "/admin/anasayfa",

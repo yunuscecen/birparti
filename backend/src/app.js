@@ -13,7 +13,9 @@ import adminPageRoutes from "./routes/adminPageRoutes.js";
 import homePageRoutes from "./routes/homePageRoutes.js";
 import adminHomePageRoutes from "./routes/adminHomePageRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
+import forumRoutes from "./routes/forumRoutes.js";
 import adminBlogRoutes from "./routes/adminBlogRoutes.js";
+import adminForumRoutes from "./routes/adminForumRoutes.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -84,8 +86,10 @@ app.use("/api", adminProjectRoutes);
 app.use("/api", adminPageRoutes);
 app.use("/api", adminBlogRoutes);
 app.use("/api", homePageRoutes);
+app.use("/api", adminForumRoutes);
 app.use("/api", adminHomePageRoutes);
 app.use("/api", blogRoutes);
+app.use("/api", forumRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({

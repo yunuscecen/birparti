@@ -29,6 +29,12 @@ import AdminBlogCategoriesPage from "./pages/admin/AdminBlogCategoriesPage";
 import AdminBlogPostsPage from "./pages/admin/AdminBlogPostsPage";
 import AdminBlogPostCreatePage from "./pages/admin/AdminBlogPostCreatePage";
 import AdminBlogPostEditPage from "./pages/admin/AdminBlogPostEditPage";
+import ForumPage from "./pages/ForumPage";
+import ForumTopicDetailPage from "./pages/ForumTopicDetailPage";
+import ForumTopicCreatePage from "./pages/ForumTopicCreatePage";
+import AdminForumCategoriesPage from "./pages/admin/AdminForumCategoriesPage";
+import AdminForumTopicsPage from "./pages/admin/AdminForumTopicsPage";
+import AdminForumTopicModerationPage from "./pages/admin/AdminForumTopicModerationPage";
 
 const App = () => {
   return (
@@ -71,16 +77,24 @@ const App = () => {
   element={<BlogDetailPage />}
 />
 
-        <Route
-          path="/forum"
-          element={
-            <PlaceholderPage
-              eyebrow="Birlikte konuşalım"
-              title="Forum"
-              description="Forum konuları herkes tarafından listelenebilecek; detay ve yorum işlemleri üyelik kurallarına bağlı olacak."
-            />
-          }
-        />
+ <Route
+  path="/forum"
+  element={<ForumPage />}
+/>
+
+<Route
+  path="/forum/yeni-konu"
+  element={
+    <ProtectedRoute>
+      <ForumTopicCreatePage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/forum/:slug"
+  element={<ForumTopicDetailPage />}
+/>
 
         <Route
           path="/iletisim"
@@ -207,6 +221,21 @@ const App = () => {
 <Route
   path="blog-kategorileri"
   element={<AdminBlogCategoriesPage />}
+/>
+<Route
+  path="forum"
+  element={<AdminForumTopicsPage />}
+/>
+
+<Route
+  path="forum-kategorileri"
+  element={<AdminForumCategoriesPage />}
+/>
+<Route
+  path="forum/:topicId/moderasyon"
+  element={
+    <AdminForumTopicModerationPage />
+  }
 />
       </Route>
     </Routes>
