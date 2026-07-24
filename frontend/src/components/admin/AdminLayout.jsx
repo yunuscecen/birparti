@@ -7,6 +7,7 @@ import {
   FileText,
   Newspaper,
   Settings,
+  House,
   Users,
   Tags,
   X,
@@ -27,6 +28,21 @@ const adminNavigation = [
     icon: Gauge,
     end: true,
   },
+  {
+  label: "Blog Yazıları",
+  path: "/admin/blog",
+  icon: Newspaper,
+},
+{
+  label: "Blog Kategorileri",
+  path: "/admin/blog-kategorileri",
+  icon: Tags,
+},
+  {
+  label: "Ana Sayfa",
+  path: "/admin/anasayfa",
+  icon: House,
+},
   {
     label: "Üye Yönetimi",
     path: "/admin/uyeler",
@@ -51,10 +67,7 @@ const adminNavigation = [
 
 const futureNavigation = [
 
-  {
-    label: "Blog",
-    icon: Newspaper,
-  },
+
   {
     label: "Talepler",
     icon: MessageSquareText,

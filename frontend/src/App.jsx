@@ -20,9 +20,15 @@ import AdminProjectCreatePage from "./pages/admin/AdminProjectCreatePage";
 import AdminProjectEditPage from "./pages/admin/AdminProjectEditPage";
 import AdminPagesPage from "./pages/admin/AdminPagesPage";
 import AdminPageEditPage from "./pages/admin/AdminPageEditPage";
-
+import AdminHomePage from "./pages/admin/AdminHomePage";
+import BlogPage from "./pages/BlogPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
+import AdminBlogCategoriesPage from "./pages/admin/AdminBlogCategoriesPage";
+import AdminBlogPostsPage from "./pages/admin/AdminBlogPostsPage";
+import AdminBlogPostCreatePage from "./pages/admin/AdminBlogPostCreatePage";
+import AdminBlogPostEditPage from "./pages/admin/AdminBlogPostEditPage";
 
 const App = () => {
   return (
@@ -55,16 +61,15 @@ const App = () => {
           }
         />
 
-        <Route
-          path="/blog"
-          element={
-            <PlaceholderPage
-              eyebrow="Görüşler ve haberler"
-              title="Blog"
-              description="Blog yazıları, kategoriler, etiketler ve SEO alanları admin panelinden yönetilecek."
-            />
-          }
-        />
+       <Route
+  path="/blog"
+  element={<BlogPage />}
+/>
+
+<Route
+  path="/blog/:slug"
+  element={<BlogDetailPage />}
+/>
 
         <Route
           path="/forum"
@@ -179,6 +184,29 @@ const App = () => {
 <Route
   path="sayfalar/:slug/duzenle"
   element={<AdminPageEditPage />}
+/>
+<Route
+  path="anasayfa"
+  element={<AdminHomePage />}
+/>
+<Route
+  path="blog"
+  element={<AdminBlogPostsPage />}
+/>
+
+<Route
+  path="blog/yeni"
+  element={<AdminBlogPostCreatePage />}
+/>
+
+<Route
+  path="blog/:postId/duzenle"
+  element={<AdminBlogPostEditPage />}
+/>
+
+<Route
+  path="blog-kategorileri"
+  element={<AdminBlogCategoriesPage />}
 />
       </Route>
     </Routes>

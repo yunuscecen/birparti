@@ -1454,3 +1454,142 @@
     width: 100%;
   }
 }
+
+
+.admin-home-editor {
+  display: grid;
+  gap: 23px;
+}
+
+.admin-home-cards {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 24px;
+}
+
+.admin-home-card-editor {
+  display: grid;
+  align-content: start;
+  gap: 15px;
+  padding: 18px;
+  border: 1px solid rgba(23, 35, 63, 0.08);
+  border-radius: 14px;
+  background: #f8fafd;
+}
+
+.admin-home-card-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.admin-home-card-editor__header strong {
+  color: var(--color-primary-950);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.admin-home-card-editor__header button {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(177, 45, 70, 0.08);
+  color: #a62e47;
+  cursor: pointer;
+}
+
+.admin-home-card-editor__header
+  button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.admin-button-editor {
+  display: grid;
+  align-content: start;
+  gap: 13px;
+  padding: 17px;
+  border: 1px solid rgba(23, 35, 63, 0.08);
+  border-radius: 13px;
+  background: #f8fafd;
+}
+
+.admin-button-editor h3 {
+  margin: 0;
+  color: var(--color-primary-950);
+  font-family: var(--font-body);
+  font-size: 0.81rem;
+  font-weight: 700;
+}
+
+.admin-home-editor__actions {
+  position: sticky;
+  z-index: 20;
+  bottom: 18px;
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px;
+  border: 1px solid rgba(23, 35, 63, 0.07);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(18px);
+}
+
+.admin-home-editor__actions
+  .admin-primary-button {
+  min-width: 220px;
+  min-height: 48px;
+}
+
+@media (max-width: 1100px) {
+  .admin-home-cards {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-home-cards {
+    grid-template-columns: 1fr;
+    padding: 15px;
+  }
+
+  .admin-home-editor__actions {
+    bottom: 8px;
+  }
+
+  .admin-home-editor__actions
+    .admin-primary-button {
+    width: 100%;
+  }
+}
+
+.admin-blog-author {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid rgba(23, 35, 63, 0.08);
+  border-radius: 11px;
+  background: #f7f9fc;
+}
+
+.admin-blog-author strong {
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.admin-blog-author span {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.69rem;
+}

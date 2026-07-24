@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "seed:projects": "node src/seeds/seedProjects.js",
     "seed:pages": "node src/seeds/seedPages.js",
-    "seed:super-admin": "node src/seeds/seedSuperAdmin.js"
+    "seed:super-admin": "node src/seeds/seedSuperAdmin.js",
+    "seed:blog": "node src/seeds/seedBlog.js"
   },
   "keywords": [],
   "author": "",

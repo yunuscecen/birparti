@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import App from "./App";
 import "./styles/auth.css";
 import "./styles/admin.css";
+import "./styles/blog.css";
 import queryClient from "./config/queryClient";
 
 
