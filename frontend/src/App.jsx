@@ -37,6 +37,10 @@ import AdminForumTopicsPage from "./pages/admin/AdminForumTopicsPage";
 import AdminForumTopicModerationPage from "./pages/admin/AdminForumTopicModerationPage";
 import MyForumActivityPage from "./pages/MyForumActivityPage";
 import AdminForumReportsPage from "./pages/admin/AdminForumReportsPage";
+import MyForumNotificationsPage from "./pages/MyForumNotificationsPage";
+import MyForumReportsPage from "./pages/MyForumReportsPage";
+import MyForumReplyEditPage from "./pages/MyForumReplyEditPage";
+import MyForumTopicEditPage from "./pages/MyForumTopicEditPage";
 
 const App = () => {
   return (
@@ -93,14 +97,9 @@ const App = () => {
   }
 />
 
-<Route
-  path="/hesabim/forum-hareketlerim"
-  element={
-    <ProtectedRoute>
-      <MyForumActivityPage />
-    </ProtectedRoute>
-  }
-/>
+
+
+
 
 <Route
   path="/forum/:slug"
@@ -158,6 +157,47 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+<Route
+  path="/hesabim/forum-konusu/:topicId/duzenle"
+  element={
+    <ProtectedRoute>
+      <MyForumTopicEditPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/hesabim/forum-yaniti/:replyId/duzenle"
+  element={
+    <ProtectedRoute>
+      <MyForumReplyEditPage />
+    </ProtectedRoute>
+  }
+/>
+        <Route
+  path="/hesabim/bildirdigim-icerikler"
+  element={
+    <ProtectedRoute>
+      <MyForumReportsPage />
+    </ProtectedRoute>
+  }
+/>
+        <Route
+  path="/hesabim/forum-hareketlerim"
+  element={
+    <ProtectedRoute>
+      <MyForumActivityPage />
+    </ProtectedRoute>
+  }
+/>
+        <Route
+  path="/hesabim/forum-bildirimlerim"
+  element={
+    <ProtectedRoute>
+      <MyForumNotificationsPage />
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="*"

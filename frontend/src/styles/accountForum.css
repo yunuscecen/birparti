@@ -386,3 +386,29 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.account-forum-item__actions {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.account-forum-item__actions
+  .account-forum-link {
+  width: auto;
+}
+
+@media (max-width: 640px) {
+  .account-forum-item__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .account-forum-item__actions
+    .account-forum-link {
+    flex: 1;
+  }
+}

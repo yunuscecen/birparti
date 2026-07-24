@@ -9,6 +9,8 @@ import "./styles/admin.css";
 import "./styles/blog.css";
 import "./styles/accountForum.css";
 import "./styles/forum.css";
+import "./styles/accountForumReports.css";
+import "./styles/accountForumNotifications.css";
 import queryClient from "./config/queryClient";
 
 

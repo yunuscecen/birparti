@@ -1,12 +1,18 @@
 import {
+  Bell,
   LogOut,
   Mail,
   MessageCircle,
   ShieldCheck,
+  Flag,
   UserRound,
 } from "lucide-react";
 
 import { useEffect } from "react";
+
+import {
+  useQuery,
+} from "@tanstack/react-query";
 
 import {
   Link,
@@ -16,17 +22,25 @@ import {
 import Container from "../components/common/Container";
 import { useAuth } from "../context/AuthContext";
 
+import {
+  getMyForumNotifications,
+} from "../services/accountForumService";
+
 const roleLabels = {
   member: "Üye",
   moderator: "Moderatör",
-  contentEditor: "İçerik editörü",
-  financeManager: "Bağış yöneticisi",
+  contentEditor:
+    "İçerik editörü",
+  financeManager:
+    "Bağış yöneticisi",
   admin: "Yönetici",
-  superAdmin: "Süper yönetici",
+  superAdmin:
+    "Süper yönetici",
 };
 
 const AccountPage = () => {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const {
     user,
@@ -34,20 +48,43 @@ const AccountPage = () => {
   } = useAuth();
 
   useEffect(() => {
-    document.title = "Hesabım | Bir Parti";
+    document.title =
+      "Hesabım | Bir Parti";
 
     return () => {
-      document.title = "Bir Parti";
+      document.title =
+        "Bir Parti";
     };
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
+  const notificationsQuery =
+    useQuery({
+      queryKey: [
+        "my-forum-notifications",
+        "account-summary",
+      ],
 
-    navigate("/", {
-      replace: true,
+      queryFn: () =>
+        getMyForumNotifications({
+          page: 1,
+          limit: 1,
+        }),
+
+      retry: false,
     });
-  };
+
+  const unreadCount =
+    notificationsQuery.data
+      ?.unreadCount || 0;
+
+  const handleLogout =
+    async () => {
+      await logout();
+
+      navigate("/", {
+        replace: true,
+      });
+    };
 
   return (
     <section className="account-page">
@@ -56,13 +93,16 @@ const AccountPage = () => {
           <p>Üye alanı</p>
 
           <h1>
-            Hoş geldiniz, {user.firstName}.
+            Hoş geldiniz,{" "}
+            {user.firstName}.
           </h1>
 
           <span>
-            Hesap bilgilerinizi ve forum
-            hareketlerinizi bu alandan
-            yönetebilirsiniz.
+            Hesap bilgilerinizi,
+            forum hareketlerinizi ve
+            bildirimlerinizi bu
+            alandan takip
+            edebilirsiniz.
           </span>
         </div>
 
@@ -72,7 +112,9 @@ const AccountPage = () => {
           </div>
 
           <div className="account-summary__identity">
-            <h2>{user.fullName}</h2>
+            <h2>
+              {user.fullName}
+            </h2>
 
             <p>
               <Mail size={17} />
@@ -82,10 +124,13 @@ const AccountPage = () => {
 
           <div className="account-summary__status">
             <span>
-              <ShieldCheck size={17} />
+              <ShieldCheck
+                size={17}
+              />
 
-              {roleLabels[user.role] ||
-                user.role}
+              {roleLabels[
+                user.role
+              ] || user.role}
             </span>
 
             <span>
@@ -99,7 +144,9 @@ const AccountPage = () => {
           <button
             type="button"
             className="account-logout"
-            onClick={handleLogout}
+            onClick={
+              handleLogout
+            }
           >
             <LogOut size={18} />
             Çıkış Yap
@@ -112,7 +159,9 @@ const AccountPage = () => {
             className="account-navigation__item"
           >
             <div className="account-navigation__icon">
-              <MessageCircle size={23} />
+              <MessageCircle
+                size={23}
+              />
             </div>
 
             <div>
@@ -121,12 +170,63 @@ const AccountPage = () => {
               </strong>
 
               <span>
-                Açtığınız konuları ve
-                yazdığınız yanıtları
+                Açtığınız konuları
+                ve yazdığınız
+                yanıtları
                 görüntüleyin.
               </span>
             </div>
           </Link>
+
+          <Link
+            to="/hesabim/forum-bildirimlerim"
+            className="account-navigation__item account-navigation__item--notification"
+          >
+            <div className="account-navigation__icon">
+              <Bell size={23} />
+            </div>
+
+            <div>
+              <strong>
+                Forum Bildirimlerim
+              </strong>
+
+              <span>
+                Yanıtları, cevapları
+                ve bildirim
+                sonuçlarını takip
+                edin.
+              </span>
+            </div>
+
+            {unreadCount > 0 && (
+              <span className="account-navigation__badge">
+                {unreadCount > 99
+                  ? "99+"
+                  : unreadCount}
+              </span>
+            )}
+          </Link>
+          <Link
+  to="/hesabim/bildirdigim-icerikler"
+  className="account-navigation__item"
+>
+  <div className="account-navigation__icon">
+    <Flag size={23} />
+  </div>
+
+  <div>
+    <strong>
+      Bildirdiğim İçerikler
+    </strong>
+
+    <span>
+      Daha önce bildirdiğiniz
+      konuların ve yanıtların
+      durumunu takip edin.
+    </span>
+  </div>
+</Link>
         </div>
       </Container>
     </section>

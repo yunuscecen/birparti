@@ -6,6 +6,7 @@ import {
   ExternalLink,
   EyeOff,
   FileText,
+  Pencil,
   Lock,
   MessageCircle,
 } from "lucide-react";
@@ -513,23 +514,31 @@ const MyForumActivityPage =
                         </div>
 
                         {[
-                          "open",
-                          "locked",
-                        ].includes(
-                          topic.status
-                        ) && (
-                          <Link
-                            to={`/forum/${topic.slug}`}
-                            className="account-forum-link"
-                          >
-                            <ExternalLink
-                              size={
-                                16
-                              }
-                            />
-                            Konuyu Aç
-                          </Link>
-                        )}
+  "open",
+  "locked",
+].includes(
+  topic.status
+) && (
+  <div className="account-forum-item__actions">
+    <Link
+      to={`/hesabim/forum-konusu/${topic._id}/duzenle`}
+      className="account-forum-link"
+    >
+      <Pencil size={16} />
+      Düzenle
+    </Link>
+
+    <Link
+      to={`/forum/${topic.slug}`}
+      className="account-forum-link"
+    >
+      <ExternalLink
+        size={16}
+      />
+      Konuyu Aç
+    </Link>
+  </div>
+)}
                       </article>
                     )
                   )}
@@ -623,26 +632,38 @@ const MyForumActivityPage =
                           </span>
                         </div>
 
-                        {reply.topic &&
-                          [
-                            "open",
-                            "locked",
-                          ].includes(
-                            reply.topic
-                              .status
-                          ) && (
-                            <Link
-                              to={`/forum/${reply.topic.slug}`}
-                              className="account-forum-link"
-                            >
-                              <ExternalLink
-                                size={
-                                  16
-                                }
-                              />
-                              Konuya Git
-                            </Link>
-                          )}
+                       {reply.topic &&
+  reply.status ===
+    "published" &&
+  [
+    "open",
+    "locked",
+  ].includes(
+    reply.topic.status
+  ) && (
+    <div className="account-forum-item__actions">
+      <Link
+        to={`/hesabim/forum-yaniti/${reply._id}/duzenle`}
+        className="account-forum-link"
+      >
+        <Pencil size={16} />
+        Düzenle
+      </Link>
+
+      <Link
+        to={
+          `/forum/${reply.topic.slug}` +
+          `#yanit-${reply._id}`
+        }
+        className="account-forum-link"
+      >
+        <ExternalLink
+          size={16}
+        />
+        Yanıta Git
+      </Link>
+    </div>
+  )}
                       </article>
                     )
                   )}

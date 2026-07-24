@@ -7,6 +7,7 @@ import User from "../models/User.js";
 
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import createForumNotification from "../services/forumNotificationService.js";
 
 const reportStatuses = [
   "pending",
@@ -519,7 +520,79 @@ export const updateAdminForumReport =
     }
 
     await report.save();
+if (status !== "pending") {
+  const notificationSettings = {
+    reviewed: {
+      type:
+        "report_reviewed",
 
+      title:
+        "Forum bildiriminiz incelendi",
+
+      message:
+        "Gönderdiğiniz forum bildirimi yönetim ekibi tarafından incelendi.",
+    },
+
+    dismissed: {
+      type:
+        "report_dismissed",
+
+      title:
+        "Forum bildiriminiz sonuçlandırıldı",
+
+      message:
+        "Gönderdiğiniz forum bildirimi incelendi ve işlem gerektirmediğine karar verildi.",
+    },
+
+    action_taken: {
+      type:
+        "report_action_taken",
+
+      title:
+        "Forum bildiriminiz için işlem yapıldı",
+
+      message:
+        "Gönderdiğiniz forum bildirimi incelendi ve ilgili içerik hakkında işlem yapıldı.",
+    },
+  };
+
+  const notification =
+    notificationSettings[status];
+
+  if (notification) {
+    await createForumNotification({
+      recipient:
+        report.reporter,
+
+      actor:
+        reviewerId,
+
+      type:
+        notification.type,
+
+      topic:
+        report.topic,
+
+      reply:
+        report.reply,
+
+      report:
+        report._id,
+
+      title:
+        notification.title,
+
+      message:
+        notification.message,
+
+      link:
+        "/hesabim/forum-bildirimlerim",
+
+      uniqueKey:
+        `forum-report-status:${report._id}:${status}`,
+    });
+  }
+}
     await report.populate([
       {
         path: "reporter",

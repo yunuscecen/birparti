@@ -76,6 +76,15 @@ const forumTopicSchema = new mongoose.Schema(
       default: Date.now,
       index: true,
     },
+    isEdited: {
+  type: Boolean,
+  default: false,
+},
+
+editedAt: {
+  type: Date,
+  default: null,
+},
 
     lastReplyAt: {
       type: Date,

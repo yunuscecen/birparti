@@ -1037,3 +1037,23 @@
 .forum-message[id^="yanit-"] {
   scroll-margin-top: 115px;
 }
+
+.forum-message--highlighted {
+  animation:
+    forum-message-highlight
+    2.2s ease;
+}
+
+@keyframes forum-message-highlight {
+  0%,
+  100% {
+    box-shadow: none;
+  }
+
+  20%,
+  70% {
+    box-shadow:
+      0 0 0 4px
+      rgba(36, 83, 173, 0.15);
+  }
+}

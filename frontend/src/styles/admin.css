@@ -294,6 +294,7 @@
 
 .admin-panel-card {
   overflow: hidden;
+  margin-top:10px;
   border: 1px solid rgba(23, 35, 63, 0.06);
   border-radius: 18px;
   background: #ffffff;

@@ -25,6 +25,8 @@ import {
 
 import {
   Link,
+  useLocation,
+  useNavigate,
   useParams,
 } from "react-router-dom";
 
@@ -67,7 +69,8 @@ const getErrorMessage = (
 
 const ForumTopicDetailPage = () => {
   const { slug } = useParams();
-
+const location =
+  useLocation();
   const queryClient =
     useQueryClient();
 
@@ -175,6 +178,55 @@ const closeReportModal = () => {
         "Bir Parti";
     };
   }, [topic]);
+
+useEffect(() => {
+  if (
+    !location.hash ||
+    replies.length === 0
+  ) {
+    return undefined;
+  }
+
+  const targetId =
+    decodeURIComponent(
+      location.hash.slice(1)
+    );
+
+  const timeout =
+    window.setTimeout(() => {
+      const targetElement =
+        document.getElementById(
+          targetId
+        );
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+
+        targetElement.classList.add(
+          "forum-message--highlighted"
+        );
+
+        window.setTimeout(() => {
+          targetElement.classList.remove(
+            "forum-message--highlighted"
+          );
+        }, 2200);
+      }
+    }, 150);
+
+  return () => {
+    window.clearTimeout(
+      timeout
+    );
+  };
+}, [
+  location.hash,
+  replies,
+]);
+
 
   const replyMutation =
     useMutation({
@@ -358,16 +410,24 @@ queryClient.invalidateQueries({
 
     setReplyError("");
 
-    await replyMutation.mutateAsync({
-      slug,
+    try {
+  await replyMutation.mutateAsync({
+    slug,
 
-      body:
-        replyBody.trim(),
+    body:
+      replyBody.trim(),
 
-      replyToReplyId:
-        replyTarget?.id ||
-        null,
-    });
+    replyToReplyId:
+      replyTarget?.id ||
+      null,
+  });
+} catch {
+  /*
+   * Hata mesajı replyMutation
+   * içindeki onError tarafından
+   * ekranda gösteriliyor.
+   */
+}
   };
 
   const replyForm = (
@@ -593,6 +653,15 @@ queryClient.invalidateQueries({
               )}
             </span>
 
+            {topic.isEdited && (
+  <span>
+    Düzenlendi:{" "}
+    {formatDate(
+      topic.editedAt
+    )}
+  </span>
+)}
+
             <span>
               <MessageCircle
                 size={15}
@@ -771,20 +840,29 @@ queryClient.invalidateQueries({
   id={`yanit-${childReply._id}`}
   className="forum-message forum-message--child"
 >
-                              <header>
-                                <strong>
-                                  {childReply
-                                    .authorInfo
-                                    ?.name ||
-                                    "Forum Üyesi"}
-                                </strong>
+                           <header>
+  <strong>
+    {childReply
+      .authorInfo
+      ?.name ||
+      "Forum Üyesi"}
+  </strong>
 
-                                <span>
-                                  {formatDate(
-                                    childReply.createdAt
-                                  )}
-                                </span>
-                              </header>
+  <span>
+    {formatDate(
+      childReply.createdAt
+    )}
+  </span>
+
+  {childReply.isEdited && (
+    <span>
+      Düzenlendi:{" "}
+      {formatDate(
+        childReply.editedAt
+      )}
+    </span>
+  )}
+</header>
 
                               <div className="forum-message__body">
                                 {childReply

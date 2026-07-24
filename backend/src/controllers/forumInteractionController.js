@@ -6,7 +6,7 @@ import ForumReply from "../models/ForumReply.js";
 import ForumTopic from "../models/ForumTopic.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-
+import createForumNotification from "../services/forumNotificationService.js";
 const createBaseSlug = (value = "") => {
   return slugify(value, {
     lower: true,
@@ -329,6 +329,77 @@ export const createForumReply = asyncHandler(
         select: "firstName lastName role",
       },
     ]);
+
+const actorId =
+  req.user?._id ||
+  req.user?.id;
+
+if (targetReply) {
+  /*
+   * Bir kullanıcı başka bir yanıta cevap verdi.
+   */
+  await createForumNotification({
+    recipient:
+      targetReply.author,
+
+    actor:
+      actorId,
+
+    type:
+      "reply_reply",
+
+    topic:
+      topic._id,
+
+    reply:
+      reply._id,
+
+    title:
+      "Forum yanıtınıza cevap geldi",
+
+    message:
+      `${authorName}, forumdaki yanıtınıza cevap verdi.`,
+
+    link:
+      `/forum/${topic.slug}#yanit-${reply._id}`,
+
+    uniqueKey:
+      `forum-reply-reply:${reply._id}`,
+  });
+} else {
+  /*
+   * Kullanıcı doğrudan forum konusuna
+   * ana yanıt gönderdi.
+   */
+  await createForumNotification({
+    recipient:
+      topic.author,
+
+    actor:
+      actorId,
+
+    type:
+      "topic_reply",
+
+    topic:
+      topic._id,
+
+    reply:
+      reply._id,
+
+    title:
+      "Forum konunuza yeni yanıt geldi",
+
+    message:
+      `${authorName}, “${topic.title}” başlıklı konunuza yanıt verdi.`,
+
+    link:
+      `/forum/${topic.slug}#yanit-${reply._id}`,
+
+    uniqueKey:
+      `forum-topic-reply:${reply._id}`,
+  });
+}
 
     res.status(201).json({
       success: true,
