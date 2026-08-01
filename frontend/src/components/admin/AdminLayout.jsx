@@ -80,6 +80,11 @@ const adminNavigation = [
   path: "/admin/blog-kategorileri",
   icon: Tags,
 },
+{
+  label: "Talepler",
+  path: "/admin/talepler",
+  icon: MessageSquareText,
+},
 
  
  
@@ -89,10 +94,7 @@ const adminNavigation = [
 const futureNavigation = [
 
 
-  {
-    label: "Talepler",
-    icon: MessageSquareText,
-  },
+ 
   {
     label: "Site Ayarları",
     icon: Settings,

@@ -11,6 +11,8 @@ import "./styles/accountForum.css";
 import "./styles/forum.css";
 import "./styles/accountForumReports.css";
 import "./styles/accountForumNotifications.css";
+import "./styles/adminContactRequests.css";
+import "./styles/accountContactRequests.css";
 import queryClient from "./config/queryClient";
 
 

@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
 
 import AccountPage from "./pages/AccountPage";
+import MyContactRequestsPage from "./pages/MyContactRequestsPage";
 import ContentPage from "./pages/ContentPage";
 import HomePage from "./pages/Homepage";
 import LoginPage from "./pages/LoginPage";
@@ -41,6 +42,9 @@ import MyForumNotificationsPage from "./pages/MyForumNotificationsPage";
 import MyForumReportsPage from "./pages/MyForumReportsPage";
 import MyForumReplyEditPage from "./pages/MyForumReplyEditPage";
 import MyForumTopicEditPage from "./pages/MyForumTopicEditPage";
+import AdminContactRequestsPage from "./pages/admin/AdminContactRequestsPage";
+import AdminContactRequestDetailPage from "./pages/admin/AdminContactRequestDetailPage";
+import ContactPage from "./pages/ContactPage";
 
 const App = () => {
   return (
@@ -106,16 +110,10 @@ const App = () => {
   element={<ForumTopicDetailPage />}
 />
 
-        <Route
-          path="/iletisim"
-          element={
-            <PlaceholderPage
-              eyebrow="Görüşünüz değerli"
-              title="İletişim ve Talepler"
-              description="Kullanıcılar bu alandan öneri, görüş, şikâyet veya taleplerini iletebilecek."
-            />
-          }
-        />
+       <Route
+  path="/iletisim"
+  element={<ContactPage />}
+/>
 
         <Route
           path="/bagis"
@@ -157,6 +155,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/hesabim/taleplerim"
+  element={
+    <ProtectedRoute>
+      <MyContactRequestsPage />
+    </ProtectedRoute>
+  }
+/>
 <Route
   path="/hesabim/forum-konusu/:topicId/duzenle"
   element={
@@ -289,11 +295,24 @@ const App = () => {
   }
 />
 <Route
+  path="talepler"
+  element={
+    <AdminContactRequestsPage />
+  }
+/>
+<Route
+  path="talepler/:requestId"
+  element={
+    <AdminContactRequestDetailPage />
+  }
+/>
+<Route
   path="forum/:topicId/moderasyon"
   element={
     <AdminForumTopicModerationPage />
   }
 />
+
       </Route>
     </Routes>
   );

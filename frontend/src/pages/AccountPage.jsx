@@ -1,10 +1,11 @@
 import {
   Bell,
+  Flag,
   LogOut,
   Mail,
   MessageCircle,
+  MessageSquareText,
   ShieldCheck,
-  Flag,
   UserRound,
 } from "lucide-react";
 
@@ -154,6 +155,28 @@ const AccountPage = () => {
         </div>
 
         <div className="account-navigation">
+          <Link
+  to="/hesabim/taleplerim"
+  className="account-navigation__item"
+>
+  <div className="account-navigation__icon">
+    <MessageSquareText
+      size={23}
+    />
+  </div>
+
+  <div>
+    <strong>
+      Taleplerim
+    </strong>
+
+    <span>
+      Gönderdiğiniz taleplerin
+      durumunu ve yönetimin
+      yanıtlarını takip edin.
+    </span>
+  </div>
+</Link>
           <Link
             to="/hesabim/forum-hareketlerim"
             className="account-navigation__item"

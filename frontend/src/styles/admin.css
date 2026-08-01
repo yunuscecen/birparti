@@ -391,7 +391,13 @@
 }
 
 .admin-table td strong,
-.admin-table td span {
+.admin-table
+  td
+  span:not(.admin-status):not(
+    .admin-contact-status
+  ):not(
+    .admin-contact-priority
+  ) {
   display: block;
 }
 
@@ -400,11 +406,16 @@
   font-size: 0.82rem;
 }
 
-.admin-table td > span:not(.admin-status) {
+.admin-table
+  td
+  > span:not(.admin-status):not(
+    .admin-contact-status
+  ):not(
+    .admin-contact-priority
+  ) {
   color: var(--color-text-muted);
   font-size: 0.7rem;
 }
-
 .admin-status {
   display: inline-flex !important;
   width: max-content;
