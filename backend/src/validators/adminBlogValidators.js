@@ -33,6 +33,29 @@ const optionalImageUrlSchema = z
     }
   );
 
+const optionalCloudinaryPublicIdSchema =
+  z
+    .string()
+    .trim()
+    .max(
+      500,
+      "Görsel kayıt kimliği çok uzun."
+    )
+    .refine(
+      (value) =>
+        !value ||
+        value.startsWith(
+          "birparti/"
+        ),
+      {
+        message:
+          "Geçersiz Cloudinary görsel kimliği.",
+      }
+    )
+    .optional()
+    .default("");
+
+
 export const adminBlogCategorySchema =
   z.object({
     name: z
@@ -154,18 +177,21 @@ export const adminBlogPostSchema = z.object({
   category: objectIdSchema,
 
   coverImage: z.object({
-    url: optionalImageUrlSchema,
+  url: optionalImageUrlSchema,
 
-    alt: z
-      .string()
-      .trim()
-      .max(
-        200,
-        "Görsel açıklaması çok uzun."
-      )
-      .optional()
-      .default(""),
-  }),
+  publicId:
+    optionalCloudinaryPublicIdSchema,
+
+  alt: z
+    .string()
+    .trim()
+    .max(
+      200,
+      "Görsel açıklaması çok uzun."
+    )
+    .optional()
+    .default(""),
+}),
 
   sections: z
     .array(blogSectionSchema)

@@ -5,7 +5,9 @@ import BlogCategory from "../models/BlogCategory.js";
 import BlogPost from "../models/BlogPost.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-
+import {
+  deleteCloudinaryImage,
+} from "../services/cloudinaryService.js";
 const createSlug = (value = "") => {
   return slugify(value, {
     lower: true,
@@ -68,6 +70,56 @@ const populateBlogPost = async (
 
   return post;
 };
+
+const deleteUnusedBlogCoverSafely =
+  async (publicId) => {
+    const normalizedPublicId =
+      String(
+        publicId || ""
+      ).trim();
+
+    if (!normalizedPublicId) {
+      return;
+    }
+
+    try {
+      /*
+       * Görsel başka bir blog
+       * yazısında kullanılıyorsa
+       * Cloudinary'den silme.
+       */
+      const imageStillInUse =
+        await BlogPost.exists({
+          "coverImage.publicId":
+            normalizedPublicId,
+        });
+
+      if (imageStillInUse) {
+        return;
+      }
+
+      await deleteCloudinaryImage(
+        normalizedPublicId
+      );
+    } catch (error) {
+      /*
+       * Veritabanı işlemi tamamlandıysa
+       * Cloudinary temizleme hatası
+       * isteği başarısız göstermemeli.
+       */
+      console.error(
+        "Blog cover image cleanup error:",
+        {
+          publicId:
+            normalizedPublicId,
+
+          message:
+            error?.message ||
+            "Bilinmeyen hata",
+        }
+      );
+    }
+  };
 
 /**
  * GET /api/admin/blog-categories
@@ -507,7 +559,11 @@ export const updateAdminBlogPost =
         404
       );
     }
-
+const previousCoverImagePublicId =
+  String(
+    post.coverImage
+      ?.publicId || ""
+  ).trim();
     const data = req.validatedBody;
 
     const category =
@@ -572,9 +628,25 @@ export const updateAdminBlogPost =
       post.publishedAt = null;
     }
 
-    await post.save();
+   await post.save();
 
-    await populateBlogPost(post);
+const nextCoverImagePublicId =
+  String(
+    post.coverImage
+      ?.publicId || ""
+  ).trim();
+
+if (
+  previousCoverImagePublicId &&
+  previousCoverImagePublicId !==
+    nextCoverImagePublicId
+) {
+  await deleteUnusedBlogCoverSafely(
+    previousCoverImagePublicId
+  );
+}
+
+await populateBlogPost(post);
 
     res.status(200).json({
       success: true,
@@ -608,7 +680,19 @@ export const deleteAdminBlogPost =
       );
     }
 
-    await post.deleteOne();
+    const coverImagePublicId =
+  String(
+    post.coverImage
+      ?.publicId || ""
+  ).trim();
+
+await post.deleteOne();
+
+if (coverImagePublicId) {
+  await deleteUnusedBlogCoverSafely(
+    coverImagePublicId
+  );
+}
 
     res.status(200).json({
       success: true,

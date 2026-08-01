@@ -1,7 +1,5 @@
 import {
   ArrowLeft,
-  Eye,
-  Image,
   Plus,
   Save,
   Trash2,
@@ -13,7 +11,7 @@ import {
 } from "react";
 
 import { Link } from "react-router-dom";
-
+import ImageUploadField from "./ImageUploadField";
 const createEmptySection = () => ({
   heading: "",
   body: "",
@@ -25,10 +23,11 @@ const initialFormState = {
   excerpt: "",
   category: "",
 
-  coverImage: {
-    url: "",
-    alt: "",
-  },
+coverImage: {
+  url: "",
+  publicId: "",
+  alt: "",
+},
 
   sections: [
     createEmptySection(),
@@ -65,14 +64,19 @@ const normalizePost = (post) => {
         ? post.category
         : post.category?._id || "",
 
-    coverImage: {
-      url:
-        post.coverImage?.url || "",
+   coverImage: {
+  url:
+    post.coverImage?.url ||
+    "",
 
-      alt:
-        post.coverImage?.alt || "",
-    },
+  publicId:
+    post.coverImage
+      ?.publicId || "",
 
+  alt:
+    post.coverImage?.alt ||
+    "",
+},
     sections:
       post.sections?.length > 0
         ? post.sections.map(
@@ -129,6 +133,12 @@ const AdminBlogPostForm = ({
     formError,
     setFormError,
   ] = useState("");
+  
+const [
+  isCoverImageUploading,
+  setIsCoverImageUploading,
+] = useState(false);
+
 
   useEffect(() => {
     setFormData(
@@ -172,6 +182,24 @@ const AdminBlogPostForm = ({
         [section]: {
           ...current[section],
           [field]: value,
+        },
+      })
+    );
+  };
+
+  const handleCoverImageChange =
+  (
+    url,
+    publicId = ""
+  ) => {
+    setFormData(
+      (current) => ({
+        ...current,
+
+        coverImage: {
+          ...current.coverImage,
+          url,
+          publicId,
         },
       })
     );
@@ -250,6 +278,11 @@ const AdminBlogPostForm = ({
   };
 
   const validateForm = () => {
+    if (
+  isCoverImageUploading
+) {
+  return "Kapak görselinin yüklenmesi tamamlanana kadar bekleyin.";
+}
     if (
       formData.title.trim()
         .length < 3
@@ -352,15 +385,19 @@ const AdminBlogPostForm = ({
         formData.category,
 
       coverImage: {
-        url:
-          formData.coverImage
-            .url.trim(),
+  url:
+    formData.coverImage
+      .url.trim(),
 
-        alt:
-          formData.coverImage
-            .alt.trim() ||
-          formData.title.trim(),
-      },
+  publicId:
+    formData.coverImage
+      .publicId.trim(),
+
+  alt:
+    formData.coverImage
+      .alt.trim() ||
+    formData.title.trim(),
+},
 
       sections,
       tags,
@@ -658,95 +695,44 @@ const AdminBlogPostForm = ({
             </div>
           </section>
 
-          <section className="admin-panel-card">
-            <div className="admin-panel-card__heading">
-              <div>
-                <p>Medya</p>
-                <h2>
-                  Kapak Görseli
-                </h2>
-              </div>
-            </div>
+       <section className="admin-panel-card">
+  <div className="admin-panel-card__heading">
+    <div>
+      <p>Medya</p>
 
-            <div className="admin-form">
-              <div className="admin-form-field">
-                <label>
-                  Görsel adresi
-                </label>
+      <h2>
+        Kapak Görseli
+      </h2>
+    </div>
+  </div>
 
-                <div className="admin-form-input-with-icon">
-                  <Image size={18} />
-
-                  <input
-                    type="url"
-                    value={
-                      formData
-                        .coverImage.url
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      updateNestedField(
-                        "coverImage",
-                        "url",
-                        event.target
-                          .value
-                      )
-                    }
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-field">
-                <label>
-                  Görsel açıklaması
-                </label>
-
-                <input
-                  value={
-                    formData
-                      .coverImage.alt
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    updateNestedField(
-                      "coverImage",
-                      "alt",
-                      event.target
-                        .value
-                    )
-                  }
-                  maxLength={200}
-                />
-              </div>
-
-              {formData.coverImage
-                .url && (
-                <div className="admin-image-preview">
-                  <img
-                    src={
-                      formData
-                        .coverImage
-                        .url
-                    }
-                    alt={
-                      formData
-                        .coverImage
-                        .alt ||
-                      "Blog görseli önizlemesi"
-                    }
-                  />
-
-                  <div>
-                    <Eye size={18} />
-                    Görsel önizlemesi
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
+  <ImageUploadField
+    id="blog-cover-image"
+    label="Blog kapak görseli"
+    folderKey="blog-cover"
+    altMaxLength={200}
+    value={
+      formData.coverImage.url
+    }
+    altValue={
+      formData.coverImage.alt
+    }
+    disabled={isSaving}
+    onUploadingChange={
+      setIsCoverImageUploading
+    }
+    onChange={
+      handleCoverImageChange
+    }
+    onAltChange={(alt) =>
+      updateNestedField(
+        "coverImage",
+        "alt",
+        alt
+      )
+    }
+  />
+</section>
 
           <section className="admin-panel-card">
             <div className="admin-panel-card__heading">
@@ -937,22 +923,29 @@ const AdminBlogPostForm = ({
             <button
               type="submit"
               className="admin-primary-button admin-project-save-button"
-              disabled={isSaving}
+             disabled={
+  isSaving ||
+  isCoverImageUploading
+}
             >
-              {isSaving ? (
-                <>
-                  <span className="auth-spinner auth-spinner--small" />
-                  Kaydediliyor...
-                </>
-              ) : (
-                <>
-                  <Save size={18} />
+             {isSaving ||
+isCoverImageUploading ? (
+  <>
+    <span className="auth-spinner auth-spinner--small" />
 
-                  {post
-                    ? "Değişiklikleri Kaydet"
-                    : "Blog Yazısını Oluştur"}
-                </>
-              )}
+    {isCoverImageUploading
+      ? "Görsel Yükleniyor..."
+      : "Kaydediliyor..."}
+  </>
+) : (
+  <>
+    <Save size={18} />
+
+    {post
+      ? "Değişiklikleri Kaydet"
+      : "Blog Yazısını Oluştur"}
+  </>
+)}
             </button>
 
             <Link

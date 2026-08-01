@@ -59,20 +59,27 @@ const blogPostSchema = new mongoose.Schema(
       index: true,
     },
 
-    coverImage: {
-      url: {
-        type: String,
-        trim: true,
-        default: "",
-      },
+   coverImage: {
+  url: {
+    type: String,
+    trim: true,
+    default: "",
+  },
 
-      alt: {
-        type: String,
-        trim: true,
-        maxlength: 200,
-        default: "",
-      },
-    },
+  publicId: {
+    type: String,
+    trim: true,
+    maxlength: 500,
+    default: "",
+  },
+
+  alt: {
+    type: String,
+    trim: true,
+    maxlength: 200,
+    default: "",
+  },
+},
 
     sections: {
       type: [blogSectionSchema],

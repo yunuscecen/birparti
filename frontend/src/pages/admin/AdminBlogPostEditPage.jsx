@@ -14,7 +14,7 @@ import {
   useParams,
 } from "react-router-dom";
 
-import AdminBlogPostForm from "../../components/admin/AdminBlogPostForm";
+import AdminBlogPostForm from "../../components/admin/AdminBlogPostForm.jsx";
 
 import {
   getAdminBlogCategories,
