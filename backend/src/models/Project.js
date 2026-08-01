@@ -22,25 +22,33 @@ const projectSectionSchema = new mongoose.Schema(
   }
 );
 
-const projectImageSchema = new mongoose.Schema(
-  {
-    url: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+const projectImageSchema =
+  new mongoose.Schema(
+    {
+      url: {
+        type: String,
+        trim: true,
+        default: "",
+      },
 
-    alt: {
-      type: String,
-      trim: true,
-      maxlength: 180,
-      default: "",
+      publicId: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: "",
+      },
+
+      alt: {
+        type: String,
+        trim: true,
+        maxlength: 180,
+        default: "",
+      },
     },
-  },
-  {
-    _id: false,
-  }
-);
+    {
+      _id: false,
+    }
+  );
 
 const projectSchema = new mongoose.Schema(
   {
@@ -74,13 +82,15 @@ const projectSchema = new mongoose.Schema(
       index: true,
     },
 
-    coverImage: {
-      type: projectImageSchema,
-      default: () => ({
-        url: "",
-        alt: "",
-      }),
-    },
+   coverImage: {
+  type: projectImageSchema,
+
+  default: () => ({
+    url: "",
+    publicId: "",
+    alt: "",
+  }),
+},
 
     sections: {
       type: [projectSectionSchema],
@@ -138,24 +148,36 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-projectSchema.pre("validate", function createSlug(next) {
-  if (this.title && (!this.slug || this.isModified("title"))) {
-    this.slug = slugify(this.title, {
-      lower: true,
-      strict: true,
-      locale: "tr",
-    });
-  }
+projectSchema.pre(
+  "validate",
+  function createSlug() {
+    if (
+      this.title &&
+      (
+        !this.slug ||
+        this.isModified("title")
+      )
+    ) {
+      this.slug = slugify(
+        this.title,
+        {
+          lower: true,
+          strict: true,
+          locale: "tr",
+        }
+      );
+    }
 
-  if (
-    this.status === "published" &&
-    !this.publishedAt
-  ) {
-    this.publishedAt = new Date();
+    if (
+      this.status ===
+        "published" &&
+      !this.publishedAt
+    ) {
+      this.publishedAt =
+        new Date();
+    }
   }
-
-  next();
-});
+);
 
 projectSchema.index({
   title: "text",

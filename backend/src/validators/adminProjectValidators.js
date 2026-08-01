@@ -29,6 +29,31 @@ const optionalUrlSchema = z
     }
   );
 
+const optionalCloudinaryPublicIdSchema =
+  z
+    .string()
+    .trim()
+    .max(
+      500,
+      "Görsel kayıt kimliği çok uzun."
+    )
+    .refine(
+      (value) => {
+        return (
+          !value ||
+          value.startsWith(
+            "birparti/"
+          )
+        );
+      },
+      {
+        message:
+          "Geçersiz Cloudinary görsel kimliği.",
+      }
+    )
+    .optional()
+    .default("");
+
 export const adminProjectCategorySchema =
   z.object({
     name: z
@@ -105,16 +130,22 @@ export const adminProjectSchema = z.object({
 
   category: objectIdSchema,
 
-  coverImage: z.object({
-    url: optionalUrlSchema,
+coverImage: z.object({
+  url: optionalUrlSchema,
 
-    alt: z
-      .string()
-      .trim()
-      .max(180, "Görsel açıklaması çok uzun.")
-      .optional()
-      .default(""),
-  }),
+  publicId:
+    optionalCloudinaryPublicIdSchema,
+
+  alt: z
+    .string()
+    .trim()
+    .max(
+      180,
+      "Görsel açıklaması çok uzun."
+    )
+    .optional()
+    .default(""),
+}),
 
   sections: z
     .array(projectSectionSchema)

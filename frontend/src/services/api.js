@@ -25,20 +25,12 @@ const api = axios.create({
   baseURL: apiBaseUrl,
   withCredentials: true,
   timeout: 15000,
-
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 const refreshClient = axios.create({
   baseURL: apiBaseUrl,
   withCredentials: true,
   timeout: 15000,
-
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 let refreshPromise = null;

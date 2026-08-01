@@ -17,6 +17,7 @@ import forumRoutes from "./routes/forumRoutes.js";
 import adminBlogRoutes from "./routes/adminBlogRoutes.js";
 import adminForumRoutes from "./routes/adminForumRoutes.js";
 import accountForumRoutes from "./routes/accountForumRoutes.js";
+import adminMediaRoutes from "./routes/adminMediaRoutes.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -95,7 +96,10 @@ app.use(
   "/api",
   accountForumRoutes
 );
-
+app.use(
+  "/api",
+  adminMediaRoutes
+);
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,

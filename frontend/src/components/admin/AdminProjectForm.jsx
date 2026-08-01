@@ -1,12 +1,11 @@
 import {
   ArrowLeft,
-  Eye,
-  Image,
   Plus,
   Save,
   Trash2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import ImageUploadField from "./ImageUploadField";
 import { Link } from "react-router-dom";
 
 const createEmptySection = () => ({
@@ -19,10 +18,11 @@ const initialFormState = {
   slug: "",
   summary: "",
   category: "",
-  coverImage: {
-    url: "",
-    alt: "",
-  },
+ coverImage: {
+  url: "",
+  publicId: "",
+  alt: "",
+},
   sections: [createEmptySection()],
   tagsText: "",
   status: "draft",
@@ -57,10 +57,19 @@ const normalizeInitialData = (project) => {
         ? project.category
         : project.category?._id || "",
 
-    coverImage: {
-      url: project.coverImage?.url || "",
-      alt: project.coverImage?.alt || "",
-    },
+ coverImage: {
+  url:
+    project.coverImage
+      ?.url || "",
+
+  publicId:
+    project.coverImage
+      ?.publicId || "",
+
+  alt:
+    project.coverImage
+      ?.alt || "",
+},
 
     sections,
 
@@ -93,7 +102,10 @@ const AdminProjectForm = ({
   );
 
   const [formError, setFormError] = useState("");
-
+const [
+  isCoverImageUploading,
+  setIsCoverImageUploading,
+] = useState(false);
   useEffect(() => {
     setFormData(normalizeInitialData(project));
     setFormError("");
@@ -127,6 +139,24 @@ const AdminProjectForm = ({
         [field]: value,
       },
     }));
+  };
+
+  const handleCoverImageChange =
+  (
+    url,
+    publicId = ""
+  ) => {
+    setFormData(
+      (current) => ({
+        ...current,
+
+        coverImage: {
+          ...current.coverImage,
+          url,
+          publicId,
+        },
+      })
+    );
   };
 
   const handleSectionChange = (
@@ -179,6 +209,11 @@ const AdminProjectForm = ({
   };
 
   const validateForm = () => {
+    if (
+  isCoverImageUploading
+) {
+  return "Kapak görselinin yüklenmesi tamamlanana kadar bekleyin.";
+}
     if (formData.title.trim().length < 3) {
       return "Proje başlığı en az 3 karakter olmalıdır.";
     }
@@ -250,12 +285,20 @@ const AdminProjectForm = ({
       summary: formData.summary.trim(),
       category: formData.category,
 
-      coverImage: {
-        url: formData.coverImage.url.trim(),
-        alt:
-          formData.coverImage.alt.trim() ||
-          formData.title.trim(),
-      },
+    coverImage: {
+  url:
+    formData.coverImage
+      .url.trim(),
+
+  publicId:
+    formData.coverImage
+      .publicId.trim(),
+
+  alt:
+    formData.coverImage
+      .alt.trim() ||
+    formData.title.trim(),
+},
 
       sections,
       tags,
@@ -480,82 +523,40 @@ const AdminProjectForm = ({
             </div>
           </section>
 
-          <section className="admin-panel-card">
-            <div className="admin-panel-card__heading">
-              <div>
-                <p>Medya</p>
+         <section className="admin-panel-card">
+  <div className="admin-panel-card__heading">
+    <div>
+      <p>Medya</p>
+      <h2>Kapak Görseli</h2>
+    </div>
+  </div>
 
-                <h2>Kapak Görseli</h2>
-              </div>
-            </div>
-
-            <div className="admin-form">
-              <div className="admin-form-field">
-                <label htmlFor="project-image-url">
-                  Görsel adresi
-                </label>
-
-                <div className="admin-form-input-with-icon">
-                  <Image size={18} />
-
-                  <input
-                    id="project-image-url"
-                    type="url"
-                    value={formData.coverImage.url}
-                    onChange={(event) =>
-                      handleNestedFieldChange(
-                        "coverImage",
-                        "url",
-                        event.target.value
-                      )
-                    }
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
-
-              <div className="admin-form-field">
-                <label htmlFor="project-image-alt">
-                  Görsel açıklaması
-                </label>
-
-                <input
-                  id="project-image-alt"
-                  value={formData.coverImage.alt}
-                  onChange={(event) =>
-                    handleNestedFieldChange(
-                      "coverImage",
-                      "alt",
-                      event.target.value
-                    )
-                  }
-                  placeholder="Görsel erişilebilirlik açıklaması"
-                  maxLength={180}
-                />
-              </div>
-
-              {formData.coverImage.url && (
-                <div className="admin-image-preview">
-                  <img
-                    src={formData.coverImage.url}
-                    alt={
-                      formData.coverImage.alt ||
-                      "Proje kapak görseli önizlemesi"
-                    }
-                    onError={(event) => {
-                      event.currentTarget.style.display =
-                        "none";
-                    }}
-                  />
-
-                  <div>
-                    <Eye size={18} />
-                    Kapak görseli önizlemesi
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
+  <ImageUploadField
+    id="project-cover-image"
+    label="Kapak görseli"
+    folderKey="project-cover"
+    value={
+      formData.coverImage.url
+    }
+    altValue={
+      formData.coverImage.alt
+    }
+    disabled={isSaving}
+    onUploadingChange={
+      setIsCoverImageUploading
+    }
+  onChange={
+  handleCoverImageChange
+}
+    onAltChange={(alt) =>
+      handleNestedFieldChange(
+        "coverImage",
+        "alt",
+        alt
+      )
+    }
+  />
+</section>
 
           <section className="admin-panel-card">
             <div className="admin-panel-card__heading">
@@ -730,22 +731,29 @@ const AdminProjectForm = ({
             <button
               type="submit"
               className="admin-primary-button admin-project-save-button"
-              disabled={isSaving}
+             disabled={
+  isSaving ||
+  isCoverImageUploading
+}
             >
-              {isSaving ? (
-                <>
-                  <span className="auth-spinner auth-spinner--small" />
-                  Kaydediliyor...
-                </>
-              ) : (
-                <>
-                  <Save size={18} />
+             {isSaving ||
+isCoverImageUploading ? (
+  <>
+    <span className="auth-spinner auth-spinner--small" />
 
-                  {project
-                    ? "Değişiklikleri Kaydet"
-                    : "Projeyi Oluştur"}
-                </>
-              )}
+    {isCoverImageUploading
+      ? "Görsel Yükleniyor..."
+      : "Kaydediliyor..."}
+  </>
+) : (
+  <>
+    <Save size={18} />
+
+    {project
+      ? "Değişiklikleri Kaydet"
+      : "Projeyi Oluştur"}
+  </>
+)}
             </button>
 
             <Link

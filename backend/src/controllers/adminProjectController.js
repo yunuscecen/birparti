@@ -6,6 +6,10 @@ import ProjectCategory from "../models/ProjectCategory.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
+import {
+  deleteCloudinaryImage,
+} from "../services/cloudinaryService.js";
+
 const createSlug = (value) => {
   return slugify(value || "", {
     lower: true,
@@ -48,6 +52,56 @@ const populateProject = async (project) => {
 
   return project;
 };
+
+const deleteUnusedProjectImageSafely =
+  async (publicId) => {
+    const normalizedPublicId =
+      String(
+        publicId || ""
+      ).trim();
+
+    if (!normalizedPublicId) {
+      return;
+    }
+
+    try {
+      /*
+       * Aynı görsel başka bir
+       * projede kullanılıyorsa silme.
+       */
+      const imageStillInUse =
+        await Project.exists({
+          "coverImage.publicId":
+            normalizedPublicId,
+        });
+
+      if (imageStillInUse) {
+        return;
+      }
+
+      await deleteCloudinaryImage(
+        normalizedPublicId
+      );
+    } catch (error) {
+      /*
+       * Proje işlemi başarıyla
+       * tamamlandıysa Cloudinary
+       * temizleme hatası API yanıtını
+       * başarısız hâle getirmemeli.
+       */
+      console.error(
+        "Project cover image cleanup error:",
+        {
+          publicId:
+            normalizedPublicId,
+
+          message:
+            error?.message ||
+            "Bilinmeyen hata",
+        }
+      );
+    }
+  };
 
 export const getAdminProjectCategories =
   asyncHandler(async (req, res) => {
@@ -352,6 +406,12 @@ export const updateAdminProject =
       );
     }
 
+    const previousCoverImagePublicId =
+  String(
+    project.coverImage
+      ?.publicId || ""
+  ).trim();
+
     const data = req.validatedBody;
 
     const category =
@@ -388,6 +448,22 @@ export const updateAdminProject =
 
     await project.save();
 
+const nextCoverImagePublicId =
+  String(
+    project.coverImage
+      ?.publicId || ""
+  ).trim();
+
+if (
+  previousCoverImagePublicId &&
+  previousCoverImagePublicId !==
+    nextCoverImagePublicId
+) {
+  await deleteUnusedProjectImageSafely(
+    previousCoverImagePublicId
+  );
+}
+
     await populateProject(project);
 
     res.status(200).json({
@@ -414,7 +490,11 @@ export const deleteAdminProject =
         404
       );
     }
-
+const coverImagePublicId =
+  String(
+    project.coverImage
+      ?.publicId || ""
+  ).trim();
     await project.deleteOne();
 
     res.status(200).json({
