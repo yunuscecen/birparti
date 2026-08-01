@@ -49,3 +49,30 @@ export const logoutUser = async () => {
     clearAccessToken();
   }
 };
+
+export const requestPasswordReset =
+  async (formData) => {
+    const response =
+      await api.post(
+        "/auth/forgot-password",
+        formData
+      );
+
+    return response.data;
+  };
+
+export const resetUserPassword =
+  async ({
+    token,
+    formData,
+  }) => {
+    const response =
+      await api.post(
+        `/auth/reset-password/${token}`,
+        formData
+      );
+
+    clearAccessToken();
+
+    return response.data;
+  };

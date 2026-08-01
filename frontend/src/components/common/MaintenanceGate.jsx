@@ -38,12 +38,17 @@ const MaintenanceGate = ({
       user?.role
     );
 
-  const isAllowedPath =
-    location.pathname ===
-      "/giris" ||
-    location.pathname.startsWith(
-      "/admin"
-    );
+ const isAllowedPath =
+  location.pathname ===
+    "/giris" ||
+  location.pathname ===
+    "/sifremi-unuttum" ||
+  location.pathname.startsWith(
+    "/sifre-sifirla/"
+  ) ||
+  location.pathname.startsWith(
+    "/admin"
+  );
 
   if (
     isLoading ||

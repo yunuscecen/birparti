@@ -12,9 +12,16 @@ import validateRequest from "../middleware/validateRequest.js";
 import {
   requireFeatureEnabled,
 } from "../middleware/featureFlagMiddleware.js";
+
 import {
+  forgotPassword,
+  resetPassword,
+} from "../controllers/passwordResetController.js";
+import {
+  forgotPasswordSchema,
   loginSchema,
   registerSchema,
+  resetPasswordSchema,
 } from "../validators/authValidators.js";
 
 const router = express.Router();
@@ -31,7 +38,25 @@ const authLimiter = rateLimit({
       "Çok fazla giriş veya kayıt isteği gönderildi. Lütfen biraz sonra tekrar deneyin.",
   },
 });
+const passwordResetLimiter =
+  rateLimit({
+    windowMs:
+      15 * 60 * 1000,
 
+    limit: 5,
+
+    standardHeaders:
+      "draft-8",
+
+    legacyHeaders: false,
+
+    message: {
+      success: false,
+
+      message:
+        "Çok fazla şifre sıfırlama isteği gönderdiniz. Lütfen daha sonra tekrar deneyin.",
+    },
+  });
 router.post(
   "/auth/register",
   authLimiter,
@@ -67,6 +92,24 @@ router.get(
   "/auth/me",
   requireAuth,
   getCurrentUser
+);
+
+router.post(
+  "/auth/forgot-password",
+  passwordResetLimiter,
+  validateRequest(
+    forgotPasswordSchema
+  ),
+  forgotPassword
+);
+
+router.post(
+  "/auth/reset-password/:token",
+  passwordResetLimiter,
+  validateRequest(
+    resetPasswordSchema
+  ),
+  resetPassword
 );
 
 export default router;

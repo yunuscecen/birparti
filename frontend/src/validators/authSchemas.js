@@ -68,3 +68,59 @@ export const registerFormSchema = z
       message: "Şifreler birbiriyle eşleşmiyor.",
     }
   );
+
+  export const forgotPasswordFormSchema =
+  z.object({
+    email: z
+      .string()
+      .trim()
+      .email(
+        "Geçerli bir e-posta adresi girin."
+      ),
+  });
+
+const resetPasswordSchema = z
+  .string()
+  .min(
+    8,
+    "Şifre en az 8 karakter olmalıdır."
+  )
+  .max(
+    72,
+    "Şifre en fazla 72 karakter olabilir."
+  )
+  .regex(
+    /[a-zçğıöşü]/,
+    "Şifre en az bir küçük harf içermelidir."
+  )
+  .regex(
+    /[A-ZÇĞİÖŞÜ]/,
+    "Şifre en az bir büyük harf içermelidir."
+  )
+  .regex(
+    /[0-9]/,
+    "Şifre en az bir rakam içermelidir."
+  );
+
+export const resetPasswordFormSchema =
+  z
+    .object({
+      password:
+        resetPasswordSchema,
+
+      passwordConfirm:
+        z.string(),
+    })
+    .refine(
+      (data) =>
+        data.password ===
+        data.passwordConfirm,
+      {
+        path: [
+          "passwordConfirm",
+        ],
+
+        message:
+          "Şifreler birbiriyle eşleşmiyor.",
+      }
+    );

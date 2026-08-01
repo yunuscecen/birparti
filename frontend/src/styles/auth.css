@@ -457,3 +457,10 @@
     justify-content: center;
   }
 }
+
+.auth-alert--success {
+  border: 1px solid
+    rgba(33, 120, 68, 0.2);
+  background: #e8f8ee;
+  color: #217844;
+}

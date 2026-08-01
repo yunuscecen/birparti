@@ -7,6 +7,7 @@ const allowedPaths =
     "/site-settings",
     "/auth/login",
     "/auth/refresh",
+    "/auth/forgot-password",
     "/auth/logout",
     "/auth/me",
   ]);
@@ -14,16 +15,19 @@ const allowedPaths =
 const maintenanceModeMiddleware =
   asyncHandler(
     async (req, res, next) => {
-      if (
-        req.method === "OPTIONS" ||
-        allowedPaths.has(req.path) ||
-        req.path.startsWith(
-          "/admin/"
-        )
-      ) {
-        next();
-        return;
-      }
+     if (
+  req.method === "OPTIONS" ||
+  allowedPaths.has(req.path) ||
+  req.path.startsWith(
+    "/auth/reset-password/"
+  ) ||
+  req.path.startsWith(
+    "/admin/"
+  )
+) {
+  next();
+  return;
+}
 
       const settings =
         await SiteSetting.findOne({

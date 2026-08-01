@@ -36,6 +36,8 @@ import ForumTopicCreatePage from "./pages/ForumTopicCreatePage";
 import AdminForumCategoriesPage from "./pages/admin/AdminForumCategoriesPage";
 import AdminForumTopicsPage from "./pages/admin/AdminForumTopicsPage";
 import AdminForumTopicModerationPage from "./pages/admin/AdminForumTopicModerationPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import FeatureGate from "./components/common/FeatureGate";
 import MyForumActivityPage from "./pages/MyForumActivityPage";
 import AdminForumReportsPage from "./pages/admin/AdminForumReportsPage";
@@ -168,16 +170,19 @@ const App = () => {
   }
 />
 
-        <Route
-          path="/sifremi-unuttum"
-          element={
-            <PlaceholderPage
-              eyebrow="Hesap güvenliği"
-              title="Şifremi Unuttum"
-              description="Şifre sıfırlama bağlantısı bir sonraki aşamada e-posta servisine bağlanacak."
-            />
-          }
-        />
+     <Route
+  path="/sifremi-unuttum"
+  element={
+    <ForgotPasswordPage />
+  }
+/>
+
+<Route
+  path="/sifre-sifirla/:token"
+  element={
+    <ResetPasswordPage />
+  }
+/>
 
         <Route
           path="/hesabim"

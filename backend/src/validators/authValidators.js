@@ -65,3 +65,31 @@ export const loginSchema = z.object({
     .min(1, "Şifre zorunludur.")
     .max(72, "Şifre geçersiz."),
 });
+
+export const forgotPasswordSchema =
+  z.object({
+    email: emailSchema,
+  });
+
+export const resetPasswordSchema =
+  z
+    .object({
+      password:
+        passwordSchema,
+
+      passwordConfirm:
+        z.string(),
+    })
+    .refine(
+      (data) =>
+        data.password ===
+        data.passwordConfirm,
+      {
+        path: [
+          "passwordConfirm",
+        ],
+
+        message:
+          "Şifreler birbiriyle eşleşmiyor.",
+      }
+    );
