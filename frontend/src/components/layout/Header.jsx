@@ -15,13 +15,18 @@ import { useAuth } from "../../context/AuthContext";
 import ButtonLink from "../common/ButtonLink";
 import Container from "../common/Container";
 import Logo from "./Logo";
+import {
+  useSiteSettings,
+} from "../../context/SiteSettingsContext";
 
 const adminRoles = ["admin", "superAdmin"];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] =
     useState(false);
-
+const {
+  settings,
+} = useSiteSettings();
   const location = useLocation();
 
   const {
@@ -75,7 +80,15 @@ const Header = () => {
           </div>
 
           <div className="site-navigation__links">
-            {siteConfig.primaryNavigation.map(
+           {siteConfig.primaryNavigation
+  .filter(
+    (item) =>
+      item.path !==
+        "/forum" ||
+      settings.features
+        .forumEnabled
+  )
+  .map(
               (item) => (
                 <NavLink
                   key={item.path}

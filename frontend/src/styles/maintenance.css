@@ -1,0 +1,104 @@
+.maintenance-page,
+.maintenance-loading {
+  min-height: 100vh;
+  font-family: var(--font-body);
+}
+
+.maintenance-page {
+  display: grid;
+  place-items: center;
+  padding: 30px;
+  background:
+    radial-gradient(
+      circle at 75% 20%,
+      rgba(104, 166, 241, 0.22),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #061126,
+      #0d234b
+    );
+}
+
+.maintenance-card {
+  width: min(620px, 100%);
+  padding: 55px 40px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
+  border-radius: 25px;
+  background:
+    rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 30px 80px
+    rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  text-align: center;
+  backdrop-filter: blur(14px);
+}
+
+.maintenance-card__icon {
+  display: inline-flex;
+  width: 76px;
+  height: 76px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+  border-radius: 50%;
+  background:
+    rgba(104, 166, 241, 0.16);
+  color: #9ac9f7;
+}
+
+.maintenance-card > p {
+  margin: 0 0 10px;
+  color: #9ac9f7;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.maintenance-card h1 {
+  margin: 0 0 18px;
+  font-family: var(--font-heading);
+  font-size: clamp(
+    2.2rem,
+    7vw,
+    4.2rem
+  );
+  line-height: 1.05;
+}
+
+.maintenance-card > span {
+  display: block;
+  max-width: 480px;
+  margin: 0 auto;
+  color:
+    rgba(255, 255, 255, 0.76);
+  line-height: 1.8;
+}
+
+.maintenance-card__notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 30px;
+  padding: 11px 15px;
+  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.08);
+  color:
+    rgba(255, 255, 255, 0.82);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.maintenance-loading {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  background: #f4f8fd;
+  color: var(--color-text-soft);
+}

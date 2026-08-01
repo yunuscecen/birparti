@@ -10,6 +10,9 @@ import {
 import { requireAuth } from "../middleware/authMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";
 import {
+  requireFeatureEnabled,
+} from "../middleware/featureFlagMiddleware.js";
+import {
   loginSchema,
   registerSchema,
 } from "../validators/authValidators.js";
@@ -32,7 +35,16 @@ const authLimiter = rateLimit({
 router.post(
   "/auth/register",
   authLimiter,
-  validateRequest(registerSchema),
+
+  requireFeatureEnabled(
+    "registrationsEnabled",
+    "Yeni üyelik oluşturma işlemleri şu anda kapalıdır."
+  ),
+
+  validateRequest(
+    registerSchema
+  ),
+
   register
 );
 

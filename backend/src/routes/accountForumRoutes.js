@@ -31,13 +31,20 @@ import {
 import {
   requireAuth,
 } from "../middleware/authMiddleware.js";
-
+import {
+  requireFeatureEnabled,
+} from "../middleware/featureFlagMiddleware.js";
 const router =
   express.Router();
 
 router.use(
   "/account/forum",
-  requireAuth
+  requireAuth,
+
+  requireFeatureEnabled(
+    "forumEnabled",
+    "Forum şu anda kullanıma kapalıdır."
+  )
 );
 
 router.get(

@@ -36,6 +36,7 @@ import ForumTopicCreatePage from "./pages/ForumTopicCreatePage";
 import AdminForumCategoriesPage from "./pages/admin/AdminForumCategoriesPage";
 import AdminForumTopicsPage from "./pages/admin/AdminForumTopicsPage";
 import AdminForumTopicModerationPage from "./pages/admin/AdminForumTopicModerationPage";
+import FeatureGate from "./components/common/FeatureGate";
 import MyForumActivityPage from "./pages/MyForumActivityPage";
 import AdminForumReportsPage from "./pages/admin/AdminForumReportsPage";
 import MyForumNotificationsPage from "./pages/MyForumNotificationsPage";
@@ -44,6 +45,7 @@ import MyForumReplyEditPage from "./pages/MyForumReplyEditPage";
 import MyForumTopicEditPage from "./pages/MyForumTopicEditPage";
 import AdminContactRequestsPage from "./pages/admin/AdminContactRequestsPage";
 import AdminContactRequestDetailPage from "./pages/admin/AdminContactRequestDetailPage";
+import AdminSiteSettingsPage from "./pages/admin/AdminSiteSettingsPage";
 import ContactPage from "./pages/ContactPage";
 
 const App = () => {
@@ -87,17 +89,31 @@ const App = () => {
   element={<BlogDetailPage />}
 />
 
- <Route
+<Route
   path="/forum"
-  element={<ForumPage />}
+  element={
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Forum geçici olarak kullanıma kapatılmıştır."
+    >
+      <ForumPage />
+    </FeatureGate>
+  }
 />
 
 <Route
   path="/forum/yeni-konu"
   element={
-    <ProtectedRoute>
-      <ForumTopicCreatePage />
-    </ProtectedRoute>
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Yeni forum konusu oluşturma işlemleri şu anda kapalıdır."
+    >
+      <ProtectedRoute>
+        <ForumTopicCreatePage />
+      </ProtectedRoute>
+    </FeatureGate>
   }
 />
 
@@ -107,7 +123,15 @@ const App = () => {
 
 <Route
   path="/forum/:slug"
-  element={<ForumTopicDetailPage />}
+  element={
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Forum içerikleri şu anda görüntülenemiyor."
+    >
+      <ForumTopicDetailPage />
+    </FeatureGate>
+  }
 />
 
        <Route
@@ -132,9 +156,17 @@ const App = () => {
         />
 
         <Route
-          path="/kayit"
-          element={<RegisterPage />}
-        />
+  path="/kayit"
+  element={
+    <FeatureGate
+      feature="registrationsEnabled"
+      title="Yeni Üyelikler Kapalı"
+      description="Yeni üyelik oluşturma işlemleri şu anda kullanıma kapalıdır."
+    >
+      <RegisterPage />
+    </FeatureGate>
+  }
+/>
 
         <Route
           path="/sifremi-unuttum"
@@ -166,42 +198,75 @@ const App = () => {
 <Route
   path="/hesabim/forum-konusu/:topicId/duzenle"
   element={
-    <ProtectedRoute>
-      <MyForumTopicEditPage />
-    </ProtectedRoute>
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Forum içeriklerini düzenleme işlemleri şu anda kullanılamıyor."
+    >
+      <ProtectedRoute>
+        <MyForumTopicEditPage />
+      </ProtectedRoute>
+    </FeatureGate>
   }
 />
 
 <Route
   path="/hesabim/forum-yaniti/:replyId/duzenle"
   element={
-    <ProtectedRoute>
-      <MyForumReplyEditPage />
-    </ProtectedRoute>
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Forum yanıtlarını düzenleme işlemleri şu anda kullanılamıyor."
+    >
+      <ProtectedRoute>
+        <MyForumReplyEditPage />
+      </ProtectedRoute>
+    </FeatureGate>
   }
 />
-        <Route
+
+<Route
   path="/hesabim/bildirdigim-icerikler"
   element={
-    <ProtectedRoute>
-      <MyForumReportsPage />
-    </ProtectedRoute>
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Forum bildirim kayıtları şu anda kullanılamıyor."
+    >
+      <ProtectedRoute>
+        <MyForumReportsPage />
+      </ProtectedRoute>
+    </FeatureGate>
   }
 />
-        <Route
+
+<Route
   path="/hesabim/forum-hareketlerim"
   element={
-    <ProtectedRoute>
-      <MyForumActivityPage />
-    </ProtectedRoute>
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Forum hareketleri şu anda görüntülenemiyor."
+    >
+      <ProtectedRoute>
+        <MyForumActivityPage />
+      </ProtectedRoute>
+    </FeatureGate>
   }
 />
-        <Route
+
+<Route
   path="/hesabim/forum-bildirimlerim"
   element={
-    <ProtectedRoute>
-      <MyForumNotificationsPage />
-    </ProtectedRoute>
+    <FeatureGate
+      feature="forumEnabled"
+      title="Forum Şu Anda Kapalı"
+      description="Forum bildirimleri şu anda görüntülenemiyor."
+    >
+      <ProtectedRoute>
+        <MyForumNotificationsPage />
+      </ProtectedRoute>
+    </FeatureGate>
   }
 />
 
@@ -310,6 +375,12 @@ const App = () => {
   path="forum/:topicId/moderasyon"
   element={
     <AdminForumTopicModerationPage />
+  }
+/>
+<Route
+  path="site-ayarlari"
+  element={
+    <AdminSiteSettingsPage />
   }
 />
 

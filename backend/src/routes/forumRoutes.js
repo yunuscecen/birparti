@@ -16,6 +16,9 @@ import {
 } from "../controllers/forumReportController.js";
 
 import {
+  requireFeatureEnabled,
+} from "../middleware/featureFlagMiddleware.js";
+import {
   requireAuth,
 } from "../middleware/authMiddleware.js";
 
@@ -32,7 +35,12 @@ import {
 } from "../validators/forumValidators.js";
 
 const router = express.Router();
-
+router.use(
+  requireFeatureEnabled(
+    "forumEnabled",
+    "Forum şu anda kullanıma kapalıdır."
+  )
+);
 /*
  * Public forum alanları
  */

@@ -23,7 +23,12 @@
   gap: 11px;
   color: var(--color-primary-950);
 }
-
+.site-logo__image {
+  width: 42px;
+  height: 52px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
 .site-logo__symbol {
   width: 31px;
   height: 44px;
@@ -414,4 +419,37 @@
 .site-header__admin:hover {
   background: var(--color-primary-200);
   color: var(--color-primary-800);
+}
+
+
+.site-footer__contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-bottom: 23px;
+}
+
+.site-footer__contact a,
+.site-footer__contact span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color:
+    rgba(255, 255, 255, 0.82);
+  font-size: 0.84rem;
+}
+
+.site-footer__social {
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.site-footer__social:hover {
+  background:
+    rgba(255, 255, 255, 0.13);
+  color: #ffffff;
+  transform: translateY(-2px);
 }

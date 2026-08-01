@@ -6,6 +6,7 @@ import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const allowedUploadFolders = {
+  
   "project-cover":
     "birparti/projects/covers",
 
@@ -18,8 +19,15 @@ const allowedUploadFolders = {
   homepage:
     "birparti/homepage",
 
-  page:
-    "birparti/pages",
+ page:
+  "birparti/pages",
+
+"site-logo":
+  "birparti/site/logo",
+
+"site-favicon":
+  "birparti/site/favicon",
+    
 };
 
 export const uploadAdminImage =

@@ -13,6 +13,9 @@ import "./styles/accountForumReports.css";
 import "./styles/accountForumNotifications.css";
 import "./styles/adminContactRequests.css";
 import "./styles/accountContactRequests.css";
+import { SiteSettingsProvider } from "./context/SiteSettingsContext";
+import MaintenanceGate from "./components/common/MaintenanceGate";
+import "./styles/maintenance.css";
 import queryClient from "./config/queryClient";
 
 
@@ -22,12 +25,20 @@ import "./styles/layout.css";
 import "./styles/home.css";
 import "./styles/projects.css";
 import "./styles/content-pages.css";
-createRoot(document.getElementById("root")).render(
+createRoot(
+  document.getElementById("root")
+).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider
+      client={queryClient}
+    >
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <SiteSettingsProvider>
+            <MaintenanceGate>
+              <App />
+            </MaintenanceGate>
+          </SiteSettingsProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

@@ -21,6 +21,9 @@ import {
 } from "react-router-dom";
 
 import Container from "../components/common/Container";
+import {
+  useSiteSettings,
+} from "../context/SiteSettingsContext";
 import { useAuth } from "../context/AuthContext";
 
 import {
@@ -40,6 +43,13 @@ const roleLabels = {
 };
 
 const AccountPage = () => {
+  const {
+  settings,
+} = useSiteSettings();
+
+const isForumEnabled =
+  settings.features
+    .forumEnabled;
   const navigate =
     useNavigate();
 
@@ -64,7 +74,8 @@ const AccountPage = () => {
         "my-forum-notifications",
         "account-summary",
       ],
-
+enabled:
+  isForumEnabled,
       queryFn: () =>
         getMyForumNotifications({
           page: 1,
@@ -154,103 +165,107 @@ const AccountPage = () => {
           </button>
         </div>
 
-        <div className="account-navigation">
-          <Link
-  to="/hesabim/taleplerim"
-  className="account-navigation__item"
->
-  <div className="account-navigation__icon">
-    <MessageSquareText
-      size={23}
-    />
-  </div>
+      <div className="account-navigation">
+  <Link
+    to="/hesabim/taleplerim"
+    className="account-navigation__item"
+  >
+    <div className="account-navigation__icon">
+      <MessageSquareText
+        size={23}
+      />
+    </div>
 
-  <div>
-    <strong>
-      Taleplerim
-    </strong>
+    <div>
+      <strong>
+        Taleplerim
+      </strong>
 
-    <span>
-      Gönderdiğiniz taleplerin
-      durumunu ve yönetimin
-      yanıtlarını takip edin.
-    </span>
-  </div>
-</Link>
-          <Link
-            to="/hesabim/forum-hareketlerim"
-            className="account-navigation__item"
-          >
-            <div className="account-navigation__icon">
-              <MessageCircle
-                size={23}
-              />
-            </div>
+      <span>
+        Gönderdiğiniz taleplerin
+        durumunu ve yönetimin
+        yanıtlarını takip edin.
+      </span>
+    </div>
+  </Link>
 
-            <div>
-              <strong>
-                Forum Hareketlerim
-              </strong>
-
-              <span>
-                Açtığınız konuları
-                ve yazdığınız
-                yanıtları
-                görüntüleyin.
-              </span>
-            </div>
-          </Link>
-
-          <Link
-            to="/hesabim/forum-bildirimlerim"
-            className="account-navigation__item account-navigation__item--notification"
-          >
-            <div className="account-navigation__icon">
-              <Bell size={23} />
-            </div>
-
-            <div>
-              <strong>
-                Forum Bildirimlerim
-              </strong>
-
-              <span>
-                Yanıtları, cevapları
-                ve bildirim
-                sonuçlarını takip
-                edin.
-              </span>
-            </div>
-
-            {unreadCount > 0 && (
-              <span className="account-navigation__badge">
-                {unreadCount > 99
-                  ? "99+"
-                  : unreadCount}
-              </span>
-            )}
-          </Link>
-          <Link
-  to="/hesabim/bildirdigim-icerikler"
-  className="account-navigation__item"
->
-  <div className="account-navigation__icon">
-    <Flag size={23} />
-  </div>
-
-  <div>
-    <strong>
-      Bildirdiğim İçerikler
-    </strong>
-
-    <span>
-      Daha önce bildirdiğiniz
-      konuların ve yanıtların
-      durumunu takip edin.
-    </span>
-  </div>
-</Link>
+  {isForumEnabled && (
+    <>
+      <Link
+        to="/hesabim/forum-hareketlerim"
+        className="account-navigation__item"
+      >
+        <div className="account-navigation__icon">
+          <MessageCircle
+            size={23}
+          />
         </div>
+
+        <div>
+          <strong>
+            Forum Hareketlerim
+          </strong>
+
+          <span>
+            Açtığınız konuları
+            ve yazdığınız yanıtları
+            görüntüleyin.
+          </span>
+        </div>
+      </Link>
+
+      <Link
+        to="/hesabim/forum-bildirimlerim"
+        className="account-navigation__item account-navigation__item--notification"
+      >
+        <div className="account-navigation__icon">
+          <Bell size={23} />
+        </div>
+
+        <div>
+          <strong>
+            Forum Bildirimlerim
+          </strong>
+
+          <span>
+            Yanıtları, cevapları
+            ve bildirim sonuçlarını
+            takip edin.
+          </span>
+        </div>
+
+        {unreadCount > 0 && (
+          <span className="account-navigation__badge">
+            {unreadCount > 99
+              ? "99+"
+              : unreadCount}
+          </span>
+        )}
+      </Link>
+
+      <Link
+        to="/hesabim/bildirdigim-icerikler"
+        className="account-navigation__item"
+      >
+        <div className="account-navigation__icon">
+          <Flag size={23} />
+        </div>
+
+        <div>
+          <strong>
+            Bildirdiğim İçerikler
+          </strong>
+
+          <span>
+            Daha önce bildirdiğiniz
+            konuların ve yanıtların
+            durumunu takip edin.
+          </span>
+        </div>
+      </Link>
+    </>
+  )}
+</div>
       </Container>
     </section>
   );

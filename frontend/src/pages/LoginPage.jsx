@@ -16,8 +16,14 @@ import {
 import Container from "../components/common/Container";
 import { useAuth } from "../context/AuthContext";
 import { loginFormSchema } from "../validators/authSchemas";
+import {
+  useSiteSettings,
+} from "../context/SiteSettingsContext";
 
 const LoginPage = () => {
+  const {
+  settings,
+} = useSiteSettings();
   const [showPassword, setShowPassword] =
     useState(false);
 
@@ -240,12 +246,16 @@ const LoginPage = () => {
             </button>
           </form>
 
-          <p className="auth-card__switch">
-            Henüz üye değil misiniz?{" "}
-            <Link to="/kayit">
-              Üye olun
-            </Link>
-          </p>
+          {settings.features
+  .registrationsEnabled && (
+  <p className="auth-card__switch">
+    Henüz üye değil misiniz?{" "}
+
+    <Link to="/kayit">
+      Üye olun
+    </Link>
+  </p>
+)}
         </div>
       </Container>
     </section>

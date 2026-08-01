@@ -19,7 +19,8 @@ import adminForumRoutes from "./routes/adminForumRoutes.js";
 import accountForumRoutes from "./routes/accountForumRoutes.js";
 import adminMediaRoutes from "./routes/adminMediaRoutes.js";
 import contactRequestRoutes from "./routes/contactRequestRoutes.js";
-
+import siteSettingRoutes from "./routes/siteSettingRoutes.js";
+import maintenanceModeMiddleware from "./middleware/maintenanceModeMiddleware.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -82,6 +83,10 @@ const apiLimiter = rateLimit({
 });
 
 app.use("/api", apiLimiter);
+app.use(
+  "/api",
+  maintenanceModeMiddleware
+);
 app.use("/api", projectRoutes);
 app.use("/api", pageRoutes);
 app.use("/api", authRoutes);
@@ -105,6 +110,10 @@ app.use(
 app.use(
   "/api",
   contactRequestRoutes
+);
+app.use(
+  "/api",
+  siteSettingRoutes
 );
 app.get("/api/health", (req, res) => {
   res.status(200).json({

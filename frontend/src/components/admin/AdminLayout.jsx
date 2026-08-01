@@ -85,21 +85,18 @@ const adminNavigation = [
   path: "/admin/talepler",
   icon: MessageSquareText,
 },
+{
+  label: "Site Ayarları",
+  path: "/admin/site-ayarlari",
+  icon: Settings,
+},
 
  
  
  
 ];
 
-const futureNavigation = [
 
-
- 
-  {
-    label: "Site Ayarları",
-    icon: Settings,
-  },
-];
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] =
@@ -172,24 +169,7 @@ const AdminLayout = () => {
             );
           })}
 
-          <p className="admin-navigation__title admin-navigation__title--secondary">
-            Sonraki modüller
-          </p>
-
-          {futureNavigation.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <span
-                key={item.label}
-                className="admin-navigation__link admin-navigation__link--disabled"
-              >
-                <Icon size={19} />
-                {item.label}
-                <small>Yakında</small>
-              </span>
-            );
-          })}
+       
         </nav>
 
         <div className="admin-sidebar__user">
