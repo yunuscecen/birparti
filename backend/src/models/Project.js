@@ -22,33 +22,32 @@ const projectSectionSchema = new mongoose.Schema(
   }
 );
 
-const projectImageSchema =
-  new mongoose.Schema(
-    {
-      url: {
-        type: String,
-        trim: true,
-        default: "",
-      },
-
-      publicId: {
-        type: String,
-        trim: true,
-        maxlength: 500,
-        default: "",
-      },
-
-      alt: {
-        type: String,
-        trim: true,
-        maxlength: 180,
-        default: "",
-      },
+const projectImageSchema = new mongoose.Schema(
+  {
+    url: {
+      type: String,
+      trim: true,
+      default: "",
     },
-    {
-      _id: false,
-    }
-  );
+
+    publicId: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: "",
+    },
+
+    alt: {
+      type: String,
+      trim: true,
+      maxlength: 180,
+      default: "",
+    },
+  },
+  {
+    _id: false,
+  }
+);
 
 const projectSchema = new mongoose.Schema(
   {

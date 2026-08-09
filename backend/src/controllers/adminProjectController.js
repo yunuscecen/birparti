@@ -477,7 +477,9 @@ if (
 
 export const deleteAdminProject =
   asyncHandler(async (req, res) => {
-    ensureObjectId(req.params.projectId);
+    ensureObjectId(
+      req.params.projectId
+    );
 
     const project =
       await Project.findById(
@@ -490,12 +492,20 @@ export const deleteAdminProject =
         404
       );
     }
-const coverImagePublicId =
-  String(
-    project.coverImage
-      ?.publicId || ""
-  ).trim();
+
+    const coverImagePublicId =
+      String(
+        project.coverImage
+          ?.publicId || ""
+      ).trim();
+
     await project.deleteOne();
+
+    if (coverImagePublicId) {
+      await deleteUnusedProjectImageSafely(
+        coverImagePublicId
+      );
+    }
 
     res.status(200).json({
       success: true,
