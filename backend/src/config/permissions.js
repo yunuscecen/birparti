@@ -1,5 +1,4 @@
 export const systemPermissions = [
-  "forum:create-topic",
   "forum:comment",
   "forum:moderate",
   "content:manage",
@@ -10,6 +9,6 @@ export const systemPermissions = [
   "users:manage",
 ];
 
-export const superAdminPermissions = [...systemPermissions];
-
-export const forumTopicPermission = "forum:create-topic";
+export const superAdminPermissions = [
+  ...systemPermissions,
+];

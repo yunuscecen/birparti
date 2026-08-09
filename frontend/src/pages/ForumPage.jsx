@@ -42,43 +42,11 @@ const ForumPage = () => {
   const [searchParams, setSearchParams] =
     useSearchParams();
 const {
-  user,
   isAuthenticated,
 } = useAuth();
 
-const privilegedRoles = [
-  "moderator",
-  "admin",
-  "superAdmin",
-];
-
-const userPermissions =
-  Array.isArray(user?.permissions)
-    ? user.permissions
-    : user?.permissions &&
-        typeof user.permissions ===
-          "object"
-      ? Object.entries(
-          user.permissions
-        )
-          .filter(
-            ([, enabled]) =>
-              Boolean(enabled)
-          )
-          .map(
-            ([permission]) =>
-              permission
-          )
-      : [];
-
 const canCreateTopic =
-  isAuthenticated &&
-  (privilegedRoles.includes(
-    user?.role
-  ) ||
-    userPermissions.includes(
-      "forum:create-topic"
-    ));
+  isAuthenticated;
   const category =
     searchParams.get("kategori") || "";
 

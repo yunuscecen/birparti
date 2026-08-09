@@ -51,20 +51,7 @@ export const updateAdminUserStatus = async ({
   return response.data.data;
 };
 
-export const updateAdminUserForumPermission =
-  async ({
-    userId,
-    canCreateTopic,
-  }) => {
-    const response = await api.patch(
-      `/admin/users/${userId}/forum-permission`,
-      {
-        canCreateTopic,
-      }
-    );
 
-    return response.data.data;
-  };
 
 export const updateAdminUserRole = async ({
   userId,

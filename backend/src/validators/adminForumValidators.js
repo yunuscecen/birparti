@@ -37,17 +37,55 @@ export const adminForumCategorySchema = z.object({
     .min(0, "Sıralama değeri negatif olamaz."),
 });
 
-export const adminForumTopicModerationSchema = z.object({
-  status: z.enum(
-    ["open", "locked", "archived", "hidden"],
-    {
-      message: "Geçerli bir konu durumu seçilmelidir.",
+export const adminForumTopicModerationSchema = z
+  .object({
+    status: z.enum(
+      ["open", "locked", "archived", "hidden"],
+      {
+        message:
+          "Geçerli bir konu durumu seçilmelidir.",
+      }
+    ),
+
+    isPinned: z.boolean(),
+
+    approvalStatus: z
+      .enum(
+        [
+          "pending",
+          "approved",
+          "rejected",
+        ],
+        {
+          message:
+            "Geçerli bir onay durumu seçilmelidir.",
+        }
+      )
+      .optional(),
+
+    rejectionReason: z
+      .string()
+      .trim()
+      .max(
+        1000,
+        "Ret nedeni en fazla 1000 karakter olabilir."
+      )
+      .optional()
+      .default(""),
+  })
+  .superRefine((data, context) => {
+    if (
+      data.approvalStatus === "rejected" &&
+      data.rejectionReason.length < 3
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rejectionReason"],
+        message:
+          "Reddedilen konu için ret nedeni girilmelidir.",
+      });
     }
-  ),
-
-  isPinned: z.boolean(),
-});
-
+  });
 export const adminForumReplyModerationSchema = z.object({
   status: z.enum([
     "published",

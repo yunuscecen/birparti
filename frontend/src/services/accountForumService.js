@@ -13,6 +13,7 @@ export const getMyForumTopics =
   async ({
     page = 1,
     status = "",
+    approvalStatus = "",
   } = {}) => {
     const response = await api.get(
       "/account/forum/topics",
@@ -22,6 +23,10 @@ export const getMyForumTopics =
 
           ...(status && {
             status,
+          }),
+
+          ...(approvalStatus && {
+            approvalStatus,
           }),
         },
       }

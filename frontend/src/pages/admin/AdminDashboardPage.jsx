@@ -108,11 +108,16 @@ const AdminDashboardPage = () => {
       value: statistics.verifiedUsers,
       icon: CheckCircle2,
     },
-    {
-      label: "Konu Açma Yetkisi",
-      value: statistics.forumAuthorizedUsers,
-      icon: MessageSquarePlus,
-    },
+   {
+  label:
+    "Onay Bekleyen Konular",
+
+  value:
+    statistics.pendingForumTopicCount ||
+    0,
+
+  icon: MessageSquarePlus,
+},
   ];
 
   return (

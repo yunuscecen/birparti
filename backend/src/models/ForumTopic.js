@@ -53,6 +53,35 @@ const forumTopicSchema = new mongoose.Schema(
       index: true,
     },
 
+    approvalStatus: {
+  type: String,
+  enum: [
+    "pending",
+    "approved",
+    "rejected",
+  ],
+  default: "approved",
+  index: true,
+},
+
+rejectionReason: {
+  type: String,
+  trim: true,
+  maxlength: 1000,
+  default: "",
+},
+
+reviewedBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+},
+
+reviewedAt: {
+  type: Date,
+  default: null,
+},
+
     isPinned: {
       type: Boolean,
       default: false,
@@ -108,6 +137,12 @@ forumTopicSchema.index({
   status: 1,
   isPinned: -1,
   lastActivityAt: -1,
+});
+
+forumTopicSchema.index({
+  approvalStatus: 1,
+  status: 1,
+  createdAt: -1,
 });
 
 const ForumTopic = mongoose.model(

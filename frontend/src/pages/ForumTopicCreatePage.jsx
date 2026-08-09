@@ -5,7 +5,6 @@ import {
 
 import {
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
@@ -16,7 +15,7 @@ import {
 } from "@tanstack/react-query";
 
 import {
-  Link,
+  Link, 
   useNavigate,
 } from "react-router-dom";
 
@@ -39,10 +38,9 @@ const ForumTopicCreatePage = () => {
   const queryClient =
     useQueryClient();
 
-  const {
-    user,
-    isAuthenticated,
-  } = useAuth();
+const {
+  isAuthenticated,
+} = useAuth();
 
   const [
     formData,
@@ -68,45 +66,8 @@ const ForumTopicCreatePage = () => {
     };
   }, []);
 
-  const userPermissions =
-    useMemo(() => {
-      if (
-        Array.isArray(
-          user?.permissions
-        )
-      ) {
-        return user.permissions;
-      }
-
-      if (
-        user?.permissions &&
-        typeof user.permissions ===
-          "object"
-      ) {
-        return Object.entries(
-          user.permissions
-        )
-          .filter(
-            ([, enabled]) =>
-              Boolean(enabled)
-          )
-          .map(
-            ([permission]) =>
-              permission
-          );
-      }
-
-      return [];
-    }, [user?.permissions]);
-
-  const canCreateTopic =
-    isAuthenticated &&
-    (privilegedRoles.includes(
-      user?.role
-    ) ||
-      userPermissions.includes(
-        "forum:create-topic"
-      ));
+ const canCreateTopic =
+    isAuthenticated;
 
   const categoriesQuery =
     useQuery({
@@ -124,7 +85,7 @@ const createMutation =
       createForumTopic,
 
     onSuccess: async (
-      data
+     
     ) => {
       await Promise.all([
         queryClient.invalidateQueries({
@@ -152,12 +113,12 @@ const createMutation =
         }),
       ]);
 
-      navigate(
-        `/forum/${data.topic.slug}`,
-        {
-          replace: true,
-        }
-      );
+    navigate(
+  "/hesabim/forum-hareketlerim",
+  {
+    replace: true,
+  }
+);
     },
 
     onError: (error) => {
@@ -242,15 +203,15 @@ const createMutation =
         <section className="forum-content">
           <Container>
             <div className="forum-permission-state">
-              <h1>
-                Konu açma yetkiniz bulunmuyor.
-              </h1>
+            <h1>
+  Giriş yapmanız gerekiyor.
+</h1>
 
-              <p>
-                Yeni forum konusu açabilmek için
-                yönetici tarafından hesabınıza
-                konu açma yetkisi verilmelidir.
-              </p>
+<p>
+  Yeni bir Topluluk konusu
+  gönderebilmek için hesabınıza
+  giriş yapmalısınız.
+</p>
 
               <Link
                 to="/forum"
@@ -290,11 +251,12 @@ const createMutation =
 
           <h1>Yeni Konu Aç</h1>
 
-          <p>
-            Konunun anlaşılır, yapıcı ve
-            tartışmaya açık olmasına özen
-            gösterin.
-          </p>
+        <p>
+  Konunuz gönderildikten sonra
+  yönetici incelemesine alınacaktır.
+  Onaylanan konular Topluluk
+  sayfasında yayınlanır.
+</p>
         </Container>
       </section>
 
@@ -422,9 +384,9 @@ const createMutation =
               >
                 <Send size={17} />
 
-                {createMutation.isPending
-                  ? "Konu oluşturuluyor..."
-                  : "Konuyu Yayınla"}
+               {createMutation.isPending
+  ? "Konu gönderiliyor..."
+  : "Onaya Gönder"}
               </button>
             </div>
           </form>

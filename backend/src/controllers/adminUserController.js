@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+
+import ForumTopic from "../models/ForumTopic.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import { forumTopicPermission } from "../config/permissions.js";
 
 const escapeRegExp = (value = "") => {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -74,9 +75,9 @@ export const getAdminDashboard = asyncHandler(
       activeUsers,
       suspendedUsers,
       pendingUsers,
-      verifiedUsers,
-      forumAuthorizedUsers,
-      roleCounts,
+     verifiedUsers,
+pendingForumTopicCount,
+roleCounts,
       recentUsers,
     ] = await Promise.all([
       User.countDocuments(),
@@ -97,9 +98,9 @@ export const getAdminDashboard = asyncHandler(
         isEmailVerified: true,
       }),
 
-      User.countDocuments({
-        permissions: forumTopicPermission,
-      }),
+      ForumTopic.countDocuments({
+  approvalStatus: "pending",
+}),
 
       User.aggregate([
         {
@@ -139,9 +140,9 @@ export const getAdminDashboard = asyncHandler(
           activeUsers,
           suspendedUsers,
           pendingUsers,
-          verifiedUsers,
-          forumAuthorizedUsers,
-          roles,
+        verifiedUsers,
+pendingForumTopicCount,
+roles,
         },
 
         recentUsers: recentUsers.map(serializeAdminUser),
@@ -291,51 +292,7 @@ export const updateUserStatus = asyncHandler(
   }
 );
 
-/**
- * PATCH /api/admin/users/:userId/forum-permission
- */
-export const updateForumPermission = asyncHandler(
-  async (req, res) => {
-    const user = await findManagedUser(
-      req.params.userId
-    );
 
-    ensureActorCanManageTarget({
-      actor: req.user,
-      target: user,
-    });
-
-    const { canCreateTopic } = req.validatedBody;
-
-    const permissions = new Set(
-      user.permissions || []
-    );
-
-    if (canCreateTopic) {
-      permissions.add(forumTopicPermission);
-    } else {
-      permissions.delete(forumTopicPermission);
-    }
-
-    user.permissions = [...permissions];
-
-    await user.save({
-      validateBeforeSave: false,
-    });
-
-    res.status(200).json({
-      success: true,
-
-      message: canCreateTopic
-        ? "Kullanıcıya forumda konu açma yetkisi verildi."
-        : "Kullanıcının forumda konu açma yetkisi kaldırıldı.",
-
-      data: {
-        user: serializeAdminUser(user),
-      },
-    });
-  }
-);
 
 /**
  * PATCH /api/admin/users/:userId/role

@@ -35,6 +35,12 @@ const statusLabels = {
   hidden: "Gizli",
 };
 
+const approvalStatusLabels = {
+  pending: "Onay Bekliyor",
+  approved: "Onaylandı",
+  rejected: "Reddedildi",
+};
+
 const getErrorMessage = (error, fallback) => {
   return (
     error?.response?.data?.message ||
@@ -68,8 +74,14 @@ const AdminForumTopicsPage = () => {
   const [category, setCategory] =
     useState("");
 
-  const [status, setStatus] = useState("");
-  const [pinned, setPinned] = useState("");
+const [status, setStatus] = useState("");
+
+const [
+  approvalStatus,
+  setApprovalStatus,
+] = useState("");
+
+const [pinned, setPinned] = useState("");
 
   const [feedback, setFeedback] = useState({
     type: "",
@@ -102,24 +114,26 @@ const AdminForumTopicsPage = () => {
   });
 
   const topicsQuery = useQuery({
-    queryKey: [
-      "admin-forum-topics",
+  queryKey: [
+    "admin-forum-topics",
+    page,
+    search,
+    category,
+    status,
+    approvalStatus,
+    pinned,
+  ],
+
+  queryFn: () =>
+    getAdminForumTopics({
       page,
       search,
       category,
       status,
+      approvalStatus,
       pinned,
-    ],
-
-    queryFn: () =>
-      getAdminForumTopics({
-        page,
-        search,
-        category,
-        status,
-        pinned,
-      }),
-  });
+    }),
+});
 
   const moderationMutation = useMutation({
     mutationFn:
@@ -192,9 +206,10 @@ const AdminForumTopicsPage = () => {
         </div>
 
         <span>
-          Konuları sabitleyin, kilitleyin,
-          arşivleyin veya gizleyin.
-        </span>
+  Bekleyen konuları inceleyin,
+  onaylayın veya gerekçesiyle
+  reddedin.
+</span>
       </div>
 
       {feedback.message && (
@@ -258,30 +273,56 @@ const AdminForumTopicsPage = () => {
           </select>
 
           <select
-            value={status}
-            onChange={(event) => {
-              setStatus(event.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="">
-              Tüm durumlar
-            </option>
+  value={status}
+  onChange={(event) => {
+    setStatus(event.target.value);
+    setPage(1);
+  }}
+>
+  <option value="">
+    Tüm konu durumları
+  </option>
 
-            <option value="open">Açık</option>
-            <option value="locked">
-              Kilitli
-            </option>
-            <option value="archived">
-              Arşivlendi
-            </option>
-            <option value="hidden">
-              Gizli
-            </option>
-          </select>
+  <option value="open">Açık</option>
+  <option value="locked">
+    Kilitli
+  </option>
+  <option value="archived">
+    Arşivlendi
+  </option>
+  <option value="hidden">
+    Gizli
+  </option>
+</select>
 
-          <select
-            value={pinned}
+<select
+  value={approvalStatus}
+  onChange={(event) => {
+    setApprovalStatus(
+      event.target.value
+    );
+    setPage(1);
+  }}
+>
+  <option value="">
+    Tüm onay durumları
+  </option>
+
+  <option value="pending">
+    Onay Bekliyor
+  </option>
+
+  <option value="approved">
+    Onaylandı
+  </option>
+
+  <option value="rejected">
+    Reddedildi
+  </option>
+</select>
+
+<select
+  value={pinned}
             onChange={(event) => {
               setPinned(event.target.value);
               setPage(1);
@@ -328,9 +369,10 @@ const AdminForumTopicsPage = () => {
                   <th>Yazar</th>
                   <th>Kategori</th>
                   <th>İstatistik</th>
-                  <th>Durum</th>
-                  <th>Sabitleme</th>
-                  <th>İşlemler</th>
+                 <th>Konu Durumu</th>
+<th>Onay Durumu</th>
+<th>Sabitleme</th>
+<th>İşlemler</th>
                 </tr>
               </thead>
 
@@ -416,56 +458,90 @@ const AdminForumTopicsPage = () => {
                       </span>
                     </td>
 
-                    <td>
-                      <button
-                        type="button"
-                        className={`admin-pin-button ${
-                          topic.isPinned
-                            ? "admin-pin-button--active"
-                            : ""
-                        }`}
-                        onClick={() =>
-                          updateTopic({
-                            topic,
+         <td>
+  <span
+    className={`admin-status admin-status--${
+      topic.approvalStatus ||
+      "approved"
+    }`}
+  >
+    {
+      approvalStatusLabels[
+        topic.approvalStatus ||
+          "approved"
+      ]
+    }
+  </span>
 
-                            nextPinned:
-                              !topic.isPinned,
-                          })
-                        }
-                        disabled={
-                          moderationMutation.isPending
-                        }
-                      >
-                        {topic.isPinned ? (
-                          <>
-                            <PinOff size={16} />
-                            Sabitlemeyi Kaldır
-                          </>
-                        ) : (
-                          <>
-                            <Pin size={16} />
-                            Sabitle
-                          </>
-                        )}
-                      </button>
-                    </td>
+  {topic.approvalStatus ===
+    "rejected" &&
+    topic.rejectionReason && (
+      <span>
+        Ret:{" "}
+        {topic.rejectionReason}
+      </span>
+    )}
+</td>
+
+<td>
+  <button
+    type="button"
+    className={`admin-pin-button ${
+      topic.isPinned
+        ? "admin-pin-button--active"
+        : ""
+    }`}
+    onClick={() =>
+      updateTopic({
+        topic,
+
+        nextPinned:
+          !topic.isPinned,
+      })
+    }
+    disabled={
+      moderationMutation.isPending ||
+      (
+        topic.approvalStatus ||
+        "approved"
+      ) !== "approved"
+    }
+  >
+    {topic.isPinned ? (
+      <>
+        <PinOff size={16} />
+        Sabitlemeyi Kaldır
+      </>
+    ) : (
+      <>
+        <Pin size={16} />
+        Sabitle
+      </>
+    )}
+  </button>
+</td>
 
                     <td>
                       <div className="admin-inline-actions">
-                        <Link
+                   <Link
   to={`/admin/forum/${topic._id}/moderasyon`}
 >
   <ShieldCheck size={16} />
-  Yanıtları Yönet
+  Konuyu İncele
 </Link>
-                        <Link
-                          to={`/forum/${topic.slug}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <Eye size={16} />
-                          Görüntüle
-                        </Link>
+                       {(
+  topic.approvalStatus ||
+  "approved"
+) === "approved" && (
+  <Link
+    to={`/forum/${topic.slug}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    <Eye size={16} />
+    Görüntüle
+  </Link>
+)}
 
                         <button
                           type="button"
@@ -494,7 +570,7 @@ const AdminForumTopicsPage = () => {
 
                 {topics.length === 0 && (
                   <tr>
-                    <td colSpan="7">
+                   <td colSpan="8">
                       Forum konusu bulunamadı.
                     </td>
                   </tr>

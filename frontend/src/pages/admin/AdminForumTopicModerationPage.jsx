@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -9,8 +10,8 @@ import {
   Pin,
   RotateCcw,
   Trash2,
+  XCircle,
 } from "lucide-react";
-
 import {
   useEffect,
   useState,
@@ -34,12 +35,17 @@ import {
   updateAdminForumReplyModeration,
   updateAdminForumTopicModeration,
 } from "../../services/adminForumService";
-
 const topicStatusLabels = {
   open: "Açık",
   locked: "Kilitli",
   archived: "Arşivlendi",
   hidden: "Gizli",
+};
+
+const approvalStatusLabels = {
+  pending: "Onay Bekliyor",
+  approved: "Onaylandı",
+  rejected: "Reddedildi",
 };
 
 const replyStatusLabels = {
@@ -400,27 +406,76 @@ const AdminForumTopicModerationPage =
         deleted: 0,
       };
 
-    const updateTopic = ({
-      status =
-        topic?.status,
-      isPinned =
-        topic?.isPinned,
-    }) => {
-      if (!topic) {
-        return;
-      }
+const updateTopic = ({
+  status =
+    topic?.status,
+  isPinned =
+    topic?.isPinned,
+  approvalStatus,
+  rejectionReason = "",
+}) => {
+  if (!topic) {
+    return;
+  }
 
-      topicMutation.mutate({
-        topicId:
-          topic._id,
+  topicMutation.mutate({
+    topicId:
+      topic._id,
 
-        formData: {
-          status,
-          isPinned:
-            Boolean(isPinned),
-        },
-      });
-    };
+    formData: {
+      status,
+      isPinned:
+        Boolean(isPinned),
+
+      ...(approvalStatus && {
+        approvalStatus,
+        rejectionReason,
+      }),
+    },
+  });
+};
+
+const approveTopic = () => {
+  updateTopic({
+    approvalStatus:
+      "approved",
+
+    rejectionReason: "",
+  });
+};
+
+const rejectTopic = () => {
+  const reason =
+    window.prompt(
+      "Konunun reddedilme nedenini yazın:",
+      topic?.rejectionReason ||
+        ""
+    );
+
+  if (reason === null) {
+    return;
+  }
+
+  if (
+    reason.trim().length < 3
+  ) {
+    setFeedback({
+      type: "error",
+      message:
+        "Ret nedeni en az 3 karakter olmalıdır.",
+    });
+
+    return;
+  }
+
+  updateTopic({
+    approvalStatus:
+      "rejected",
+
+    rejectionReason:
+      reason.trim(),
+  });
+};
 
     const moderateReply = (
       replyId,
@@ -590,11 +645,71 @@ const AdminForumTopicModerationPage =
             </div>
           </div>
 
-          <div className="admin-forum-topic-controls">
-            <div className="admin-form-field">
-              <label>
-                Konu durumu
-              </label>
+         <div className="admin-forum-topic-controls">
+  <div className="admin-form-field">
+    <label>
+      Yayın onayı
+    </label>
+
+    <span
+      className={`admin-status admin-status--${
+        topic.approvalStatus ||
+        "approved"
+      }`}
+    >
+      {
+        approvalStatusLabels[
+          topic.approvalStatus ||
+            "approved"
+        ]
+      }
+    </span>
+
+    {topic.approvalStatus ===
+      "rejected" &&
+      topic.rejectionReason && (
+        <small>
+          Ret nedeni:{" "}
+          {topic.rejectionReason}
+        </small>
+      )}
+
+    <div className="admin-inline-actions">
+      <button
+        type="button"
+        onClick={approveTopic}
+        disabled={
+          topicMutation.isPending ||
+          (
+            topic.approvalStatus ||
+            "approved"
+          ) === "approved"
+        }
+      >
+        <CheckCircle2 size={16} />
+        Konuyu Onayla
+      </button>
+
+      <button
+        type="button"
+        className="admin-danger-button"
+        onClick={rejectTopic}
+        disabled={
+          topicMutation.isPending ||
+          topic.approvalStatus ===
+            "rejected"
+        }
+      >
+        <XCircle size={16} />
+        Konuyu Reddet
+      </button>
+    </div>
+  </div>
+
+  <div className="admin-form-field">
+    <label>
+      Konu durumu
+    </label>
 
               <select
                 value={topic.status}
@@ -667,12 +782,16 @@ const AdminForumTopicModerationPage =
               </span>
             </label>
 
-            {[
-              "open",
-              "locked",
-            ].includes(
-              topic.status
-            ) && (
+           {(
+  topic.approvalStatus ||
+  "approved"
+) === "approved" &&
+[
+  "open",
+  "locked",
+].includes(
+  topic.status
+) && (
               <Link
                 to={`/forum/${topic.slug}`}
                 target="_blank"

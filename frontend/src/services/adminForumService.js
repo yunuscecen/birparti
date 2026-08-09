@@ -54,6 +54,7 @@ export const getAdminForumTopics = async ({
   search = "",
   category = "",
   status = "",
+  approvalStatus = "",
   pinned = "",
 } = {}) => {
   const response = await api.get(
@@ -72,6 +73,10 @@ export const getAdminForumTopics = async ({
 
         ...(status && {
           status,
+        }),
+
+        ...(approvalStatus && {
+          approvalStatus,
         }),
 
         ...(pinned !== "" && {

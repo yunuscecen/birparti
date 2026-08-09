@@ -22,9 +22,7 @@ import {
   requireAuth,
 } from "../middleware/authMiddleware.js";
 
-import {
-  requireForumTopicPermission,
-} from "../middleware/forumPermissionMiddleware.js";
+
 
 import validateRequest from "../middleware/validateRequest.js";
 
@@ -63,7 +61,6 @@ router.get(
 router.post(
   "/forum-topics",
   requireAuth,
-  requireForumTopicPermission,
   validateRequest(
     createForumTopicSchema
   ),

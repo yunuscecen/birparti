@@ -200,6 +200,10 @@ export const createForumTopic = asyncHandler(
         isPinned: false,
         viewCount: 0,
         replyCount: 0,
+        approvalStatus: "pending",
+rejectionReason: "",
+reviewedBy: null,
+reviewedAt: null,
         lastActivityAt: new Date(),
         lastReplyAt: null,
       });
@@ -218,7 +222,7 @@ export const createForumTopic = asyncHandler(
     res.status(201).json({
       success: true,
       message:
-        "Forum konusu başarıyla oluşturuldu.",
+         "Forum konusu yönetici onayına gönderildi.",
 
       data: {
         topic: {
@@ -245,13 +249,16 @@ export const createForumReply = asyncHandler(
       .trim()
       .toLowerCase();
 
-    const topic =
-      await ForumTopic.findOne({
-        slug,
-        status: {
-          $in: ["open", "locked"],
-        },
-      });
+    const topic = await ForumTopic.findOne({
+  slug,
+  approvalStatus: "approved",
+
+  status: {
+    $in: ["open", "locked"],
+  },
+});
+
+
 
     if (!topic) {
       throw new AppError(

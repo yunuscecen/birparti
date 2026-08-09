@@ -1,7 +1,6 @@
 import {
   ChevronLeft,
   ChevronRight,
-  MessageSquarePlus,
   Search,
   ShieldCheck,
   UserRoundCog,
@@ -18,7 +17,6 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import {
   getAdminUsers,
-  updateAdminUserForumPermission,
   updateAdminUserRole,
   updateAdminUserStatus,
 } from "../../services/adminService";
@@ -121,25 +119,7 @@ const AdminUsersPage = () => {
     },
   });
 
-  const forumPermissionMutation = useMutation({
-    mutationFn:
-      updateAdminUserForumPermission,
 
-    onSuccess: async () => {
-      setFeedback(
-        "Forum konu açma yetkisi güncellendi."
-      );
-
-      await refreshUsers();
-    },
-
-    onError: (error) => {
-      setFeedback(
-        error.message ||
-          "Forum yetkisi güncellenemedi."
-      );
-    },
-  });
 
   const roleMutation = useMutation({
     mutationFn: updateAdminUserRole,
@@ -166,9 +146,8 @@ const AdminUsersPage = () => {
   const pagination = data?.pagination;
 
   const isMutating =
-    statusMutation.isPending ||
-    forumPermissionMutation.isPending ||
-    roleMutation.isPending;
+  statusMutation.isPending ||
+  roleMutation.isPending;
 
   return (
     <div className="admin-page">
@@ -179,9 +158,9 @@ const AdminUsersPage = () => {
         </div>
 
         <span>
-          Üye durumlarını, rollerini ve forum
-          yetkilerini yönetin.
-        </span>
+  Üye durumlarını ve kullanıcı
+  rollerini yönetin.
+</span>
       </div>
 
       {feedback && (
@@ -282,11 +261,10 @@ const AdminUsersPage = () => {
               <table className="admin-table admin-users-table">
                 <thead>
                   <tr>
-                    <th>Üye</th>
-                    <th>Rol</th>
-                    <th>Durum</th>
-                    <th>Forum Yetkisi</th>
-                    <th>İşlemler</th>
+                  <th>Üye</th>
+<th>Rol</th>
+<th>Durum</th>
+<th>İşlemler</th>
                   </tr>
                 </thead>
 
@@ -381,37 +359,7 @@ const AdminUsersPage = () => {
                           </span>
                         </td>
 
-                        <td>
-                          <button
-                            type="button"
-                            className={`admin-permission-button ${
-                              canCreateTopic
-                                ? "admin-permission-button--active"
-                                : ""
-                            }`}
-                            disabled={
-                              isActionDisabled
-                            }
-                            onClick={() =>
-                              forumPermissionMutation.mutate(
-                                {
-                                  userId:
-                                    managedUser.id,
-                                  canCreateTopic:
-                                    !canCreateTopic,
-                                }
-                              )
-                            }
-                          >
-                            <MessageSquarePlus
-                              size={16}
-                            />
-
-                            {canCreateTopic
-                              ? "Yetkiyi Al"
-                              : "Yetki Ver"}
-                          </button>
-                        </td>
+         
 
                         <td>
                           <div className="admin-user-actions">
@@ -465,7 +413,7 @@ const AdminUsersPage = () => {
 
                   {users.length === 0 && (
                     <tr>
-                      <td colSpan="5">
+                      <td colSpan="4">
                         Arama kriterlerine uygun
                         kullanıcı bulunamadı.
                       </td>

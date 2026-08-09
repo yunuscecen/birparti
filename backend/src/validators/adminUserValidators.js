@@ -6,11 +6,7 @@ export const updateUserStatusSchema = z.object({
   }),
 });
 
-export const updateForumPermissionSchema = z.object({
-  canCreateTopic: z.boolean({
-    message: "Forum konu açma yetkisi boolean olmalıdır.",
-  }),
-});
+
 
 export const updateUserRoleSchema = z.object({
   role: z.enum(

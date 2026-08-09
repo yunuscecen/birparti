@@ -85,18 +85,19 @@ const ensureReplyEditable = (
       409
     );
   }
-
-  if (
-    !reply.topic ||
-    !editableTopicStatuses.has(
-      reply.topic.status
-    )
-  ) {
-    throw new AppError(
-      "Yanıtın bağlı olduğu forum konusu düzenlemeye uygun değil.",
-      409
-    );
-  }
+if (
+  !reply.topic ||
+  reply.topic.approvalStatus !==
+    "approved" ||
+  !editableTopicStatuses.has(
+    reply.topic.status
+  )
+) {
+  throw new AppError(
+    "Yanıtın bağlı olduğu forum konusu düzenlemeye uygun değil.",
+    409
+  );
+}
 };
 const recalculateTopicReplyStats = async (
   topicId
@@ -314,7 +315,13 @@ export const updateMyForumTopic =
 
       topic.editedAt =
         new Date();
+topic.approvalStatus =
+  "pending";
 
+topic.rejectionReason = "";
+topic.reviewedBy = null;
+topic.reviewedAt = null;
+topic.isPinned = false;
       /*
        * Slug bilerek değiştirilmiyor.
        * Eski forum ve bildirim bağlantıları
@@ -332,7 +339,7 @@ export const updateMyForumTopic =
         success: true,
 
         message:
-          "Forum konusu güncellendi.",
+         "Forum konusu güncellendi ve yeniden yönetici onayına gönderildi.",
 
         data: {
           topic,
@@ -368,7 +375,7 @@ export const getMyForumReplyForEdit =
           .populate({
             path: "topic",
             select:
-              "title slug status",
+             "title slug status approvalStatus",
           })
           .lean();
 
@@ -419,7 +426,7 @@ export const updateMyForumReply =
         }).populate({
           path: "topic",
           select:
-            "title slug status",
+           "title slug status approvalStatus",
         });
 
       if (!reply) {
@@ -596,7 +603,7 @@ export const deleteMyForumReply =
         }).populate({
           path: "topic",
           select:
-            "title slug status",
+           "title slug status approvalStatus",
         });
 
       if (!reply) {

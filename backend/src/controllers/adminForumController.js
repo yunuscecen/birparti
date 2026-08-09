@@ -6,6 +6,7 @@ import ForumReply from "../models/ForumReply.js";
 import ForumTopic from "../models/ForumTopic.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import createForumNotification from "../services/forumNotificationService.js";
 
 const createSlug = (value = "") => {
   return slugify(value, {
@@ -514,9 +515,23 @@ export const getAdminForumTopics = asyncHandler(
     ).trim();
 
     const status = String(req.query.status || "").trim();
+    const approvalStatus = String(
+  req.query.approvalStatus || ""
+).trim();
     const pinned = String(req.query.pinned || "").trim();
 
     const filter = {};
+
+    if (
+  [
+    "pending",
+    "approved",
+    "rejected",
+  ].includes(approvalStatus)
+) {
+  filter.approvalStatus =
+    approvalStatus;
+}
 
     if (search) {
       const safeSearch = escapeRegExp(search);
@@ -550,17 +565,31 @@ export const getAdminForumTopics = asyncHandler(
       filter.category = category;
     }
 
-    if (
-      ["open", "locked", "archived", "hidden"].includes(
-        status
-      )
-    ) {
-      filter.status = status;
-    }
+   if (
+  [
+    "open",
+    "locked",
+    "archived",
+    "hidden",
+  ].includes(status)
+) {
+  filter.status = status;
+}
 
-    if (pinned === "true") {
-      filter.isPinned = true;
-    }
+if (
+  [
+    "pending",
+    "approved",
+    "rejected",
+  ].includes(approvalStatus)
+) {
+  filter.approvalStatus =
+    approvalStatus;
+}
+
+if (pinned === "true") {
+  filter.isPinned = true;
+}
 
     if (pinned === "false") {
       filter.isPinned = false;
@@ -714,34 +743,138 @@ export const updateAdminForumTopicModeration =
       );
     }
 
-    const { status, isPinned } = req.validatedBody;
+    const {
+      status,
+      isPinned,
+      approvalStatus,
+      rejectionReason = "",
+    } = req.validatedBody;
+
+    const previousApprovalStatus =
+      topic.approvalStatus ||
+      "approved";
+
+    const approvalStatusWasProvided =
+      approvalStatus !== undefined;
 
     topic.status = status;
-    topic.isPinned = isPinned;
+    topic.isPinned =
+      Boolean(isPinned);
+
+    if (approvalStatusWasProvided) {
+      topic.approvalStatus =
+        approvalStatus;
+
+      topic.rejectionReason =
+        approvalStatus === "rejected"
+          ? rejectionReason.trim()
+          : "";
+
+      if (
+        approvalStatus === "pending"
+      ) {
+        topic.reviewedBy = null;
+        topic.reviewedAt = null;
+      } else {
+        topic.reviewedBy =
+          req.user._id;
+
+        topic.reviewedAt =
+          new Date();
+      }
+    }
+
+    if (
+      topic.approvalStatus !==
+      "approved"
+    ) {
+      topic.isPinned = false;
+    }
 
     await topic.save();
+
+    const approvalChanged =
+      approvalStatusWasProvided &&
+      previousApprovalStatus !==
+        topic.approvalStatus;
+
+    if (
+      approvalChanged &&
+      [
+        "approved",
+        "rejected",
+      ].includes(
+        topic.approvalStatus
+      )
+    ) {
+      const isApproved =
+        topic.approvalStatus ===
+        "approved";
+
+      await createForumNotification({
+        recipient: topic.author,
+
+        actor:
+          req.user?._id ||
+          req.user?.id,
+
+        type: isApproved
+          ? "topic_approved"
+          : "topic_rejected",
+
+        topic: topic._id,
+
+        title: isApproved
+          ? "Forum konunuz onaylandı"
+          : "Forum konunuz reddedildi",
+
+        message: isApproved
+          ? `“${topic.title}” başlıklı konunuz yayınlandı.`
+          : `“${topic.title}” başlıklı konunuz reddedildi. Neden: ${topic.rejectionReason}`,
+
+        link: isApproved
+          ? `/forum/${topic.slug}`
+          : "/hesabim/forum-hareketlerim",
+
+        uniqueKey:
+          `forum-topic-review:${topic._id}:` +
+          `${topic.approvalStatus}:` +
+          `${topic.reviewedAt.getTime()}`,
+      });
+    }
 
     await topic.populate([
       {
         path: "category",
-        select: "name slug color isActive",
+        select:
+          "name slug color isActive",
       },
       {
         path: "author",
-        select: "firstName lastName email role",
+        select:
+          "firstName lastName email role",
       },
     ]);
 
     const serializedTopic = {
       ...topic.toObject(),
-      authorInfo: serializeTopicAuthor(topic),
+      authorInfo:
+        serializeTopicAuthor(topic),
     };
 
     delete serializedTopic.author;
 
+    const responseMessage =
+      approvalChanged
+        ? topic.approvalStatus ===
+          "approved"
+          ? "Forum konusu onaylandı ve yayınlandı."
+          : "Forum konusu reddedildi."
+        : "Forum konusu moderasyon ayarları güncellendi.";
+
     res.status(200).json({
       success: true,
-      message: "Forum konusu moderasyon ayarları güncellendi.",
+      message: responseMessage,
 
       data: {
         topic: serializedTopic,

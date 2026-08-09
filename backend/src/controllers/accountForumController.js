@@ -94,12 +94,28 @@ export const getMyForumOverview =
       replyCount,
       publishedReplyCount,
       hiddenReplyCount,
+      pendingTopicCount,
+approvedTopicCount,
+rejectedTopicCount,
       deletedReplyCount,
     ] = await Promise.all([
       ForumTopic.countDocuments({
         author: userId,
       }),
+ForumTopic.countDocuments({
+  author: userId,
+  approvalStatus: "pending",
+}),
 
+ForumTopic.countDocuments({
+  author: userId,
+  approvalStatus: "approved",
+}),
+
+ForumTopic.countDocuments({
+  author: userId,
+  approvalStatus: "rejected",
+}),
       ForumTopic.countDocuments({
         author: userId,
         status: "open",
@@ -144,6 +160,9 @@ export const getMyForumOverview =
           openTopicCount,
           lockedTopicCount,
           hiddenTopicCount,
+          pendingTopicCount,
+approvedTopicCount,
+rejectedTopicCount,
           replyCount,
           publishedReplyCount,
           hiddenReplyCount,
@@ -168,6 +187,21 @@ export const getMyForumTopics =
     } = getPaginationValues(
       req.query
     );
+
+const approvalStatus = String(
+  req.query.approvalStatus || ""
+).trim();
+
+if (
+  [
+    "pending",
+    "approved",
+    "rejected",
+  ].includes(approvalStatus)
+) {
+  filter.approvalStatus =
+    approvalStatus;
+}
 
     const status = String(
       req.query.status || ""
@@ -277,18 +311,18 @@ export const getMyForumReplies =
       totalReplies,
     ] = await Promise.all([
       ForumReply.find(filter)
-        .populate({
-          path: "topic",
+       .populate({
+  path: "topic",
 
-          select:
-            "title slug status category createdAt",
+  select:
+    "title slug status approvalStatus category createdAt",
 
-          populate: {
-            path: "category",
-            select:
-              "name slug color",
-          },
-        })
+  populate: {
+    path: "category",
+    select:
+      "name slug color",
+  },
+})
         .populate({
           path: "replyToUser",
           select:

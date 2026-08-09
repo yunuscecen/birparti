@@ -87,12 +87,14 @@ export const getPublicForumCategories = asyncHandler(
 
     const categoriesWithCounts = await Promise.all(
       categories.map(async (category) => {
-        const topicCount = await ForumTopic.countDocuments({
-          category: category._id,
-          status: {
-            $in: publicTopicStatuses,
-          },
-        });
+       const topicCount = await ForumTopic.countDocuments({
+  category: category._id,
+  approvalStatus: "approved",
+
+  status: {
+    $in: publicTopicStatuses,
+  },
+});
 
         return {
           ...category,
@@ -132,10 +134,12 @@ export const getPublicForumTopics = asyncHandler(
     ).trim();
 
     const filter = {
-      status: {
-        $in: publicTopicStatuses,
-      },
-    };
+  approvalStatus: "approved",
+
+  status: {
+    $in: publicTopicStatuses,
+  },
+};
 
     if (search) {
       const safeSearch = escapeRegExp(search);
@@ -255,15 +259,13 @@ export const getPublicForumTopicBySlug = asyncHandler(
     const topic =
       await ForumTopic.findOneAndUpdate(
         {
-          slug,
+  slug,
+  approvalStatus: "approved",
 
-          status: {
-            $in: [
-              "open",
-              "locked",
-            ],
-          },
-        },
+  status: {
+    $in: ["open", "locked"],
+  },
+},
         {
           $inc: {
             viewCount: 1,

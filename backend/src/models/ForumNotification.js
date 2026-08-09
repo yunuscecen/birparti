@@ -22,6 +22,8 @@ const forumNotificationSchema = new mongoose.Schema(
         "reply_reply",
         "report_reviewed",
         "report_dismissed",
+        "topic_approved",
+"topic_rejected",
         "report_action_taken",
       ],
       required: true,

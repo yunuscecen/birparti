@@ -2,7 +2,6 @@ import express from "express";
 import {
   getAdminDashboard,
   getAdminUsers,
-  updateForumPermission,
   updateUserRole,
   updateUserStatus,
 } from "../controllers/adminUserController.js";
@@ -12,7 +11,6 @@ import {
 } from "../middleware/authMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";
 import {
-  updateForumPermissionSchema,
   updateUserRoleSchema,
   updateUserStatusSchema,
 } from "../validators/adminUserValidators.js";
@@ -41,11 +39,6 @@ router.patch(
   updateUserStatus
 );
 
-router.patch(
-  "/admin/users/:userId/forum-permission",
-  validateRequest(updateForumPermissionSchema),
-  updateForumPermission
-);
 
 router.patch(
   "/admin/users/:userId/role",

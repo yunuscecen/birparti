@@ -44,6 +44,12 @@ const topicStatusLabels = {
   hidden: "Gizli",
 };
 
+const approvalStatusLabels = {
+  pending: "Onay Bekliyor",
+  approved: "Onaylandı",
+  rejected: "Reddedildi",
+};
+
 const replyStatusLabels = {
   published: "Yayında",
   hidden: "Gizli",
@@ -101,10 +107,26 @@ const [
       1
     );
 
-    const status =
-      searchParams.get(
-        "durum"
-      ) || "";
+  const status =
+  searchParams.get(
+    "durum"
+  ) || "";
+
+const topicApprovalStatus =
+  tab === "topics" &&
+  [
+    "pending",
+    "approved",
+    "rejected",
+  ].includes(status)
+    ? status
+    : "";
+
+const topicStatus =
+  tab === "topics" &&
+  !topicApprovalStatus
+    ? status
+    : "";
 
     useEffect(() => {
       document.title =
@@ -135,10 +157,12 @@ const [
         ],
 
         queryFn: () =>
-          getMyForumTopics({
-            page,
-            status,
-          }),
+         getMyForumTopics({
+  page,
+  status: topicStatus,
+  approvalStatus:
+    topicApprovalStatus,
+}),
 
         enabled:
           tab === "topics",
@@ -371,10 +395,13 @@ const handleDeleteReply = (
     const overview =
       overviewQuery.data
         ?.overview || {
-        topicCount: 0,
-        openTopicCount: 0,
-        lockedTopicCount: 0,
-        hiddenTopicCount: 0,
+       topicCount: 0,
+openTopicCount: 0,
+lockedTopicCount: 0,
+hiddenTopicCount: 0,
+pendingTopicCount: 0,
+approvedTopicCount: 0,
+rejectedTopicCount: 0,
         replyCount: 0,
         publishedReplyCount: 0,
         hiddenReplyCount: 0,
@@ -566,26 +593,38 @@ const handleDeleteReply = (
                     Tüm durumlar
                   </option>
 
-                  {tab ===
-                  "topics" ? (
-                    <>
-                      <option value="open">
-                        Açık
-                      </option>
+                {tab ===
+"topics" ? (
+  <>
+    <option value="pending">
+      Onay Bekliyor
+    </option>
 
-                      <option value="locked">
-                        Kilitli
-                      </option>
+    <option value="approved">
+      Onaylandı
+    </option>
 
-                      <option value="archived">
-                        Arşivlendi
-                      </option>
+    <option value="rejected">
+      Reddedildi
+    </option>
 
-                      <option value="hidden">
-                        Gizli
-                      </option>
-                    </>
-                  ) : (
+    <option value="open">
+      Açık
+    </option>
+
+    <option value="locked">
+      Kilitli
+    </option>
+
+    <option value="archived">
+      Arşivlendi
+    </option>
+
+    <option value="hidden">
+      Gizli
+    </option>
+  </>
+) : (
                     <>
                       <option value="published">
                         Yayında
@@ -661,18 +700,30 @@ const handleDeleteReply = (
                               )}
                             </span>
 
-                       <span
+                 <span
   className={`account-forum-status ${
     topic.deletedByAuthor
       ? "account-forum-status--deleted"
-      : `account-forum-status--${topic.status}`
+      : topic.approvalStatus ===
+          "pending"
+        ? "account-forum-status--pending"
+        : topic.approvalStatus ===
+            "rejected"
+          ? "account-forum-status--rejected"
+          : `account-forum-status--${topic.status}`
   }`}
 >
   {topic.deletedByAuthor
     ? "Silindi"
-    : topicStatusLabels[
-        topic.status
-      ]}
+    : topic.approvalStatus &&
+        topic.approvalStatus !==
+          "approved"
+      ? approvalStatusLabels[
+          topic.approvalStatus
+        ]
+      : topicStatusLabels[
+          topic.status
+        ]}
 </span>
                           </div>
 
@@ -682,18 +733,29 @@ const handleDeleteReply = (
                             }
                           </h2>
 
-                          <p>
-                            {topic.body
-                              .length >
-                            220
-                              ? `${topic.body.slice(
-                                  0,
-                                  220
-                                )}…`
-                              : topic.body}
-                          </p>
+                         <p>
+  {topic.body
+    .length >
+  220
+    ? `${topic.body.slice(
+        0,
+        220
+      )}…`
+    : topic.body}
+</p>
 
-                          <div className="account-forum-item__stats">
+{topic.approvalStatus ===
+  "rejected" &&
+  topic.rejectionReason && (
+    <div className="account-forum-feedback account-forum-feedback--error">
+      <strong>
+        Ret nedeni:
+      </strong>{" "}
+      {topic.rejectionReason}
+    </div>
+  )}
+
+<div className="account-forum-item__stats">
                             <span>
                               <MessageCircle
                                 size={
@@ -729,6 +791,10 @@ const handleDeleteReply = (
     Düzenle
   </Link>
 
+ {(
+  topic.approvalStatus ||
+  "approved"
+) === "approved" && (
   <Link
     to={`/forum/${topic.slug}`}
     className="account-forum-link"
@@ -736,6 +802,7 @@ const handleDeleteReply = (
     <ExternalLink size={16} />
     Konuyu Aç
   </Link>
+)}
 
   <button
     type="button"
