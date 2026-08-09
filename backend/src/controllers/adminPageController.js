@@ -3,7 +3,9 @@ import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const managedPageSlugs = [
-  "biz-kimiz",
+  "manifesto",
+  "yol-haritasi",
+  "seffaflik",
   "neye-karsiyiz",
 ];
 

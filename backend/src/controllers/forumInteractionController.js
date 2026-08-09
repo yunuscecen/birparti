@@ -4,6 +4,7 @@ import slugify from "slugify";
 import ForumCategory from "../models/ForumCategory.js";
 import ForumReply from "../models/ForumReply.js";
 import ForumTopic from "../models/ForumTopic.js";
+import ForumTopicInteraction from "../models/ForumTopicInteraction.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import createForumNotification from "../services/forumNotificationService.js";
@@ -158,6 +159,197 @@ const findReplyTarget = async ({
   return targetReply;
 };
 
+
+const findInteractiveTopicBySlug =
+  async (slugValue) => {
+    const slug = String(
+      slugValue || ""
+    )
+      .trim()
+      .toLowerCase();
+
+    const topic =
+      await ForumTopic.findOne({
+        slug,
+        approvalStatus:
+          "approved",
+
+        status: {
+          $in: [
+            "open",
+            "locked",
+          ],
+        },
+      });
+
+    if (!topic) {
+      throw new AppError(
+        "Forum konusu bulunamadı.",
+        404
+      );
+    }
+
+    return topic;
+  };
+
+const recalculateTopicMetrics =
+  async (topicId) => {
+    const normalizedTopicId =
+      new mongoose.Types.ObjectId(
+        String(topicId)
+      );
+
+    const [metrics] =
+      await ForumTopicInteraction.aggregate([
+        {
+          $match: {
+            topic:
+              normalizedTopicId,
+          },
+        },
+
+        {
+          $group: {
+            _id: null,
+
+            upvoteCount: {
+              $sum: {
+                $cond: [
+                  {
+                    $eq: [
+                      "$vote",
+                      1,
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+            },
+
+            downvoteCount: {
+              $sum: {
+                $cond: [
+                  {
+                    $eq: [
+                      "$vote",
+                      -1,
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+            },
+
+            supportCount: {
+              $sum: {
+                $cond: [
+                  "$isSupported",
+                  1,
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      ]);
+
+    const topic =
+      await ForumTopic.findById(
+        topicId
+      );
+
+    if (!topic) {
+      throw new AppError(
+        "Forum konusu bulunamadı.",
+        404
+      );
+    }
+
+    const upvoteCount =
+      metrics?.upvoteCount || 0;
+
+    const downvoteCount =
+      metrics?.downvoteCount || 0;
+
+    const supportCount =
+      metrics?.supportCount || 0;
+
+    const voteScore =
+      upvoteCount -
+      downvoteCount;
+
+    topic.upvoteCount =
+      upvoteCount;
+
+    topic.downvoteCount =
+      downvoteCount;
+
+    topic.voteScore =
+      voteScore;
+
+    topic.supportCount =
+      supportCount;
+
+    topic.popularityScore =
+      Math.max(
+        0,
+        (topic.viewCount || 0) +
+          (topic.replyCount ||
+            0) *
+            5 +
+          voteScore * 3 +
+          supportCount * 4
+      );
+
+    await topic.save();
+
+    return topic;
+  };
+
+const serializeInteraction = (
+  interaction
+) => {
+  return {
+    vote:
+      interaction?.vote || 0,
+
+    isSupported:
+      Boolean(
+        interaction
+          ?.isSupported
+      ),
+  };
+};
+
+const serializeTopicMetrics = (
+  topic
+) => {
+  return {
+    voteScore:
+      topic.voteScore || 0,
+
+    upvoteCount:
+      topic.upvoteCount || 0,
+
+    downvoteCount:
+      topic.downvoteCount || 0,
+
+    supportCount:
+      topic.supportCount || 0,
+
+    popularityScore:
+      topic.popularityScore || 0,
+
+    isSolved:
+      Boolean(topic.isSolved),
+
+    solvedAt:
+      topic.solvedAt || null,
+  };
+};
+
 /**
  * POST /api/forum-topics
  */
@@ -237,6 +429,265 @@ reviewedAt: null,
     });
   }
 );
+
+/**
+ * GET /api/forum-topics/:slug/interaction
+ */
+export const getMyForumTopicInteraction =
+  asyncHandler(
+    async (req, res) => {
+      const topic =
+        await findInteractiveTopicBySlug(
+          req.params.slug
+        );
+
+      const userId =
+        req.user?._id ||
+        req.user?.id;
+
+      const interaction =
+        await ForumTopicInteraction.findOne({
+          topic: topic._id,
+          user: userId,
+        });
+
+      res.status(200).json({
+        success: true,
+
+        data: {
+          interaction:
+            serializeInteraction(
+              interaction
+            ),
+
+          topic:
+            serializeTopicMetrics(
+              topic
+            ),
+        },
+      });
+    }
+  );
+
+/**
+ * PATCH /api/forum-topics/:slug/vote
+ */
+export const updateForumTopicVote =
+  asyncHandler(
+    async (req, res) => {
+      const topic =
+        await findInteractiveTopicBySlug(
+          req.params.slug
+        );
+
+      const userId =
+        req.user?._id ||
+        req.user?.id;
+
+      const { vote } =
+        req.validatedBody;
+
+      let interaction =
+        await ForumTopicInteraction.findOne({
+          topic: topic._id,
+          user: userId,
+        });
+
+      if (!interaction) {
+        interaction =
+          new ForumTopicInteraction({
+            topic: topic._id,
+            user: userId,
+          });
+      }
+
+      interaction.vote = vote;
+
+      await interaction.save();
+
+      if (
+        interaction.vote === 0 &&
+        !interaction.isSupported
+      ) {
+        await interaction.deleteOne();
+        interaction = null;
+      }
+
+      const updatedTopic =
+        await recalculateTopicMetrics(
+          topic._id
+        );
+
+      res.status(200).json({
+        success: true,
+
+        message:
+          vote === 0
+            ? "Oyunuz kaldırıldı."
+            : "Oyunuz kaydedildi.",
+
+        data: {
+          interaction:
+            serializeInteraction(
+              interaction
+            ),
+
+          topic:
+            serializeTopicMetrics(
+              updatedTopic
+            ),
+        },
+      });
+    }
+  );
+
+/**
+ * PATCH /api/forum-topics/:slug/support
+ */
+export const updateForumTopicSupport =
+  asyncHandler(
+    async (req, res) => {
+      const topic =
+        await findInteractiveTopicBySlug(
+          req.params.slug
+        );
+
+      const userId =
+        req.user?._id ||
+        req.user?.id;
+
+      const { isSupported } =
+        req.validatedBody;
+
+      let interaction =
+        await ForumTopicInteraction.findOne({
+          topic: topic._id,
+          user: userId,
+        });
+
+      if (!interaction) {
+        interaction =
+          new ForumTopicInteraction({
+            topic: topic._id,
+            user: userId,
+          });
+      }
+
+      interaction.isSupported =
+        isSupported;
+
+      await interaction.save();
+
+      if (
+        interaction.vote === 0 &&
+        !interaction.isSupported
+      ) {
+        await interaction.deleteOne();
+        interaction = null;
+      }
+
+      const updatedTopic =
+        await recalculateTopicMetrics(
+          topic._id
+        );
+
+      res.status(200).json({
+        success: true,
+
+        message: isSupported
+          ? "Konuya desteğiniz kaydedildi."
+          : "Konu desteğiniz kaldırıldı.",
+
+        data: {
+          interaction:
+            serializeInteraction(
+              interaction
+            ),
+
+          topic:
+            serializeTopicMetrics(
+              updatedTopic
+            ),
+        },
+      });
+    }
+  );
+
+/**
+ * PATCH /api/forum-topics/:slug/solved
+ */
+export const updateForumTopicSolvedStatus =
+  asyncHandler(
+    async (req, res) => {
+      const topic =
+        await findInteractiveTopicBySlug(
+          req.params.slug
+        );
+
+      const userId =
+        req.user?._id ||
+        req.user?.id;
+
+      const privilegedRoles = [
+        "moderator",
+        "admin",
+        "superAdmin",
+      ];
+
+      const isAuthor =
+        String(topic.author || "") ===
+        String(userId || "");
+
+      const canUpdate =
+        isAuthor ||
+        privilegedRoles.includes(
+          req.user?.role
+        );
+
+      if (!canUpdate) {
+        throw new AppError(
+          "Bu konunun çözüm durumunu değiştirme yetkiniz yok.",
+          403
+        );
+      }
+
+      const { isSolved } =
+        req.validatedBody;
+
+      topic.isSolved =
+        isSolved;
+
+      topic.solvedAt =
+        isSolved
+          ? new Date()
+          : null;
+
+      topic.solvedBy =
+        isSolved
+          ? userId
+          : null;
+
+      topic.lastActivityAt =
+        new Date();
+
+      await topic.save();
+
+      res.status(200).json({
+        success: true,
+
+        message: isSolved
+          ? "Konu çözüldü olarak işaretlendi."
+          : "Konunun çözüm işareti kaldırıldı.",
+
+        data: {
+          topic:
+            serializeTopicMetrics(
+              topic
+            ),
+        },
+      });
+    }
+  );
 
 /**
  * POST /api/forum-topics/:slug/replies
@@ -319,12 +770,22 @@ export const createForumReply = asyncHandler(
       });
 
     const now = new Date();
+topic.replyCount += 1;
+topic.lastReplyAt = now;
+topic.lastActivityAt = now;
 
-    topic.replyCount += 1;
-    topic.lastReplyAt = now;
-    topic.lastActivityAt = now;
+topic.popularityScore =
+  Math.max(
+    0,
+    (topic.viewCount || 0) +
+      topic.replyCount * 5 +
+      (topic.voteScore || 0) *
+        3 +
+      (topic.supportCount || 0) *
+        4
+  );
 
-    await topic.save();
+await topic.save();
 
     await reply.populate([
       {

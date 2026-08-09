@@ -97,3 +97,36 @@ export const createForumReportSchema = z.object({
     .optional()
     .default(""),
 });
+
+export const updateForumTopicVoteSchema =
+  z.object({
+    vote: z
+      .number()
+      .int()
+      .refine(
+        (value) =>
+          [-1, 0, 1].includes(
+            value
+          ),
+        {
+          message:
+            "Oy değeri -1, 0 veya 1 olmalıdır.",
+        }
+      ),
+  });
+
+export const updateForumTopicSupportSchema =
+  z.object({
+    isSupported: z.boolean({
+      message:
+        "Destek durumu boolean olmalıdır.",
+    }),
+  });
+
+export const updateForumTopicSolvedSchema =
+  z.object({
+    isSolved: z.boolean({
+      message:
+        "Çözüm durumu boolean olmalıdır.",
+    }),
+  });

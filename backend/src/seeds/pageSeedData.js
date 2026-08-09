@@ -115,4 +115,201 @@ export const pageSeedData = [
         "Bir Parti'nin karşı durduğu toplumsal, hukuki ve siyasi sorunlar.",
     },
   },
+    {
+    slug: "manifesto",
+    eyebrow: "Bir Parti",
+    title: "Manifesto",
+    description:
+      "Siyaseti yeniden güven, vicdan, katılım ve ortak sorumluluk temelinde kurmak için yola çıkıyoruz.",
+    status: "published",
+
+    sections: [
+      {
+        type: "text",
+        title: "Başka Bir Siyaset Mümkün",
+        sortOrder: 1,
+        paragraphs: [
+          "Bir Parti; siyasetin yalnızca seçim dönemlerinde hatırlanan bir temsil faaliyeti olmadığına inanır. Siyaset, insanların hayatına dokunan kararların açık, katılımcı ve hesap verebilir biçimde alınmasıdır.",
+
+          "İnsanları ayrıştıran değil bir araya getiren, sorunları saklayan değil görünür kılan ve çözümü toplumla birlikte üreten bir anlayışı savunuyoruz.",
+
+          "Hiçbir kişinin, makamın veya grubun ortak vicdanın üzerinde olmadığı; kaynakların şeffaf kullanıldığı ve her yurttaşın söz hakkına sahip olduğu bir yapı kurmayı hedefliyoruz.",
+        ],
+      },
+
+      {
+        type: "cards",
+        title: "Temel İlkelerimiz",
+        sortOrder: 2,
+
+        cards: [
+          {
+            title: "Adalet",
+            description:
+              "Herkes için eşit hukuk, bağımsız yargı ve erişilebilir adalet.",
+            linkLabel: "",
+            linkUrl: "",
+            sortOrder: 1,
+          },
+          {
+            title: "Şeffaflık",
+            description:
+              "Kararların, gelirlerin ve harcamaların toplum tarafından izlenebilmesi.",
+            linkLabel: "Şeffaflığı İncele",
+            linkUrl: "/seffaflik",
+            sortOrder: 2,
+          },
+          {
+            title: "Katılım",
+            description:
+              "Yurttaşların yalnızca oy verirken değil karar süreçlerinde de söz sahibi olması.",
+            linkLabel: "Topluluğa Katıl",
+            linkUrl: "/forum",
+            sortOrder: 3,
+          },
+          {
+            title: "Dayanışma",
+            description:
+              "Kimsenin yalnız bırakılmadığı, ortak sorunların birlikte çözüldüğü bir toplum.",
+            linkLabel: "",
+            linkUrl: "",
+            sortOrder: 4,
+          },
+        ],
+      },
+    ],
+
+    seo: {
+      title: "Manifesto | Bir Parti",
+      description:
+        "Bir Parti'nin temel ilkeleri, siyaset anlayışı ve ortak gelecek çağrısı.",
+    },
+  },
+
+  {
+    slug: "yol-haritasi",
+    eyebrow: "Birlikte İlerliyoruz",
+    title: "Yol Haritası",
+    description:
+      "Hedeflerimizi, çalışma aşamalarımızı ve ilerlememizi açık biçimde paylaşıyoruz.",
+    status: "published",
+
+    sections: [
+      {
+        type: "cards",
+        title: "Çalışma Aşamalarımız",
+        sortOrder: 1,
+
+        cards: [
+          {
+            title: "1. Dinleme ve Hazırlık",
+            description:
+              "Toplumsal ihtiyaçları, yerel sorunları ve çözüm önerilerini doğrudan yurttaşlardan topluyoruz.",
+            linkLabel: "Topluluğa Katıl",
+            linkUrl: "/forum",
+            sortOrder: 1,
+          },
+          {
+            title: "2. Ortak Program",
+            description:
+              "Toplanan görüşleri uzmanlık, saha deneyimi ve açık tartışma süreçleriyle uygulanabilir politikalara dönüştürüyoruz.",
+            linkLabel: "Projeleri İncele",
+            linkUrl: "/projelerimiz",
+            sortOrder: 2,
+          },
+          {
+            title: "3. Yerel Yapılanma",
+            description:
+              "Yerelde hesap verebilir, katılımcı ve dayanışmayı büyüten çalışma grupları oluşturuyoruz.",
+            linkLabel: "",
+            linkUrl: "",
+            sortOrder: 3,
+          },
+          {
+            title: "4. Açık İlerleme",
+            description:
+              "Tamamlanan, devam eden ve planlanan çalışmaların durumunu düzenli olarak kamuoyuyla paylaşıyoruz.",
+            linkLabel: "Şeffaflığı İncele",
+            linkUrl: "/seffaflik",
+            sortOrder: 4,
+          },
+        ],
+      },
+    ],
+
+    seo: {
+      title: "Yol Haritası | Bir Parti",
+      description:
+        "Bir Parti'nin hazırlık, katılım, program ve ilerleme aşamaları.",
+    },
+  },
+
+  {
+    slug: "seffaflik",
+    eyebrow: "Açık ve Hesap Verebilir",
+    title: "Şeffaflık",
+    description:
+      "Gelirlerimizi, harcamalarımızı, karar süreçlerimizi ve çalışma sonuçlarımızı toplumla paylaşmayı taahhüt ediyoruz.",
+    status: "published",
+
+    sections: [
+      {
+        type: "text",
+        title: "Şeffaflık Taahhüdümüz",
+        sortOrder: 1,
+        paragraphs: [
+          "Topluma ait kaynakların nasıl kullanıldığının toplum tarafından görülebilmesi gerektiğine inanıyoruz.",
+
+          "Gelir ve harcama kayıtları, bağışların kullanım alanları, proje ilerlemeleri ve önemli kararlar düzenli olarak yayımlanacaktır.",
+        ],
+      },
+
+      {
+        type: "cards",
+        title: "Açık Bilgi Alanları",
+        sortOrder: 2,
+
+        cards: [
+          {
+            title: "Gelirler",
+            description:
+              "Toplam gelirler ve gelir kaynakları dönemsel olarak açıklanacaktır.",
+            linkLabel: "",
+            linkUrl: "",
+            sortOrder: 1,
+          },
+          {
+            title: "Harcamalar",
+            description:
+              "Harcamaların tutarı, kategorisi ve kullanım amacı paylaşılacaktır.",
+            linkLabel: "",
+            linkUrl: "",
+            sortOrder: 2,
+          },
+          {
+            title: "Bağışlar",
+            description:
+              "Bağışların hangi çalışmalarda kullanıldığı açık biçimde gösterilecektir.",
+            linkLabel: "Bir Damla Ol",
+            linkUrl: "/bagis",
+            sortOrder: 3,
+          },
+          {
+            title: "Proje İlerlemesi",
+            description:
+              "Projelerin planlanan, devam eden ve tamamlanan aşamaları yayımlanacaktır.",
+            linkLabel: "Projeleri İncele",
+            linkUrl: "/projelerimiz",
+            sortOrder: 4,
+          },
+        ],
+      },
+    ],
+
+    seo: {
+      title: "Şeffaflık | Bir Parti",
+      description:
+        "Bir Parti'nin gelir, harcama, bağış ve proje şeffaflığı yaklaşımı.",
+    },
+  },
 ];

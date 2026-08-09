@@ -112,37 +112,76 @@ export const getPublicForumCategories = asyncHandler(
   }
 );
 
-/**
- * GET /api/forum-topics
- */
 export const getPublicForumTopics = asyncHandler(
   async (req, res) => {
     const page = Math.max(
-      Number.parseInt(req.query.page, 10) || 1,
+      Number.parseInt(
+        req.query.page,
+        10
+      ) || 1,
       1
     );
 
     const limit = Math.min(
-      Math.max(Number.parseInt(req.query.limit, 10) || 15, 1),
+      Math.max(
+        Number.parseInt(
+          req.query.limit,
+          10
+        ) || 15,
+        1
+      ),
       40
     );
 
-    const search = String(req.query.search || "").trim();
+    const search = String(
+      req.query.search || ""
+    ).trim();
 
     const categorySlug = String(
       req.query.category || ""
     ).trim();
 
-    const filter = {
-  approvalStatus: "approved",
+    const requestedSort = String(
+      req.query.sort || "newest"
+    )
+      .trim()
+      .toLowerCase();
 
-  status: {
-    $in: publicTopicStatuses,
-  },
-};
+    const allowedSorts = [
+      "newest",
+      "popular",
+      "most-voted",
+      "solved",
+      "most-supported",
+      "most-commented",
+    ];
+
+    const selectedSort =
+      allowedSorts.includes(
+        requestedSort
+      )
+        ? requestedSort
+        : "newest";
+
+    const filter = {
+      approvalStatus: "approved",
+
+      status: {
+        $in: publicTopicStatuses,
+      },
+    };
+
+    /*
+     * Çözülenler seçildiğinde yalnızca
+     * çözülmüş konular listelenir.
+     */
+    if (selectedSort === "solved") {
+      filter.isSolved = true;
+    }
 
     if (search) {
-      const safeSearch = escapeRegExp(search);
+      const safeSearch =
+        escapeRegExp(search);
 
       filter.$or = [
         {
@@ -161,16 +200,21 @@ export const getPublicForumTopics = asyncHandler(
     }
 
     if (categorySlug) {
-      const category = await ForumCategory.findOne({
-        slug: categorySlug,
-        isActive: true,
-      }).select("_id");
+      const category =
+        await ForumCategory.findOne({
+          slug: categorySlug,
+          isActive: true,
+        }).select("_id");
 
       if (!category) {
         return res.status(200).json({
           success: true,
+
           data: {
             topics: [],
+
+            selectedSort,
+
             pagination: {
               page: 1,
               limit,
@@ -181,48 +225,103 @@ export const getPublicForumTopics = asyncHandler(
         });
       }
 
-      filter.category = category._id;
+      filter.category =
+        category._id;
     }
 
-    const skip = (page - 1) * limit;
+    const sortOptions = {
+      newest: {
+        isPinned: -1,
+        createdAt: -1,
+      },
 
-    const [topics, totalTopics] = await Promise.all([
+      popular: {
+        isPinned: -1,
+        popularityScore: -1,
+        lastActivityAt: -1,
+      },
+
+      "most-voted": {
+        isPinned: -1,
+        voteScore: -1,
+        createdAt: -1,
+      },
+
+      solved: {
+        isPinned: -1,
+        solvedAt: -1,
+        createdAt: -1,
+      },
+
+      "most-supported": {
+        isPinned: -1,
+        supportCount: -1,
+        createdAt: -1,
+      },
+
+      "most-commented": {
+        isPinned: -1,
+        replyCount: -1,
+        createdAt: -1,
+      },
+    };
+
+    const skip =
+      (page - 1) * limit;
+
+    const [
+      topics,
+      totalTopics,
+    ] = await Promise.all([
       ForumTopic.find(filter)
         .populate({
           path: "category",
-          select: "name slug color",
+          select:
+            "name slug color",
         })
         .populate({
           path: "author",
-          select: "firstName lastName role",
+          select:
+            "firstName lastName role",
         })
-        .sort({
-          isPinned: -1,
-          lastActivityAt: -1,
-          createdAt: -1,
-        })
+        .sort(
+          sortOptions[selectedSort]
+        )
         .skip(skip)
         .limit(limit)
         .lean(),
 
-      ForumTopic.countDocuments(filter),
+      ForumTopic.countDocuments(
+        filter
+      ),
     ]);
 
     res.status(200).json({
       success: true,
+
       data: {
-        topics: topics.map((topic) => ({
-          ...topic,
-          authorInfo: serializeAuthor(topic),
-          author: undefined,
-        })),
+        topics: topics.map(
+          (topic) => ({
+            ...topic,
+
+            authorInfo:
+              serializeAuthor(topic),
+
+            author: undefined,
+          })
+        ),
+
+        selectedSort,
 
         pagination: {
           page,
           limit,
           totalTopics,
+
           totalPages: Math.max(
-            Math.ceil(totalTopics / limit),
+            Math.ceil(
+              totalTopics / limit
+            ),
             1
           ),
         },
@@ -268,8 +367,9 @@ export const getPublicForumTopicBySlug = asyncHandler(
 },
         {
           $inc: {
-            viewCount: 1,
-          },
+  viewCount: 1,
+  popularityScore: 1,
+},
         },
         {
           new: true,

@@ -12,12 +12,14 @@ export const getForumTopics = async ({
   page = 1,
   search = "",
   category = "",
+  sort = "newest",
 } = {}) => {
   const response = await api.get(
     "/forum-topics",
     {
       params: {
         page,
+        sort,
 
         ...(search && {
           search,
@@ -95,6 +97,63 @@ export const createForumReply =
           targetId,
           reason,
           description,
+        }
+      );
+
+    return response.data.data;
+  };
+
+  export const getMyForumTopicInteraction =
+  async (slug) => {
+    const response = await api.get(
+      `/forum-topics/${slug}/interaction`
+    );
+
+    return response.data.data;
+  };
+
+export const updateForumTopicVote =
+  async ({
+    slug,
+    vote,
+  }) => {
+    const response =
+      await api.patch(
+        `/forum-topics/${slug}/vote`,
+        {
+          vote,
+        }
+      );
+
+    return response.data.data;
+  };
+
+export const updateForumTopicSupport =
+  async ({
+    slug,
+    isSupported,
+  }) => {
+    const response =
+      await api.patch(
+        `/forum-topics/${slug}/support`,
+        {
+          isSupported,
+        }
+      );
+
+    return response.data.data;
+  };
+
+export const updateForumTopicSolvedStatus =
+  async ({
+    slug,
+    isSolved,
+  }) => {
+    const response =
+      await api.patch(
+        `/forum-topics/${slug}/solved`,
+        {
+          isSolved,
         }
       );
 

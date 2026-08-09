@@ -1,4 +1,8 @@
-import { Route, Routes } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminRoute from "./components/auth/AdminRoute";
@@ -34,6 +38,7 @@ import ForumPage from "./pages/ForumPage";
 import ForumTopicDetailPage from "./pages/ForumTopicDetailPage";
 import ForumTopicCreatePage from "./pages/ForumTopicCreatePage";
 import AdminForumCategoriesPage from "./pages/admin/AdminForumCategoriesPage";
+import AdminTransparencyPage from "./pages/admin/AdminTransparencyPage";
 import AdminForumTopicsPage from "./pages/admin/AdminForumTopicsPage";
 import AdminForumTopicModerationPage from "./pages/admin/AdminForumTopicModerationPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -48,6 +53,7 @@ import MyForumTopicEditPage from "./pages/MyForumTopicEditPage";
 import AdminContactRequestsPage from "./pages/admin/AdminContactRequestsPage";
 import AdminContactRequestDetailPage from "./pages/admin/AdminContactRequestDetailPage";
 import AdminSiteSettingsPage from "./pages/admin/AdminSiteSettingsPage";
+import TransparencyPage from "./pages/TransparencyPage";
 import ContactPage from "./pages/ContactPage";
 
 const App = () => {
@@ -67,12 +73,34 @@ const App = () => {
           element={<ProjectDetailPage />}
         />
 
-        <Route
-          path="/biz-kimiz"
-          element={
-            <ContentPage fixedSlug="biz-kimiz" />
-          }
-        />
+      <Route
+  path="/biz-kimiz"
+  element={
+    <Navigate
+      to="/manifesto"
+      replace
+    />
+  }
+/>
+
+<Route
+  path="/manifesto"
+  element={
+    <ContentPage fixedSlug="manifesto" />
+  }
+/>
+
+<Route
+  path="/yol-haritasi"
+  element={
+    <ContentPage fixedSlug="yol-haritasi" />
+  }
+/>
+
+<Route
+  path="/seffaflik"
+  element={<TransparencyPage />}
+/>
 
         <Route
           path="/neye-karsiyiz"
@@ -96,8 +124,8 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
-      description="Forum geçici olarak kullanıma kapatılmıştır."
+      title="Topluluk Şu Anda Kapalı"
+      description="Topluluk geçici olarak kullanıma kapatılmıştır."
     >
       <ForumPage />
     </FeatureGate>
@@ -109,8 +137,8 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
-      description="Yeni forum konusu oluşturma işlemleri şu anda kapalıdır."
+      title="Topluluk Şu Anda Kapalı"
+      description="Yeni Topluluk konusu oluşturma işlemleri şu anda kapalıdır."
     >
       <ProtectedRoute>
         <ForumTopicCreatePage />
@@ -128,8 +156,8 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
-      description="Forum içerikleri şu anda görüntülenemiyor."
+      title="Topluluk Şu Anda Kapalı"
+      description="Topluluk içerikleri şu anda görüntülenemiyor."
     >
       <ForumTopicDetailPage />
     </FeatureGate>
@@ -205,7 +233,7 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
+      title="Topluluk Şu Anda Kapalı"
       description="Forum içeriklerini düzenleme işlemleri şu anda kullanılamıyor."
     >
       <ProtectedRoute>
@@ -220,7 +248,7 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
+      title="Topluluk Şu Anda Kapalı"
       description="Forum yanıtlarını düzenleme işlemleri şu anda kullanılamıyor."
     >
       <ProtectedRoute>
@@ -235,7 +263,7 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
+      title="Topluluk Şu Anda Kapalı"
       description="Forum bildirim kayıtları şu anda kullanılamıyor."
     >
       <ProtectedRoute>
@@ -250,7 +278,7 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
+      title="Topluluk Şu Anda Kapalı"
       description="Forum hareketleri şu anda görüntülenemiyor."
     >
       <ProtectedRoute>
@@ -265,7 +293,7 @@ const App = () => {
   element={
     <FeatureGate
       feature="forumEnabled"
-      title="Forum Şu Anda Kapalı"
+      title="Topluluk Şu Anda Kapalı"
       description="Forum bildirimleri şu anda görüntülenemiyor."
     >
       <ProtectedRoute>
@@ -320,6 +348,11 @@ const App = () => {
 <Route
   path="sayfalar"
   element={<AdminPagesPage />}
+/>
+
+<Route
+  path="seffaflik"
+  element={<AdminTransparencyPage />}
 />
 
 <Route

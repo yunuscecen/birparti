@@ -9,6 +9,10 @@ import {
 import {
   createForumReply,
   createForumTopic,
+  getMyForumTopicInteraction,
+  updateForumTopicSolvedStatus,
+  updateForumTopicSupport,
+  updateForumTopicVote,
 } from "../controllers/forumInteractionController.js";
 
 import {
@@ -30,6 +34,9 @@ import {
   createForumReplySchema,
   createForumReportSchema,
   createForumTopicSchema,
+  updateForumTopicSolvedSchema,
+  updateForumTopicSupportSchema,
+  updateForumTopicVoteSchema,
 } from "../validators/forumValidators.js";
 
 const router = express.Router();
@@ -65,6 +72,39 @@ router.post(
     createForumTopicSchema
   ),
   createForumTopic
+);
+
+router.get(
+  "/forum-topics/:slug/interaction",
+  requireAuth,
+  getMyForumTopicInteraction
+);
+
+router.patch(
+  "/forum-topics/:slug/vote",
+  requireAuth,
+  validateRequest(
+    updateForumTopicVoteSchema
+  ),
+  updateForumTopicVote
+);
+
+router.patch(
+  "/forum-topics/:slug/support",
+  requireAuth,
+  validateRequest(
+    updateForumTopicSupportSchema
+  ),
+  updateForumTopicSupport
+);
+
+router.patch(
+  "/forum-topics/:slug/solved",
+  requireAuth,
+  validateRequest(
+    updateForumTopicSolvedSchema
+  ),
+  updateForumTopicSolvedStatus
 );
 
 router.post(

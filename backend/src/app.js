@@ -21,6 +21,7 @@ import adminMediaRoutes from "./routes/adminMediaRoutes.js";
 import contactRequestRoutes from "./routes/contactRequestRoutes.js";
 import siteSettingRoutes from "./routes/siteSettingRoutes.js";
 import maintenanceModeMiddleware from "./middleware/maintenanceModeMiddleware.js";
+import transparencyRoutes from "./routes/transparencyRoutes.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -110,6 +111,10 @@ app.use(
 app.use(
   "/api",
   contactRequestRoutes
+);
+app.use(
+  "/api",
+  transparencyRoutes
 );
 app.use(
   "/api",

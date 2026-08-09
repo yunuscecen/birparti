@@ -5,6 +5,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 
 const allowedAdminRoles = [
+  "financeManager",
   "admin",
   "superAdmin",
 ];
@@ -47,7 +48,19 @@ const AdminRoute = ({ children }) => {
       />
     );
   }
-
+if (
+  user.role ===
+    "financeManager" &&
+  location.pathname ===
+    "/admin"
+) {
+  return (
+    <Navigate
+      to="/admin/seffaflik"
+      replace
+    />
+  );
+}
   return children;
 };
 

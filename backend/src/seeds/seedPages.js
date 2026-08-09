@@ -15,12 +15,12 @@ const seedPages = async () => {
         {
           slug: pageData.slug,
         },
-        {
-          $set: {
-            ...pageData,
-            publishedAt: new Date(),
-          },
-        },
+       {
+  $setOnInsert: {
+    ...pageData,
+    publishedAt: new Date(),
+  },
+},
         {
           upsert: true,
           new: true,

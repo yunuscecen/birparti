@@ -1,12 +1,16 @@
 import {
+  ArrowUpDown,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Eye,
+  Handshake,
   Lock,
   MessageCircle,
   Pin,
   Search,
   Plus,
+  ThumbsUp,
 } from "lucide-react";
 import {
   useEffect,
@@ -50,8 +54,12 @@ const canCreateTopic =
   const category =
     searchParams.get("kategori") || "";
 
-  const search =
-    searchParams.get("arama") || "";
+const search =
+  searchParams.get("arama") || "";
+
+const sort =
+  searchParams.get("sirala") ||
+  "newest";
 
   const page = Math.max(
     Number(searchParams.get("sayfa")) || 1,
@@ -62,7 +70,7 @@ const canCreateTopic =
     useState(search);
 
   useEffect(() => {
-    document.title = "Forum | Bir Parti";
+    document.title = "Topluluk | Bir Parti";
 
     return () => {
       document.title = "Bir Parti";
@@ -75,19 +83,21 @@ const canCreateTopic =
   });
 
   const topicsQuery = useQuery({
-    queryKey: [
-      "forum-topics",
-      page,
-      category,
-      search,
-    ],
+   queryKey: [
+  "forum-topics",
+  page,
+  category,
+  search,
+  sort,
+],
 
     queryFn: () =>
       getForumTopics({
-        page,
-        category,
-        search,
-      }),
+  page,
+  category,
+  search,
+  sort,
+}),
   });
 
   const updateSearchParams = (updates) => {
@@ -133,7 +143,7 @@ const canCreateTopic =
             Birlikte konuşalım
           </p>
 
-          <h1>Forum</h1>
+         <h1>Topluluk</h1>
 
           <p>
             Görüşlerinizi paylaşın, farklı
@@ -226,14 +236,58 @@ const canCreateTopic =
             event.target.value
           )
         }
-        placeholder="Forum konularında ara..."
+        placeholder="Topluluk konularında ara..."
       />
 
       <button type="submit">
         Ara
       </button>
-    </form>
+      </form>
 
+  <div className="forum-sort-control">
+  <ArrowUpDown size={17} />
+
+  <span className="forum-sort-control__label">
+    Sırala
+  </span>
+
+  <select
+    className="forum-sort-select"
+    value={sort}
+    onChange={(event) =>
+      updateSearchParams({
+        sirala:
+          event.target.value,
+        sayfa: "",
+      })
+    }
+    aria-label="Konuları sırala"
+  >
+    <option value="newest">
+      En Yeni
+    </option>
+
+    <option value="popular">
+      En Popüler
+    </option>
+
+    <option value="most-voted">
+      En Çok Oy Alan
+    </option>
+
+    <option value="solved">
+      Çözülenler
+    </option>
+
+    <option value="most-supported">
+      En Çok Desteklenen
+    </option>
+
+    <option value="most-commented">
+      En Çok Yorum Alan
+    </option>
+  </select>
+</div>
     {canCreateTopic && (
       <Link
         to="/forum/yeni-konu"
@@ -248,7 +302,7 @@ const canCreateTopic =
             {topicsQuery.isLoading ? (
               <div className="forum-state">
                 <span className="auth-spinner" />
-                <p>Forum konuları yükleniyor...</p>
+             <p>Topluluk konuları yükleniyor...</p>
               </div>
             ) : topicsQuery.isError ? (
               <div className="forum-state">
@@ -279,17 +333,24 @@ const canCreateTopic =
                           </span>
                         )}
 
-                        {topic.status ===
-                          "locked" && (
-                          <span>
-                            <Lock size={13} />
-                            Kilitli
-                          </span>
-                        )}
+                      {topic.status ===
+  "locked" && (
+  <span>
+    <Lock size={13} />
+    Kilitli
+  </span>
+)}
 
-                        <span>
-                          {topic.category?.name}
-                        </span>
+{topic.isSolved && (
+  <span className="forum-topic-badge--solved">
+    <CheckCircle2 size={13} />
+    Çözüldü
+  </span>
+)}
+
+<span>
+  {topic.category?.name}
+</span>
                       </div>
 
                       <h2>
@@ -324,16 +385,26 @@ const canCreateTopic =
                     </div>
 
                     <div className="forum-topic-card__stats">
-                      <span>
-                        <MessageCircle size={17} />
-                        {topic.replyCount || 0}
-                      </span>
+  <span title="Yanıt sayısı">
+    <MessageCircle size={16} />
+    {topic.replyCount || 0}
+  </span>
 
-                      <span>
-                        <Eye size={17} />
-                        {topic.viewCount || 0}
-                      </span>
-                    </div>
+  <span title="Oy puanı">
+    <ThumbsUp size={16} />
+    {topic.voteScore || 0}
+  </span>
+
+  <span title="Destek sayısı">
+    <Handshake size={16} />
+    {topic.supportCount || 0}
+  </span>
+
+  <span title="Görüntülenme sayısı">
+    <Eye size={16} />
+    {topic.viewCount || 0}
+  </span>
+</div>
                   </article>
                 ))}
 

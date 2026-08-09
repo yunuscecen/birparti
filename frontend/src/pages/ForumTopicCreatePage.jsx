@@ -58,7 +58,7 @@ const {
 
   useEffect(() => {
     document.title =
-      "Yeni Forum Konusu | Bir Parti";
+      "Yeni Topluluk Konusu | Bir Parti"
 
     return () => {
       document.title =
@@ -125,7 +125,7 @@ const createMutation =
       setFormError(
         error?.response?.data?.message ||
           error?.message ||
-          "Forum konusu oluşturulamadı."
+          "Topluluk konusu oluşturulamadı."
       );
     },
   });
@@ -175,7 +175,7 @@ const createMutation =
 
     if (!formData.category) {
       setFormError(
-        "Bir forum kategorisi seçmelisiniz."
+       "Bir kategori seçmelisiniz."
       );
 
       return;
@@ -220,7 +220,7 @@ const createMutation =
                 <ArrowLeft
                   size={17}
                 />
-                Foruma Dön
+               Topluluğa Dön
               </Link>
             </div>
           </Container>

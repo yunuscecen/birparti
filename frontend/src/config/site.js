@@ -5,36 +5,36 @@ export const siteConfig = {
   email: "bilgi@birparti.com",
 
   primaryNavigation: [
-    {
-      label: "Ana Sayfa",
-      path: "/",
-      end: true,
-    },
-    {
-      label: "Projelerimiz",
-      path: "/projelerimiz",
-    },
-    {
-      label: "Biz Kimiz",
-      path: "/biz-kimiz",
-    },
-    {
-      label: "Neye Karşıyız",
-      path: "/neye-karsiyiz",
-    },
-    {
-      label: "Blog",
-      path: "/blog",
-    },
-    {
-      label: "Forum",
-      path: "/forum",
-    },
-    {
-      label: "İletişim",
-      path: "/iletisim",
-    },
-  ],
+  {
+    label: "Ana Sayfa",
+    path: "/",
+    end: true,
+  },
+  {
+    label: "Manifesto",
+    path: "/manifesto",
+  },
+  {
+    label: "Projeler",
+    path: "/projelerimiz",
+  },
+  {
+    label: "Yol Haritası",
+    path: "/yol-haritasi",
+  },
+  {
+    label: "Şeffaflık",
+    path: "/seffaflik",
+  },
+  {
+    label: "Blog",
+    path: "/blog",
+  },
+  {
+    label: "Topluluk",
+    path: "/forum",
+  },
+],
 
   auth: {
     loginLabel: "Giriş Yap",

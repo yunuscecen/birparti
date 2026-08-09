@@ -3,6 +3,7 @@ import {
   Gauge,
   LogOut,
   Menu,
+  WalletCards,
   MessageSquareText,
    Flag,
   FileText,
@@ -45,6 +46,11 @@ const adminNavigation = [
   path: "/admin/sayfalar",
   icon: FileText,
 },
+{
+  label: "Şeffaflık",
+  path: "/admin/seffaflik",
+  icon: WalletCards,
+},
  {
     label: "Projeler",
     path: "/admin/projeler",
@@ -56,17 +62,17 @@ const adminNavigation = [
     icon: Tags,
   },
   {
-  label: "Forum Konuları",
+  label: "Topluluk Konuları",
   path: "/admin/forum",
   icon: MessageSquareText,
 },
 {
-  label: "Forum Kategorileri",
+  label: "Topluluk Kategorileri",
   path: "/admin/forum-kategorileri",
   icon: Tags,
 },
 {
-  label: "Forum Bildirimleri",
+  label: "Topluluk Bildirimleri",
   path: "/admin/forum-bildirimleri",
   icon: Flag,
 },
@@ -117,6 +123,16 @@ const AdminLayout = () => {
     });
   };
 
+  const visibleNavigation =
+  user.role ===
+  "financeManager"
+    ? adminNavigation.filter(
+        (item) =>
+          item.path ===
+          "/admin/seffaflik"
+      )
+    : adminNavigation;
+
   return (
     <div className="admin-shell">
       <aside
@@ -144,7 +160,7 @@ const AdminLayout = () => {
             Yönetim
           </p>
 
-          {adminNavigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const Icon = item.icon;
 
             return (

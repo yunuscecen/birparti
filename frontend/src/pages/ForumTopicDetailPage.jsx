@@ -1,14 +1,18 @@
 import {
   ArrowLeft,
   AtSign,
+  CheckCircle2,
   CornerUpLeft,
   Eye,
   Flag,
+  Handshake,
   Lock,
   LogIn,
   MessageCircle,
   Pin,
   Send,
+  ThumbsDown,
+  ThumbsUp,
   X,
 } from "lucide-react";
 
@@ -37,6 +41,10 @@ import { useAuth } from "../context/AuthContext";
 import {
   createForumReply,
   getForumTopicBySlug,
+  getMyForumTopicInteraction,
+  updateForumTopicSolvedStatus,
+  updateForumTopicSupport,
+  updateForumTopicVote,
 } from "../services/forumService";
 
 const formatDate = (date) => {
@@ -71,8 +79,12 @@ const ForumTopicDetailPage = () => {
   const { slug } = useParams();
 const location =
   useLocation();
-  const queryClient =
-    useQueryClient();
+
+const navigate =
+  useNavigate();
+
+const queryClient =
+  useQueryClient();
 
 const {
   user,
@@ -102,6 +114,11 @@ const {
   setReportTarget,
 ] = useState(null);
 
+const [
+  interactionError,
+  setInteractionError,
+] = useState("");
+
   const topicQuery = useQuery({
     queryKey: [
       "forum-topic",
@@ -116,7 +133,24 @@ const {
     enabled: Boolean(slug),
     retry: false,
   });
+const interactionQuery =
+  useQuery({
+    queryKey: [
+      "forum-topic-interaction",
+      slug,
+    ],
 
+    queryFn: () =>
+      getMyForumTopicInteraction(
+        slug
+      ),
+
+    enabled:
+      Boolean(slug) &&
+      isAuthenticated,
+
+    retry: false,
+  });
   const topic =
     topicQuery.data?.topic;
 
@@ -126,12 +160,33 @@ const {
 
   const pagination =
     topicQuery.data?.pagination;
-
+const interaction =
+  interactionQuery.data
+    ?.interaction || {
+    vote: 0,
+    isSupported: false,
+  };
     const currentUserId = String(
   user?.id ||
   user?._id ||
   ""
 );
+
+const solvedManagerRoles = [
+  "moderator",
+  "admin",
+  "superAdmin",
+];
+
+const canManageSolved =
+  isAuthenticated &&
+  (String(
+    topic?.authorInfo?.id ||
+      ""
+  ) === currentUserId ||
+    solvedManagerRoles.includes(
+      user?.role
+    ));
 
 const canReportContent = (
   authorId
@@ -165,13 +220,186 @@ const closeReportModal = () => {
   setReportTarget(null);
 };
 
+const updateTopicMetricsCache = (
+  topicMetrics
+) => {
+  if (!topicMetrics) {
+    return;
+  }
+
+  queryClient.setQueryData(
+    [
+      "forum-topic",
+      slug,
+    ],
+
+    (currentData) => {
+      if (!currentData) {
+        return currentData;
+      }
+
+      return {
+        ...currentData,
+
+        topic: {
+          ...currentData.topic,
+          ...topicMetrics,
+        },
+      };
+    }
+  );
+
+  queryClient.invalidateQueries({
+    queryKey: [
+      "forum-topics",
+    ],
+  });
+};
+
+const handleInteractionError = (
+  error
+) => {
+  setInteractionError(
+    getErrorMessage(
+      error,
+      "İşlem tamamlanamadı."
+    )
+  );
+};
+
+const voteMutation =
+  useMutation({
+    mutationFn:
+      updateForumTopicVote,
+
+    onSuccess: (data) => {
+      setInteractionError("");
+
+      queryClient.setQueryData(
+        [
+          "forum-topic-interaction",
+          slug,
+        ],
+        data
+      );
+
+      updateTopicMetricsCache(
+        data.topic
+      );
+    },
+
+    onError:
+      handleInteractionError,
+  });
+
+const supportMutation =
+  useMutation({
+    mutationFn:
+      updateForumTopicSupport,
+
+    onSuccess: (data) => {
+      setInteractionError("");
+
+      queryClient.setQueryData(
+        [
+          "forum-topic-interaction",
+          slug,
+        ],
+        data
+      );
+
+      updateTopicMetricsCache(
+        data.topic
+      );
+    },
+
+    onError:
+      handleInteractionError,
+  });
+
+const solvedMutation =
+  useMutation({
+    mutationFn:
+      updateForumTopicSolvedStatus,
+
+    onSuccess: (data) => {
+      setInteractionError("");
+
+      updateTopicMetricsCache(
+        data.topic
+      );
+    },
+
+    onError:
+      handleInteractionError,
+  });
+
+const redirectToLogin = () => {
+  navigate(
+    "/giris",
+    {
+      state: {
+        from:
+          `/forum/${slug}`,
+      },
+    }
+  );
+};
+
+const handleVote = (
+  voteValue
+) => {
+  if (!isAuthenticated) {
+    redirectToLogin();
+    return;
+  }
+
+  const nextVote =
+    interaction.vote ===
+    voteValue
+      ? 0
+      : voteValue;
+
+  voteMutation.mutate({
+    slug,
+    vote: nextVote,
+  });
+};
+
+const handleSupport = () => {
+  if (!isAuthenticated) {
+    redirectToLogin();
+    return;
+  }
+
+  supportMutation.mutate({
+    slug,
+
+    isSupported:
+      !interaction.isSupported,
+  });
+};
+
+const handleSolved = () => {
+  solvedMutation.mutate({
+    slug,
+    isSolved:
+      !topic.isSolved,
+  });
+};
+
+const interactionPending =
+  voteMutation.isPending ||
+  supportMutation.isPending ||
+  solvedMutation.isPending;
+
   useEffect(() => {
     if (!topic) {
       return;
     }
 
     document.title =
-      `${topic.title} | Bir Parti Forum`;
+      `${topic.title} | Topluluk | Bir Parti`;
 
     return () => {
       document.title =
@@ -583,7 +811,7 @@ queryClient.invalidateQueries({
       <div className="forum-state forum-state--page">
         <span className="auth-spinner" />
         <p>
-          Forum konusu yükleniyor...
+         Topluluk konusu yükleniyor...
         </p>
       </div>
     );
@@ -596,11 +824,11 @@ queryClient.invalidateQueries({
     return (
       <div className="forum-state forum-state--page">
         <h1>
-          Forum konusu bulunamadı.
+         Topluluk konusu bulunamadı.
         </h1>
 
         <Link to="/forum">
-          Forum Sayfasına Dön
+          Topluluğa Dön
         </Link>
       </div>
     );
@@ -615,7 +843,7 @@ queryClient.invalidateQueries({
             className="forum-detail__back"
           >
             <ArrowLeft size={17} />
-            Foruma Dön
+            Topluluğa Dön
           </Link>
 
           <div className="forum-topic-card__badges">
@@ -684,7 +912,7 @@ queryClient.invalidateQueries({
         targetType: "topic",
         targetId: topic._id,
         targetLabel:
-          "Bu forum konusunu bildir",
+         "Bu konuyu bildir"
       })
     }
   >
@@ -726,6 +954,114 @@ queryClient.invalidateQueries({
                     </p>
                   )
                 )}
+                       </div>
+
+            <div className="forum-topic-interactions">
+              {interactionError && (
+                <div className="forum-interaction-error">
+                  {interactionError}
+                </div>
+              )}
+
+            <div className="forum-vote-control">
+  <button
+    type="button"
+    className={`forum-interaction-button ${
+      interaction.vote === 1
+        ? "forum-interaction-button--active"
+        : ""
+    }`}
+    onClick={() =>
+      handleVote(1)
+    }
+    disabled={
+      interactionPending
+    }
+    aria-label="Olumlu oy ver"
+    title="Olumlu oy ver"
+  >
+    <ThumbsUp size={17} />
+
+    <span>
+      {topic.upvoteCount || 0}
+    </span>
+  </button>
+
+  <button
+    type="button"
+    className={`forum-interaction-button forum-interaction-button--negative ${
+      interaction.vote === -1
+        ? "forum-interaction-button--active"
+        : ""
+    }`}
+    onClick={() =>
+      handleVote(-1)
+    }
+    disabled={
+      interactionPending
+    }
+    aria-label="Olumsuz oy ver"
+    title="Olumsuz oy ver"
+  >
+    <ThumbsDown size={17} />
+
+    <span>
+      {topic.downvoteCount || 0}
+    </span>
+  </button>
+</div>
+
+              <button
+                type="button"
+                className={`forum-support-button ${
+                  interaction.isSupported
+                    ? "forum-support-button--active"
+                    : ""
+                }`}
+                onClick={
+                  handleSupport
+                }
+                disabled={
+                  interactionPending
+                }
+              >
+                <Handshake size={17} />
+
+                {interaction.isSupported
+                  ? "Destekleniyor"
+                  : "Destekle"}
+
+                <strong>
+                  {topic.supportCount ||
+                    0}
+                </strong>
+              </button>
+
+             {canManageSolved ? (
+  <button
+    type="button"
+    className={`forum-solved-button ${
+      topic.isSolved
+        ? "forum-solved-button--active"
+        : ""
+    }`}
+    onClick={handleSolved}
+    disabled={interactionPending}
+  >
+    <CheckCircle2 size={17} />
+
+    {topic.isSolved
+      ? "Çözüldü · İşareti Kaldır"
+      : "Çözüldü Olarak İşaretle"}
+  </button>
+) : (
+  topic.isSolved && (
+    <span className="forum-solved-badge">
+      <CheckCircle2 size={17} />
+      Çözüldü
+    </span>
+  )
+)}
             </div>
           </article>
 
@@ -807,7 +1143,7 @@ queryClient.invalidateQueries({
               reply._id,
 
             targetLabel:
-              "Bu forum yanıtını bildir",
+              "Bu yanıtı bildir",
           })
         }
       >
@@ -935,7 +1271,7 @@ queryClient.invalidateQueries({
               childReply._id,
 
             targetLabel:
-              "Bu forum cevabını bildir",
+              "Bu cevabı bildir"
           })
         }
       >
@@ -1005,7 +1341,7 @@ queryClient.invalidateQueries({
                   </strong>
 
                   <p>
-                    Forum tartışmasına
+                   Topluluk tartışmasına
                     katılmak için
                     hesabınıza giriş
                     yapmanız gerekir.
