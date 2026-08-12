@@ -76,3 +76,21 @@ export const resetUserPassword =
 
     return response.data;
   };
+
+  export const verifyUserEmail =
+  async (token) => {
+    const response = await api.get(
+      `/auth/verify-email/${token}`
+    );
+
+    return response.data;
+  };
+
+export const resendEmailVerification =
+  async () => {
+    const response = await api.post(
+      "/auth/resend-verification"
+    );
+
+    return response.data;
+  };

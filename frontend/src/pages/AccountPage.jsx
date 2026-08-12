@@ -9,8 +9,14 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { useEffect } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
+import {
+  resendEmailVerification,
+} from "../services/authService";
 import {
   useQuery,
 } from "@tanstack/react-query";
@@ -52,6 +58,21 @@ const isForumEnabled =
     .forumEnabled;
   const navigate =
     useNavigate();
+
+    const [
+  verificationMessage,
+  setVerificationMessage,
+] = useState("");
+
+const [
+  verificationError,
+  setVerificationError,
+] = useState("");
+
+const [
+  isSendingVerification,
+  setIsSendingVerification,
+] = useState(false);
 
   const {
     user,
@@ -97,6 +118,33 @@ enabled:
         replace: true,
       });
     };
+
+    const handleResendVerification =
+  async () => {
+    setVerificationMessage("");
+    setVerificationError("");
+    setIsSendingVerification(
+      true
+    );
+
+    try {
+      const response =
+        await resendEmailVerification();
+
+      setVerificationMessage(
+        response.message
+      );
+    } catch (error) {
+      setVerificationError(
+        error.message ||
+          "E-posta gönderilemedi."
+      );
+    } finally {
+      setIsSendingVerification(
+        false
+      );
+    }
+  };
 
   return (
     <section className="account-page">
@@ -146,11 +194,40 @@ enabled:
             </span>
 
             <span>
-              E-posta:{" "}
-              {user.isEmailVerified
-                ? "Doğrulandı"
-                : "Doğrulama bekliyor"}
-            </span>
+  E-posta:{" "}
+  {user.isEmailVerified
+    ? "Doğrulandı"
+    : "Doğrulama bekliyor"}
+</span>
+
+{!user.isEmailVerified && (
+  <button
+    type="button"
+    className="account-verify-button"
+    disabled={
+      isSendingVerification
+    }
+    onClick={
+      handleResendVerification
+    }
+  >
+    {isSendingVerification
+      ? "Gönderiliyor..."
+      : "Doğrulama E-postasını Gönder"}
+  </button>
+)}
+
+{verificationMessage && (
+  <small className="account-verification-message">
+    {verificationMessage}
+  </small>
+)}
+
+{verificationError && (
+  <small className="account-verification-error">
+    {verificationError}
+  </small>
+)}
           </div>
 
           <button

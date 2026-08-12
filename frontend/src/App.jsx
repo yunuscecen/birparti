@@ -54,6 +54,7 @@ import AdminContactRequestsPage from "./pages/admin/AdminContactRequestsPage";
 import AdminContactRequestDetailPage from "./pages/admin/AdminContactRequestDetailPage";
 import AdminSiteSettingsPage from "./pages/admin/AdminSiteSettingsPage";
 import TransparencyPage from "./pages/TransparencyPage";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ContactPage from "./pages/ContactPage";
 
 const App = () => {
@@ -209,6 +210,13 @@ const App = () => {
   path="/sifre-sifirla/:token"
   element={
     <ResetPasswordPage />
+  }
+/>
+
+<Route
+  path="/e-posta-dogrula/:token"
+  element={
+    <EmailVerificationPage />
   }
 />
 

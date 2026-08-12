@@ -464,3 +464,69 @@
   background: #e8f8ee;
   color: #217844;
 }
+
+
+
+.email-verification-card {
+  width: min(100%, 560px);
+  padding: 38px;
+  text-align: center;
+}
+
+.email-verification-card h1 {
+  margin: 18px 0 10px;
+  color: var(--color-primary-950);
+}
+
+.email-verification-card p {
+  margin-bottom: 24px;
+  color: var(--color-text-soft);
+  line-height: 1.7;
+}
+
+.email-verification-card .auth-submit {
+  width: 100%;
+}
+
+.account-verify-button {
+  padding: 8px 12px;
+  border: 1px solid
+    rgba(36, 83, 173, 0.2);
+  border-radius: 9px;
+  background: rgba(
+    36,
+    83,
+    173,
+    0.08
+  );
+  color: var(--color-primary-700);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.account-verify-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.account-verification-message,
+.account-verification-error {
+  max-width: 260px;
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.account-verification-message {
+  color: #217844;
+}
+
+.account-verification-error {
+  color: #b72f49;
+}
+
+@media (max-width: 620px) {
+  .email-verification-card {
+    padding: 28px 20px;
+  }
+}

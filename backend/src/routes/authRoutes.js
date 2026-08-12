@@ -10,6 +10,10 @@ import {
 import { requireAuth } from "../middleware/authMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";
 import {
+  resendEmailVerification,
+  verifyEmail,
+} from "../controllers/emailVerificationController.js";
+import {
   requireFeatureEnabled,
 } from "../middleware/featureFlagMiddleware.js";
 
@@ -57,6 +61,27 @@ const passwordResetLimiter =
         "Çok fazla şifre sıfırlama isteği gönderdiniz. Lütfen daha sonra tekrar deneyin.",
     },
   });
+
+const emailVerificationLimiter =
+  rateLimit({
+    windowMs:
+      15 * 60 * 1000,
+
+    limit: 10,
+
+    standardHeaders:
+      "draft-8",
+
+    legacyHeaders: false,
+
+    message: {
+      success: false,
+
+      message:
+        "Çok fazla doğrulama isteği gönderdiniz. Lütfen daha sonra tekrar deneyin.",
+    },
+  });
+
 router.post(
   "/auth/register",
   authLimiter,
@@ -92,6 +117,19 @@ router.get(
   "/auth/me",
   requireAuth,
   getCurrentUser
+);
+
+router.get(
+  "/auth/verify-email/:token",
+  emailVerificationLimiter,
+  verifyEmail
+);
+
+router.post(
+  "/auth/resend-verification",
+  emailVerificationLimiter,
+  requireAuth,
+  resendEmailVerification
 );
 
 router.post(

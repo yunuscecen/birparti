@@ -3,6 +3,9 @@ import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import {
+  sendUserEmailVerification,
+} from "../services/emailVerificationService.js";
+import {
   createAccessToken,
   createRawRefreshToken,
   getClearRefreshCookieOptions,
@@ -123,7 +126,14 @@ export const register = asyncHandler(
         marketingAcceptedAt: acceptedMarketing ? now : null,
       },
     });
-
+void sendUserEmailVerification(
+  user
+).catch((error) => {
+  console.error(
+    "Registration verification email error:",
+    error
+  );
+});
     const accessToken = await issueSession({
       user,
       req,

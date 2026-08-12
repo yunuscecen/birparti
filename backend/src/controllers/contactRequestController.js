@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 import ContactRequest from "../models/ContactRequest.js";
+import {
+  sendContactRequestCreatedEmails,
+  sendContactRequestResponseEmail,
+} from "../services/emailService.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
@@ -91,15 +95,19 @@ export const createContactRequest =
           });
       }
 
-      const request =
-        await createRequestRecord({
-          data,
-        });
+    const request =
+  await createRequestRecord({
+    data,
+  });
 
-      sendCreatedResponse(
-        res,
-        request
-      );
+void sendContactRequestCreatedEmails(
+  request
+);
+
+sendCreatedResponse(
+  res,
+  request
+);
     }
   );
 
@@ -120,16 +128,20 @@ export const createAccountContactRequest =
           });
       }
 
-      const request =
-        await createRequestRecord({
-          data,
-          user: req.user,
-        });
+     const request =
+  await createRequestRecord({
+    data,
+    user: req.user,
+  });
 
-      sendCreatedResponse(
-        res,
-        request
-      );
+void sendContactRequestCreatedEmails(
+  request
+);
+
+sendCreatedResponse(
+  res,
+  request
+);  
     }
   );
 
@@ -467,6 +479,9 @@ export const updateAdminContactRequest =
       const data =
         req.validatedBody;
 
+let shouldSendResponseEmail =
+  false;
+
       if (
         data.status !==
         undefined
@@ -525,6 +540,8 @@ if (
     data.publicResponse;
 
   if (data.publicResponse) {
+    shouldSendResponseEmail =
+  true;
     const responseDate =
       new Date();
 
@@ -582,11 +599,19 @@ if (
       await request.save();
 
       await request.populate({
-        path:
-          "lastUpdatedBy",
-        select:
-          "firstName lastName email",
-      });
+  path:
+    "lastUpdatedBy",
+  select:
+    "firstName lastName email",
+});
+
+if (shouldSendResponseEmail) {
+  void sendContactRequestResponseEmail(
+    request
+  );
+}
+
+
 
       res.status(200).json({
         success: true,
