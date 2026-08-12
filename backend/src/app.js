@@ -21,6 +21,7 @@ import adminMediaRoutes from "./routes/adminMediaRoutes.js";
 import contactRequestRoutes from "./routes/contactRequestRoutes.js";
 import siteSettingRoutes from "./routes/siteSettingRoutes.js";
 import maintenanceModeMiddleware from "./middleware/maintenanceModeMiddleware.js";
+import bulkEmailRoutes from "./routes/bulkEmailRoutes.js";
 import transparencyRoutes from "./routes/transparencyRoutes.js";
 const app = express();
 
@@ -119,6 +120,10 @@ app.use(
 app.use(
   "/api",
   siteSettingRoutes
+);
+app.use(
+  "/api",
+  bulkEmailRoutes
 );
 app.get("/api/health", (req, res) => {
   res.status(200).json({

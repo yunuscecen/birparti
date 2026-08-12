@@ -103,6 +103,10 @@ const userSchema = new mongoose.Schema(
         type: Date,
         default: null,
       },
+      marketingUnsubscribedAt: {
+  type: Date,
+  default: null,
+},
     },
 
     lastLoginAt: {
