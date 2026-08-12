@@ -55,6 +55,7 @@ import AdminContactRequestDetailPage from "./pages/admin/AdminContactRequestDeta
 import AdminSiteSettingsPage from "./pages/admin/AdminSiteSettingsPage";
 import TransparencyPage from "./pages/TransparencyPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
+import AdminBulkEmailsPage from "./pages/admin/AdminBulkEmailsPage";
 import ContactPage from "./pages/ContactPage";
 
 const App = () => {
@@ -421,6 +422,12 @@ const App = () => {
   path="forum/:topicId/moderasyon"
   element={
     <AdminForumTopicModerationPage />
+  }
+/>
+<Route
+  path="toplu-e-posta"
+  element={
+    <AdminBulkEmailsPage />
   }
 />
 <Route

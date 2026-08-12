@@ -11,6 +11,7 @@ import {
   Settings,
   House,
   Users,
+  Mail,
   Tags,
   X,
 } from "lucide-react";
@@ -40,7 +41,11 @@ const adminNavigation = [
     path: "/admin/uyeler",
     icon: Users,
   },
-
+{
+  label: "Toplu E-posta",
+  path: "/admin/toplu-e-posta",
+  icon: Mail,
+},
   {
   label: "Sayfa Yönetimi",
   path: "/admin/sayfalar",

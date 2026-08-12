@@ -12,6 +12,7 @@ import "./styles/forum.css";
 import "./styles/accountForumReports.css";
 import "./styles/accountForumNotifications.css";
 import "./styles/adminContactRequests.css";
+import "./styles/adminBulkEmails.css";
 import "./styles/accountContactRequests.css";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import MaintenanceGate from "./components/common/MaintenanceGate";
