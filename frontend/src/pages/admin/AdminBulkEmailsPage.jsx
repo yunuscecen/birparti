@@ -1,4 +1,5 @@
 import {
+  Copy,
   Mail,
   Pencil,
   Plus,
@@ -416,7 +417,37 @@ const AdminBulkEmailsPage = () => {
         behavior: "smooth",
       });
     };
+  const handleCopyCampaign =
+    (campaign) => {
+      setFormData({
+        ...normalizeCampaign(
+          campaign
+        ),
 
+        name:
+          `${campaign.name} - Kopya`,
+      });
+
+      setEditingId("");
+
+      setEditingStatus(
+        "draft"
+      );
+
+      setIsDirty(true);
+      setConfirmation("");
+
+      setFeedback(
+        "Kampanya içeriği yeni taslağa kopyalandı. Göndermeden önce taslağı kaydedin."
+      );
+
+      setFormError("");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
   const handleEditCampaign =
     (campaign) => {
       setFormData(
@@ -926,19 +957,27 @@ const AdminBulkEmailsPage = () => {
                           campaign._id
                         }
                       >
-                        <td>
-                          <strong>
-                            {
-                              campaign.name
-                            }
-                          </strong>
+                     <td>
+  <strong>
+    {
+      campaign.name
+    }
+  </strong>
 
-                          <span>
-                            {
-                              campaign.subject
-                            }
-                          </span>
-                        </td>
+  <span>
+    {
+      campaign.subject
+    }
+  </span>
+
+  {campaign.lastError && (
+    <small className="bulk-email-history-error">
+      Hata: {
+        campaign.lastError
+      }
+    </small>
+  )}
+</td>
 
                         <td>
                           {campaign.emailType ===
@@ -978,30 +1017,36 @@ const AdminBulkEmailsPage = () => {
                           )}
                         </td>
 
-                        <td>
-                          {campaign.status ===
-                          "draft" ? (
-                            <div className="admin-inline-actions">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleEditCampaign(
-                                    campaign
-                                  )
-                                }
-                              >
-                                <Pencil
-                                  size={
-                                    15
-                                  }
-                                />
-                                Düzenle
-                              </button>
-                            </div>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
+               <td>
+  <div className="admin-inline-actions">
+    {campaign.status ===
+    "draft" ? (
+      <button
+        type="button"
+        onClick={() =>
+          handleEditCampaign(
+            campaign
+          )
+        }
+      >
+        <Pencil size={15} />
+        Düzenle
+      </button>
+    ) : (
+      <button
+        type="button"
+        onClick={() =>
+          handleCopyCampaign(
+            campaign
+          )
+        }
+      >
+        <Copy size={15} />
+        Taslak Olarak Kopyala
+      </button>
+    )}
+  </div>
+</td>
                       </tr>
                     )
                   )}

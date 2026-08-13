@@ -55,6 +55,7 @@ import AdminContactRequestDetailPage from "./pages/admin/AdminContactRequestDeta
 import AdminSiteSettingsPage from "./pages/admin/AdminSiteSettingsPage";
 import TransparencyPage from "./pages/TransparencyPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
+import EmailPreferencePage from "./pages/EmailPreferencePage";
 import AdminBulkEmailsPage from "./pages/admin/AdminBulkEmailsPage";
 import ContactPage from "./pages/ContactPage";
 
@@ -220,6 +221,12 @@ const App = () => {
     <EmailVerificationPage />
   }
 />
+<Route
+  path="/e-posta-tercihi/:token"
+  element={
+    <EmailPreferencePage />
+  }
+/>  
 
         <Route
           path="/hesabim"

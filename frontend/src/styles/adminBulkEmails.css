@@ -278,3 +278,19 @@
     padding: 21px;
   }
 }
+
+.bulk-email-history-error {
+  display: block;
+  max-width: 420px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid
+    rgba(177, 45, 70, 0.14);
+  border-radius: 8px;
+  background:
+    rgba(177, 45, 70, 0.06);
+  color: #9f2941;
+  font-size: 0.67rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
