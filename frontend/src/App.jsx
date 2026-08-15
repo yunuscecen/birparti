@@ -15,8 +15,8 @@ import ContentPage from "./pages/ContentPage";
 import HomePage from "./pages/Homepage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import PlaceholderPage from "./pages/PlaceholderPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
+import DonationPage from "./pages/DonationPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminProjectCategoriesPage from "./pages/admin/AdminProjectCategoriesPage";
@@ -172,16 +172,12 @@ const App = () => {
   element={<ContactPage />}
 />
 
-        <Route
-          path="/bagis"
-          element={
-            <PlaceholderPage
-              eyebrow="Bir Damla Ol"
-              title="Birlikte çoğalalım"
-              description="Halk bağışı ve milletvekili bağışı seçenekleri bu sayfa altında bulunacak."
-            />
-          }
-        />
+     <Route
+  path="/bagis"
+  element={
+    <DonationPage />
+  }
+/>
 
         <Route
           path="/giris"

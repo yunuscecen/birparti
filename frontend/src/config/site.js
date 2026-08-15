@@ -44,9 +44,16 @@ export const siteConfig = {
   },
 
   donation: {
-    label: "Bir Damla Ol",
-    path: "/bagis",
-  },
+  label: "Bir Damla Ol",
+  path: "/bagis",
+
+  provider: "Kreosus",
+
+  creatorId: "6161",
+
+  profileUrl:
+    "https://kreosus.com/birparti",
+},
 
   footer: {
     primaryText: "Bu bir parti sitesi değil.",

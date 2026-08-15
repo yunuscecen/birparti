@@ -24,8 +24,8 @@
   color: var(--color-primary-950);
 }
 .site-logo__image {
-  width: 42px;
-  height: 52px;
+  width: 200px;
+  height: 70px;
   flex: 0 0 auto;
   object-fit: contain;
 }
@@ -40,6 +40,7 @@
   font-weight: 700;
   letter-spacing: 0.035em;
   white-space: nowrap;
+  display: none!important;
 }
 
 .site-navigation {
