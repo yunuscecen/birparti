@@ -64,15 +64,36 @@ const bulkEmailCampaignSchema =
         default: "",
       },
 
-      audienceRoles: {
-        type: [
-          {
-            type: String,
-            enum: allowedRoles,
-          },
-        ],
-        default: [],
-      },
+     audienceMode: {
+  type: String,
+  enum: [
+    "all",
+    "roles",
+    "selected",
+  ],
+  default: "all",
+  index: true,
+},
+
+audienceRoles: {
+  type: [
+    {
+      type: String,
+      enum: allowedRoles,
+    },
+  ],
+  default: [],
+},
+
+selectedRecipients: [
+  {
+    type:
+      mongoose.Schema.Types
+        .ObjectId,
+
+    ref: "User",
+  },
+],
 
       status: {
         type: String,

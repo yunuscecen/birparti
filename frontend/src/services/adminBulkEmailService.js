@@ -1,18 +1,62 @@
 import api from "./api";
 
+const getRecipientIds = (
+  selectedRecipients = []
+) =>
+  selectedRecipients
+    .map((recipient) =>
+      typeof recipient === "string"
+        ? recipient
+        : recipient?._id
+    )
+    .filter(Boolean);
+
 export const getBulkEmailAudienceCount =
   async ({
     emailType = "announcement",
+    audienceMode = "all",
     roles = [],
+    selectedRecipients = [],
   } = {}) => {
+    const recipientIds =
+      getRecipientIds(
+        selectedRecipients
+      );
+
     const response = await api.get(
       "/admin/bulk-emails/audience-count",
       {
         params: {
           emailType,
+          audienceMode,
+
           ...(roles.length > 0 && {
             roles: roles.join(","),
           }),
+
+          ...(recipientIds.length >
+            0 && {
+            userIds:
+              recipientIds.join(","),
+          }),
+        },
+      }
+    );
+
+    return response.data.data;
+  };
+
+export const getBulkEmailRecipientOptions =
+  async ({
+    search = "",
+    emailType = "announcement",
+  } = {}) => {
+    const response = await api.get(
+      "/admin/bulk-emails/recipient-options",
+      {
+        params: {
+          search,
+          emailType,
         },
       }
     );

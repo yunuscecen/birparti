@@ -5,6 +5,7 @@ import {
   createAdminBulkEmailCampaign,
   getAdminBulkEmailCampaignById,
   getAdminBulkEmailCampaigns,
+  getBulkEmailRecipientOptions,
   getBulkEmailAudienceCount,
   sendAdminBulkEmailCampaign,
   sendAdminBulkEmailTest,
@@ -54,6 +55,11 @@ router.use(
 router.get(
   "/admin/bulk-emails/audience-count",
   getBulkEmailAudienceCount
+);
+
+router.get(
+  "/admin/bulk-emails/recipient-options",
+  getBulkEmailRecipientOptions
 );
 
 router.get(

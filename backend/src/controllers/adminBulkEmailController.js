@@ -21,6 +21,12 @@ const allowedRoles = [
   "superAdmin",
 ];
 
+const allowedAudienceModes = [
+  "all",
+  "roles",
+  "selected",
+];
+
 const ensureObjectId = (
   id
 ) => {
@@ -55,9 +61,93 @@ const parseRoles = (
   ];
 };
 
+const parseObjectIds = (
+  value = ""
+) => {
+  const ids = Array.isArray(
+    value
+  )
+    ? value
+    : String(value)
+        .split(",");
+
+  return [
+    ...new Set(
+      ids
+        .map((id) =>
+          String(id).trim()
+        )
+        .filter((id) =>
+          mongoose.isValidObjectId(
+            id
+          )
+        )
+    ),
+  ];
+};
+
+const normalizeAudienceMode = (
+  value,
+  audienceRoles = []
+) => {
+  if (
+    allowedAudienceModes.includes(
+      value
+    )
+  ) {
+    return value;
+  }
+
+  return audienceRoles.length >
+    0
+    ? "roles"
+    : "all";
+};
+
+const normalizeCampaignAudience =
+  (data) => {
+    const audienceRoles = [
+      ...new Set(
+        data.audienceRoles ||
+          []
+      ),
+    ];
+
+    const audienceMode =
+      normalizeAudienceMode(
+        data.audienceMode,
+        audienceRoles
+      );
+
+    const selectedRecipients =
+      parseObjectIds(
+        data.selectedRecipients ||
+          []
+      );
+
+    return {
+      ...data,
+      audienceMode,
+
+      audienceRoles:
+        audienceMode ===
+        "roles"
+          ? audienceRoles
+          : [],
+
+      selectedRecipients:
+        audienceMode ===
+        "selected"
+          ? selectedRecipients
+          : [],
+    };
+  };
+
 const getRecipientFilter = ({
   emailType,
+  audienceMode = "all",
   audienceRoles = [],
+  selectedRecipients = [],
 }) => {
   const filter = {
     status: "active",
@@ -76,15 +166,39 @@ const getRecipientFilter = ({
   }
 
   if (
-    audienceRoles.length > 0
+    audienceMode ===
+    "roles"
   ) {
-    filter.role = {
-      $in: audienceRoles,
+    filter.role =
+      audienceRoles.length > 0
+        ? {
+            $in:
+              audienceRoles,
+          }
+        : {
+            $in: [],
+          };
+  }
+
+  if (
+    audienceMode ===
+    "selected"
+  ) {
+    filter._id = {
+      $in:
+        selectedRecipients,
     };
   }
 
   return filter;
 };
+
+const escapeRegularExpression =
+  (value = "") =>
+    String(value).replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
+    );
 
 export const getBulkEmailAudienceCount =
   asyncHandler(
@@ -100,11 +214,25 @@ export const getBulkEmailAudienceCount =
           req.query.roles
         );
 
+      const audienceMode =
+        normalizeAudienceMode(
+          req.query
+            .audienceMode,
+          audienceRoles
+        );
+
+      const selectedRecipients =
+        parseObjectIds(
+          req.query.userIds
+        );
+
       const count =
         await User.countDocuments(
           getRecipientFilter({
             emailType,
+            audienceMode,
             audienceRoles,
+            selectedRecipients,
           })
         );
 
@@ -113,6 +241,108 @@ export const getBulkEmailAudienceCount =
 
         data: {
           count,
+        },
+      });
+    }
+  );
+
+export const getBulkEmailRecipientOptions =
+  asyncHandler(
+    async (req, res) => {
+      const emailType =
+        req.query.emailType ===
+        "system"
+          ? "system"
+          : "announcement";
+
+      const search =
+        String(
+          req.query.search ||
+            ""
+        )
+          .trim()
+          .slice(0, 160);
+
+      if (search.length < 2) {
+        return res
+          .status(200)
+          .json({
+            success: true,
+
+            data: {
+              users: [],
+            },
+          });
+      }
+
+           const searchTerms =
+        search
+          .split(/\s+/)
+          .map(
+            escapeRegularExpression
+          )
+          .filter(Boolean);
+
+      const filter =
+        getRecipientFilter({
+          emailType,
+          audienceMode: "all",
+        });
+
+      filter.$and =
+        searchTerms.map(
+          (searchTerm) => ({
+            $or: [
+              {
+                firstName: {
+                  $regex:
+                    searchTerm,
+                  $options: "i",
+                },
+              },
+              {
+                lastName: {
+                  $regex:
+                    searchTerm,
+                  $options: "i",
+                },
+              },
+              {
+                email: {
+                  $regex:
+                    searchTerm,
+                  $options: "i",
+                },
+              },
+            ],
+          })
+        );
+
+      const users =
+        await User.find(filter)
+          .select(
+            "_id firstName lastName email role"
+          )
+          .sort({
+            firstName: 1,
+            lastName: 1,
+          })
+          .limit(25)
+          .lean();
+
+      res.status(200).json({
+        success: true,
+
+        data: {
+          users:
+            users.map(
+              (user) => ({
+                ...user,
+
+                fullName:
+                  `${user.firstName} ${user.lastName}`.trim(),
+              })
+            ),
         },
       });
     }
@@ -149,6 +379,13 @@ export const getAdminBulkEmailCampaigns =
             select:
               "firstName lastName email",
           })
+          .populate({
+  path:
+    "selectedRecipients",
+
+  select:
+    "firstName lastName email role",
+})
           .sort({
             createdAt: -1,
           })
@@ -187,13 +424,18 @@ export const getAdminBulkEmailCampaigns =
 export const createAdminBulkEmailCampaign =
   asyncHandler(
     async (req, res) => {
-      const campaign =
-        await BulkEmailCampaign.create({
-          ...req.validatedBody,
-          createdBy:
-            req.user._id,
-        });
+     const campaignData =
+  normalizeCampaignAudience(
+    req.validatedBody
+  );
 
+const campaign =
+  await BulkEmailCampaign.create({
+    ...campaignData,
+
+    createdBy:
+      req.user._id,
+  });
       res.status(201).json({
         success: true,
 
@@ -229,7 +471,13 @@ export const getAdminBulkEmailCampaignById =
             path: "sentBy",
             select:
               "firstName lastName email",
-          });
+          }).populate({
+  path:
+    "selectedRecipients",
+
+  select:
+    "firstName lastName email role",
+})
 
       if (!campaign) {
         throw new AppError(
@@ -278,11 +526,15 @@ export const updateAdminBulkEmailCampaign =
         );
       }
 
-      Object.assign(
-        campaign,
-        req.validatedBody
-      );
+     const campaignData =
+  normalizeCampaignAudience(
+    req.validatedBody
+  );
 
+Object.assign(
+  campaign,
+  campaignData
+);
       await campaign.save();
 
       res.status(200).json({
@@ -364,14 +616,29 @@ export const sendAdminBulkEmailCampaign =
 
       const users =
         await User.find(
-          getRecipientFilter({
-            emailType:
-              campaign.emailType,
+         getRecipientFilter({
+  emailType:
+    campaign.emailType,
 
-            audienceRoles:
-              campaign
-                .audienceRoles,
-          })
+  audienceMode:
+    campaign
+      .audienceMode ||
+    (
+      campaign
+        .audienceRoles
+        ?.length > 0
+        ? "roles"
+        : "all"
+    ),
+
+  audienceRoles:
+    campaign
+      .audienceRoles,
+
+  selectedRecipients:
+    campaign
+      .selectedRecipients,
+})
         )
           .select(
             "_id firstName lastName email"

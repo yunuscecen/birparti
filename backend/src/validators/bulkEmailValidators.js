@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+const objectIdSchema = z
+  .string()
+  .trim()
+  .regex(
+    /^[a-f\d]{24}$/i,
+    "Seçilen üye kimliği geçerli değil."
+  );
+
 const roleSchema = z.enum([
   "member",
   "moderator",
@@ -81,11 +89,28 @@ export const bulkEmailCampaignSchema =
           .optional()
           .default(""),
 
-      audienceRoles: z
-        .array(roleSchema)
-        .max(6)
-        .optional()
-        .default([]),
+    audienceMode: z
+  .enum([
+    "all",
+    "roles",
+    "selected",
+  ])
+  .optional(),
+
+audienceRoles: z
+  .array(roleSchema)
+  .max(6)
+  .optional()
+  .default([]),
+
+selectedRecipients: z
+  .array(objectIdSchema)
+  .max(
+    500,
+    "Bir kampanyada en fazla 500 seçili üye kullanılabilir."
+  )
+  .optional()
+  .default([]),
     })
     .superRefine(
       (data, context) => {
@@ -112,6 +137,47 @@ export const bulkEmailCampaignSchema =
             ],
             message:
               "Buton bağlantısı girildiyse buton yazısı da girilmelidir.",
+          });
+        }
+
+                const audienceMode =
+          data.audienceMode ||
+          (
+            data.audienceRoles
+              .length > 0
+              ? "roles"
+              : "all"
+          );
+
+        if (
+          audienceMode ===
+            "roles" &&
+          data.audienceRoles
+            .length === 0
+        ) {
+          context.addIssue({
+            code: "custom",
+            path: [
+              "audienceRoles",
+            ],
+            message:
+              "Rol hedeflemesi için en az bir rol seçilmelidir.",
+          });
+        }
+
+        if (
+          audienceMode ===
+            "selected" &&
+          data.selectedRecipients
+            .length === 0
+        ) {
+          context.addIssue({
+            code: "custom",
+            path: [
+              "selectedRecipients",
+            ],
+            message:
+              "En az bir üye seçilmelidir.",
           });
         }
       }

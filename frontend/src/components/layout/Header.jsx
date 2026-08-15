@@ -1,33 +1,62 @@
-import { useEffect, useState } from "react";
 import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Bell,
   LayoutDashboard,
   Menu,
   UserRound,
   X,
 } from "lucide-react";
+
+import {
+  useQuery,
+} from "@tanstack/react-query";
+
 import {
   NavLink,
   useLocation,
 } from "react-router-dom";
 
-import { siteConfig } from "../../config/site";
-import { useAuth } from "../../context/AuthContext";
-import ButtonLink from "../common/ButtonLink";
-import Container from "../common/Container";
-import Logo from "./Logo";
+import {
+  siteConfig,
+} from "../../config/site";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
 import {
   useSiteSettings,
 } from "../../context/SiteSettingsContext";
 
-const adminRoles = ["admin", "superAdmin"];
+import {
+  getMyForumNotifications,
+} from "../../services/accountForumService";
+
+import ButtonLink from "../common/ButtonLink";
+import Container from "../common/Container";
+import Logo from "./Logo";
+
+const adminRoles = [
+  "admin",
+  "superAdmin",
+];
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] =
-    useState(false);
-const {
-  settings,
-} = useSiteSettings();
-  const location = useLocation();
+  const [
+    isMenuOpen,
+    setIsMenuOpen,
+  ] = useState(false);
+
+  const {
+    settings,
+  } = useSiteSettings();
+
+  const location =
+    useLocation();
 
   const {
     user,
@@ -37,7 +66,49 @@ const {
 
   const hasAdminAccess =
     isAuthenticated &&
-    adminRoles.includes(user?.role);
+    adminRoles.includes(
+      user?.role
+    );
+
+  const isForumEnabled =
+    Boolean(
+      settings.features
+        .forumEnabled
+    );
+
+  const notificationSummaryQuery =
+    useQuery({
+      queryKey: [
+        "my-forum-notifications",
+        "header-summary",
+        user?.id || "",
+      ],
+
+      queryFn: () =>
+        getMyForumNotifications({
+          page: 1,
+          limit: 1,
+        }),
+
+      enabled:
+        isAuthReady &&
+        isAuthenticated &&
+        isForumEnabled,
+
+      staleTime: 30000,
+      refetchInterval: 60000,
+      refetchOnWindowFocus: true,
+      retry: false,
+    });
+
+  const unreadCount =
+    notificationSummaryQuery
+      .data?.unreadCount || 0;
+
+  const unreadCountLabel =
+    unreadCount > 99
+      ? "99+"
+      : unreadCount;
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -45,10 +116,13 @@ const {
 
   useEffect(() => {
     document.body.style.overflow =
-      isMenuOpen ? "hidden" : "";
+      isMenuOpen
+        ? "hidden"
+        : "";
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
     };
   }, [isMenuOpen]);
 
@@ -72,7 +146,9 @@ const {
             <button
               type="button"
               className="site-navigation__close"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() =>
+                setIsMenuOpen(false)
+              }
               aria-label="Menüyü kapat"
             >
               <X size={24} />
@@ -80,44 +156,73 @@ const {
           </div>
 
           <div className="site-navigation__links">
-           {siteConfig.primaryNavigation
-  .filter(
-    (item) =>
-      item.path !==
-        "/forum" ||
-      settings.features
-        .forumEnabled
-  )
-  .map(
-              (item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.end}
-                  className={({ isActive }) =>
-                    `site-navigation__link ${
-                      isActive
-                        ? "site-navigation__link--active"
-                        : ""
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
+            {siteConfig
+              .primaryNavigation
+              .filter(
+                (item) =>
+                  item.path !==
+                    "/forum" ||
+                  isForumEnabled
               )
-            )}
+              .map(
+                (item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    end={item.end}
+                    className={({
+                      isActive,
+                    }) =>
+                      `site-navigation__link ${
+                        isActive
+                          ? "site-navigation__link--active"
+                          : ""
+                      }`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                )
+              )}
           </div>
 
           <div className="site-navigation__mobile-actions">
-            {isAuthReady && isAuthenticated ? (
+            {isAuthReady &&
+            isAuthenticated ? (
               <>
+                {isForumEnabled && (
+                  <ButtonLink
+                    to="/hesabim/forum-bildirimlerim"
+                    variant="ghost"
+                    className="site-navigation__mobile-button site-navigation__mobile-notification"
+                  >
+                    <Bell
+                      size={18}
+                    />
+
+                    Bildirimler
+
+                    {unreadCount >
+                      0 && (
+                      <span className="site-navigation__mobile-notification-count">
+                        {
+                          unreadCountLabel
+                        }
+                      </span>
+                    )}
+                  </ButtonLink>
+                )}
+
                 {hasAdminAccess && (
                   <ButtonLink
                     to="/admin"
                     variant="secondary"
                     className="site-navigation__mobile-button"
                   >
-                    <LayoutDashboard size={18} />
+                    <LayoutDashboard
+                      size={18}
+                    />
+
                     Yönetim Paneli
                   </ButtonLink>
                 )}
@@ -127,40 +232,88 @@ const {
                   variant="ghost"
                   className="site-navigation__mobile-button"
                 >
-                  <UserRound size={18} />
+                  <UserRound
+                    size={18}
+                  />
+
                   Hesabım
                 </ButtonLink>
               </>
             ) : (
               <ButtonLink
-                to={siteConfig.auth.loginPath}
+                to={
+                  siteConfig.auth
+                    .loginPath
+                }
                 variant="ghost"
                 className="site-navigation__mobile-button"
               >
-                <UserRound size={18} />
-                {siteConfig.auth.loginLabel}
+                <UserRound
+                  size={18}
+                />
+
+                {
+                  siteConfig.auth
+                    .loginLabel
+                }
               </ButtonLink>
             )}
 
             <ButtonLink
-              to={siteConfig.donation.path}
+              to={
+                siteConfig.donation
+                  .path
+              }
               className="site-navigation__mobile-button"
             >
-              {siteConfig.donation.label}
+              {
+                siteConfig.donation
+                  .label
+              }
             </ButtonLink>
           </div>
         </nav>
 
         <div className="site-header__actions">
-          {isAuthReady && isAuthenticated ? (
+          {isAuthReady &&
+          isAuthenticated ? (
             <>
+              {isForumEnabled && (
+                <NavLink
+                  to="/hesabim/forum-bildirimlerim"
+                  className="site-header__notification"
+                  aria-label={
+                    unreadCount > 0
+                      ? `${unreadCount} okunmamış forum bildirimi`
+                      : "Forum bildirimleri"
+                  }
+                  title="Forum Bildirimleri"
+                >
+                  <Bell size={20} />
+
+                  {unreadCount >
+                    0 && (
+                    <span className="site-header__notification-count">
+                      {
+                        unreadCountLabel
+                      }
+                    </span>
+                  )}
+                </NavLink>
+              )}
+
               {hasAdminAccess && (
                 <NavLink
                   to="/admin"
                   className="site-header__admin"
                 >
-                  <LayoutDashboard size={18} />
-                  <span>Yönetim</span>
+                  <LayoutDashboard
+                    size={18}
+                  />
+
+                  <span>
+                    Yönetim
+                  </span>
                 </NavLink>
               )}
 
@@ -168,36 +321,58 @@ const {
                 to="/hesabim"
                 className="site-header__login"
               >
-                <UserRound size={18} />
-                <span>Hesabım</span>
+                <UserRound
+                  size={18}
+                />
+
+                <span>
+                  Hesabım
+                </span>
               </NavLink>
             </>
           ) : (
             <NavLink
-              to={siteConfig.auth.loginPath}
+              to={
+                siteConfig.auth
+                  .loginPath
+              }
               className="site-header__login"
             >
-              <UserRound size={18} />
+              <UserRound
+                size={18}
+              />
+
               <span>
-                {siteConfig.auth.loginLabel}
+                {
+                  siteConfig.auth
+                    .loginLabel
+                }
               </span>
             </NavLink>
           )}
 
           <ButtonLink
-            to={siteConfig.donation.path}
+            to={
+              siteConfig.donation.path
+            }
             size="small"
             className="site-header__donation"
           >
-            {siteConfig.donation.label}
+            {
+              siteConfig.donation.label
+            }
           </ButtonLink>
 
           <button
             type="button"
             className="site-header__menu-button"
-            onClick={() => setIsMenuOpen(true)}
+            onClick={() =>
+              setIsMenuOpen(true)
+            }
             aria-label="Menüyü aç"
-            aria-expanded={isMenuOpen}
+            aria-expanded={
+              isMenuOpen
+            }
             aria-controls="main-navigation"
           >
             <Menu size={25} />
@@ -210,7 +385,9 @@ const {
           type="button"
           className="site-navigation-overlay"
           aria-label="Menüyü kapat"
-          onClick={() => setIsMenuOpen(false)}
+          onClick={() =>
+            setIsMenuOpen(false)
+          }
         />
       )}
     </header>

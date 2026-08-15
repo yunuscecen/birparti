@@ -19,6 +19,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import BulkEmailAudienceSelector from "../../components/admin/BulkEmailAudienceSelector";
+
 import {
   createAdminBulkEmailCampaign,
   getAdminBulkEmailCampaigns,
@@ -36,35 +38,12 @@ const emptyForm = {
   body: "",
   actionLabel: "",
   actionUrl: "",
+  audienceMode: "all",
   audienceRoles: [],
+  selectedRecipients: [],
 };
 
-const roleOptions = [
-  {
-    value: "member",
-    label: "Üyeler",
-  },
-  {
-    value: "moderator",
-    label: "Moderatörler",
-  },
-  {
-    value: "contentEditor",
-    label: "İçerik Editörleri",
-  },
-  {
-    value: "financeManager",
-    label: "Finans Yöneticileri",
-  },
-  {
-    value: "admin",
-    label: "Yöneticiler",
-  },
-  {
-    value: "superAdmin",
-    label: "Süper Yöneticiler",
-  },
-];
+
 
 const statusLabels = {
   draft: "Taslak",
@@ -106,8 +85,52 @@ const normalizeCampaign = (
     campaign.actionLabel || "",
   actionUrl:
     campaign.actionUrl || "",
+
+  audienceMode:
+    campaign.audienceMode ||
+    (
+      campaign.audienceRoles
+        ?.length > 0
+        ? "roles"
+        : "all"
+    ),
+
   audienceRoles:
     campaign.audienceRoles || [],
+
+  selectedRecipients:
+    (
+      campaign.selectedRecipients ||
+      []
+    ).map((recipient) =>
+      typeof recipient === "string"
+        ? {
+            _id: recipient,
+            firstName: "",
+            lastName: "",
+            email: recipient,
+            role: "",
+          }
+        : recipient
+    ),
+});
+
+const getRecipientId = (
+  recipient
+) =>
+  typeof recipient === "string"
+    ? recipient
+    : recipient?._id || "";
+
+const buildCampaignPayload = (
+  formData
+) => ({
+  ...formData,
+
+  selectedRecipients:
+    formData.selectedRecipients
+      .map(getRecipientId)
+      .filter(Boolean),
 });
 
 const AdminBulkEmailsPage = () => {
@@ -165,12 +188,19 @@ const AdminBulkEmailsPage = () => {
         }),
     });
 
+  const selectedRecipientIds =
+    formData.selectedRecipients
+      .map(getRecipientId)
+      .filter(Boolean);
+
   const audienceQuery =
     useQuery({
       queryKey: [
         "admin-bulk-email-audience",
         formData.emailType,
+        formData.audienceMode,
         formData.audienceRoles,
+        selectedRecipientIds,
       ],
 
       queryFn: () =>
@@ -178,16 +208,27 @@ const AdminBulkEmailsPage = () => {
           emailType:
             formData.emailType,
 
+          audienceMode:
+            formData.audienceMode,
+
           roles:
             formData.audienceRoles,
+
+          selectedRecipients:
+            selectedRecipientIds,
         }),
     });
 
   const saveMutation =
     useMutation({
-      mutationFn: (
+           mutationFn: (
         submittedForm
       ) => {
+        const campaignPayload =
+          buildCampaignPayload(
+            submittedForm
+          );
+
         if (editingId) {
           return updateAdminBulkEmailCampaign(
             {
@@ -195,13 +236,13 @@ const AdminBulkEmailsPage = () => {
                 editingId,
 
               formData:
-                submittedForm,
+                campaignPayload,
             }
           );
         }
 
         return createAdminBulkEmailCampaign(
-          submittedForm
+          campaignPayload
         );
       },
 
@@ -356,31 +397,14 @@ const AdminBulkEmailsPage = () => {
     setFeedback("");
   };
 
-  const handleRoleChange = (
-    role
+  const handleAudienceChange = (
+    changes
   ) => {
     setFormData(
-      (current) => {
-        const isSelected =
-          current.audienceRoles.includes(
-            role
-          );
-
-        return {
-          ...current,
-
-          audienceRoles:
-            isSelected
-              ? current.audienceRoles.filter(
-                  (item) =>
-                    item !== role
-                )
-              : [
-                  ...current.audienceRoles,
-                  role,
-                ],
-        };
-      }
+      (current) => ({
+        ...current,
+        ...changes,
+      })
     );
 
     setIsDirty(true);
@@ -696,48 +720,23 @@ const AdminBulkEmailsPage = () => {
               </div>
             </div>
 
-            <fieldset className="bulk-email-role-fieldset">
-              <legend>
-                Hedef üye rolleri
-              </legend>
-
-              <p>
-                Hiçbir rol seçmezseniz
-                uygun durumdaki tüm
-                üyelere gönderilir.
-              </p>
-
-              <div className="bulk-email-role-grid">
-                {roleOptions.map(
-                  (role) => (
-                    <label
-                      className="admin-form-checkbox admin-form-checkbox--boxed"
-                      key={
-                        role.value
-                      }
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.audienceRoles.includes(
-                          role.value
-                        )}
-                        onChange={() =>
-                          handleRoleChange(
-                            role.value
-                          )
-                        }
-                      />
-
-                      <span>
-                        <strong>
-                          {role.label}
-                        </strong>
-                      </span>
-                    </label>
-                  )
-                )}
-              </div>
-            </fieldset>
+                   <BulkEmailAudienceSelector
+              emailType={
+                formData.emailType
+              }
+              audienceMode={
+                formData.audienceMode
+              }
+              audienceRoles={
+                formData.audienceRoles
+              }
+              selectedRecipients={
+                formData.selectedRecipients
+              }
+              onChange={
+                handleAudienceChange
+              }
+            />
 
             <div className="bulk-email-audience">
               <Users size={22} />
