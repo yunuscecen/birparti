@@ -968,18 +968,27 @@ queryClient.invalidateQueries({
       <section className="forum-detail-content">
         <Container className="forum-detail-content__container">
           <article className="forum-message forum-message--topic">
-            <header>
-              <strong>
-                {topic.authorInfo?.name ||
-                  "Bir Parti"}
-              </strong>
+     <header>
+  <div className="forum-message__author">
+    <strong>
+      {topic.authorInfo?.name ||
+        "Bir Parti"}
+    </strong>
 
-              <span>
-                {formatDate(
-                  topic.createdAt
-                )}
-              </span>
-            </header>
+    <ExpertBadge
+      profile={
+        topic.authorInfo
+          ?.expertProfile
+      }
+    />
+  </div>
+
+  <span>
+    {formatDate(
+      topic.createdAt
+    )}
+  </span>
+</header>
 
             <div className="forum-message__body">
               {topic.body
