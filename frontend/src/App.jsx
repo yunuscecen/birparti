@@ -50,6 +50,7 @@ import MyForumNotificationsPage from "./pages/MyForumNotificationsPage";
 import MyForumReportsPage from "./pages/MyForumReportsPage";
 import MyForumReplyEditPage from "./pages/MyForumReplyEditPage";
 import MyForumTopicEditPage from "./pages/MyForumTopicEditPage";
+import AccountSettingsPage from "./pages/AccountSettingsPage";
 import AdminContactRequestsPage from "./pages/admin/AdminContactRequestsPage";
 import AdminContactRequestDetailPage from "./pages/admin/AdminContactRequestDetailPage";
 import AdminSiteSettingsPage from "./pages/admin/AdminSiteSettingsPage";
@@ -232,6 +233,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/hesabim/ayarlar"
+  element={
+    <ProtectedRoute>
+      <AccountSettingsPage />
+    </ProtectedRoute>
+  }
+/>
         <Route
   path="/hesabim/taleplerim"
   element={

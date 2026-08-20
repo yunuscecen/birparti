@@ -15,6 +15,7 @@ import "./styles/adminContactRequests.css";
 import "./styles/adminBulkEmails.css";
 import "./styles/accountContactRequests.css";
 import "./styles/donation.css";
+import "./styles/accountSettings.css";
 
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import MaintenanceGate from "./components/common/MaintenanceGate";

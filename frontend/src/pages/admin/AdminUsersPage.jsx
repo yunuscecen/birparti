@@ -1,4 +1,5 @@
 import {
+  BadgeCheck,
   ChevronLeft,
   ChevronRight,
   Search,
@@ -15,8 +16,10 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
+import AdminExpertProfileModal from "../../components/admin/AdminExpertProfileModal";
 import {
   getAdminUsers,
+  updateAdminUserExpertProfile,
   updateAdminUserRole,
   updateAdminUserStatus,
 } from "../../services/adminService";
@@ -46,6 +49,11 @@ const AdminUsersPage = () => {
   const [status, setStatus] = useState("");
   const [feedback, setFeedback] =
     useState("");
+
+  const [
+    expertEditorUser,
+    setExpertEditorUser,
+  ] = useState(null);
 
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
@@ -140,14 +148,40 @@ const AdminUsersPage = () => {
     },
   });
 
+  const expertMutation =
+    useMutation({
+      mutationFn:
+        updateAdminUserExpertProfile,
+
+      onSuccess: async () => {
+        setExpertEditorUser(null);
+
+        setFeedback(
+          "Kullanıcının uzman profili güncellendi."
+        );
+
+        await refreshUsers();
+      },
+
+      onError: (error) => {
+        setFeedback(
+          error?.response?.data
+            ?.message ||
+            error.message ||
+            "Uzman profili güncellenemedi."
+        );
+      },
+    });
+
   const data = usersQuery.data;
 
   const users = data?.users || [];
   const pagination = data?.pagination;
 
   const isMutating =
-  statusMutation.isPending ||
-  roleMutation.isPending;
+    statusMutation.isPending ||
+    roleMutation.isPending ||
+    expertMutation.isPending;
 
   return (
     <div className="admin-page">
@@ -260,20 +294,18 @@ const AdminUsersPage = () => {
             <div className="admin-table-wrapper">
               <table className="admin-table admin-users-table">
                 <thead>
-                  <tr>
-                  <th>Üye</th>
-<th>Rol</th>
-<th>Durum</th>
-<th>İşlemler</th>
-                  </tr>
+                <tr>
+  <th>Üye</th>
+  <th>Rol</th>
+  <th>Uzmanlık</th>
+  <th>Durum</th>
+  <th>İşlemler</th>
+</tr>
                 </thead>
 
                 <tbody>
                   {users.map((managedUser) => {
-                    const canCreateTopic =
-                      managedUser.permissions.includes(
-                        "forum:create-topic"
-                      );
+                   
 
                     const isCurrentUser =
                       managedUser.id ===
@@ -345,6 +377,48 @@ const AdminUsersPage = () => {
                             ] ||
                             managedUser.role
                           )}
+                                                </td>
+
+                        <td>
+                          <div className="admin-expert-cell">
+                            {managedUser
+                              .expertProfile
+                              ?.isVerified ? (
+                              <span className="admin-expert-badge">
+                                <BadgeCheck
+                                  size={14}
+                                />
+
+                                {
+                                  managedUser
+                                    .expertProfile
+                                    .title
+                                }
+                              </span>
+                            ) : (
+                              <span className="admin-expert-empty">
+                                Uzmanlık yok
+                              </span>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpertEditorUser(
+                                  managedUser
+                                )
+                              }
+                              disabled={
+                                isActionDisabled
+                              }
+                            >
+                              {managedUser
+                                .expertProfile
+                                ?.isVerified
+                                ? "Düzenle"
+                                : "Uzmanlık Ata"}
+                            </button>
+                          </div>
                         </td>
 
                         <td>
@@ -413,7 +487,7 @@ const AdminUsersPage = () => {
 
                   {users.length === 0 && (
                     <tr>
-                      <td colSpan="4">
+                  <td colSpan="5">  
                         Arama kriterlerine uygun
                         kullanıcı bulunamadı.
                       </td>
@@ -466,7 +540,27 @@ const AdminUsersPage = () => {
             </div>
           </div>
         )}
-      </section>
+         </section>
+
+      {expertEditorUser && (
+        <AdminExpertProfileModal
+          key={expertEditorUser.id}
+          user={expertEditorUser}
+          isSaving={
+            expertMutation.isPending
+          }
+          onClose={() =>
+            setExpertEditorUser(
+              null
+            )
+          }
+          onSave={(payload) =>
+            expertMutation.mutate(
+              payload
+            )
+          }
+        />
+      )}
     </div>
   );
 };

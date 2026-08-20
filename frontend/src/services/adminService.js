@@ -66,3 +66,17 @@ export const updateAdminUserRole = async ({
 
   return response.data.data;
 };
+
+export const updateAdminUserExpertProfile =
+  async ({
+    userId,
+    formData,
+  }) => {
+    const response =
+      await api.patch(
+        `/admin/users/${userId}/expert-profile`,
+        formData
+      );
+
+    return response.data.data;
+  };

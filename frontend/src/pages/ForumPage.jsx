@@ -9,6 +9,7 @@ import {
   MessageCircle,
   Pin,
   Search,
+  Lightbulb,
   Plus,
   ThumbsUp,
 } from "lucide-react";
@@ -23,10 +24,23 @@ import {
 } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Container from "../components/common/Container";
+import ExpertBadge from "../components/forum/ExpertBadge";
 import {
   getForumCategories,
   getForumTopics,
 } from "../services/forumService";
+
+const ideaStageLabels = {
+  submitted: "Fikir Alındı",
+  reviewing: "Değerlendiriliyor",
+  planned: "Planlandı",
+  in_progress:
+    "Üzerinde Çalışılıyor",
+  completed:
+    "Hayata Geçirildi",
+  not_planned:
+    "Şimdilik Planlanmıyor",
+};  
 
 const formatDate = (date) => {
   if (!date) {
@@ -348,6 +362,20 @@ const sort =
   </span>
 )}
 
+{topic.ideaStage &&
+  topic.ideaStage !==
+    "none" && (
+    <span className="forum-topic-badge--idea">
+      <Lightbulb
+        size={13}
+      />
+
+      {ideaStageLabels[
+        topic.ideaStage
+      ] || topic.ideaStage}
+    </span>
+  )}
+
 <span>
   {topic.category?.name}
 </span>
@@ -370,18 +398,28 @@ const sort =
                           : topic.body}
                       </p>
 
-                      <div className="forum-topic-card__author">
-                        <span>
-                          {topic.authorInfo?.name ||
-                            "Bir Parti"}
-                        </span>
+             <div className="forum-topic-card__author">
+  <div className="forum-author-identity">
+    <span>
+      {topic.authorInfo?.name ||
+        "Bir Parti"}
+    </span>
 
-                        <span>
-                          {formatDate(
-                            topic.lastActivityAt
-                          )}
-                        </span>
-                      </div>
+    <ExpertBadge
+      profile={
+        topic.authorInfo
+          ?.expertProfile
+      }
+      compact
+    />
+  </div>
+
+  <span>
+    {formatDate(
+      topic.lastActivityAt
+    )}
+  </span>
+</div>
                     </div>
 
                     <div className="forum-topic-card__stats">

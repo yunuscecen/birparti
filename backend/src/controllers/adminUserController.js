@@ -18,8 +18,35 @@ const serializeAdminUser = (user) => ({
   role: user.role,
   permissions: user.permissions || [],
   status: user.status,
-  isEmailVerified: user.isEmailVerified,
-  emailVerifiedAt: user.emailVerifiedAt,
+   isEmailVerified:
+    user.isEmailVerified,
+
+  emailVerifiedAt:
+    user.emailVerifiedAt,
+
+  expertProfile: {
+    isVerified: Boolean(
+      user.expertProfile
+        ?.isVerified
+    ),
+
+    title:
+      user.expertProfile
+        ?.title || "",
+
+    area:
+      user.expertProfile
+        ?.area || "",
+
+    bio:
+      user.expertProfile
+        ?.bio || "",
+
+    verifiedAt:
+      user.expertProfile
+        ?.verifiedAt || null,
+  },
+
   lastLoginAt: user.lastLoginAt,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
@@ -325,3 +352,91 @@ export const updateUserRole = asyncHandler(
     });
   }
 );
+
+/**
+ * PATCH /api/admin/users/:userId/expert-profile
+ */
+export const updateUserExpertProfile =
+  asyncHandler(
+    async (req, res) => {
+      const user =
+        await findManagedUser(
+          req.params.userId
+        );
+
+      ensureActorCanManageTarget({
+        actor: req.user,
+        target: user,
+      });
+
+      const {
+        isVerified,
+        title,
+        area,
+        bio,
+      } = req.validatedBody;
+
+      const wasAlreadyVerified =
+        Boolean(
+          user.expertProfile
+            ?.isVerified
+        );
+
+      if (isVerified) {
+        user.expertProfile = {
+          isVerified: true,
+
+          title:
+            title.trim(),
+
+          area:
+            area.trim(),
+
+          bio:
+            bio.trim(),
+
+          verifiedAt:
+            wasAlreadyVerified
+              ? user.expertProfile
+                  ?.verifiedAt ||
+                new Date()
+              : new Date(),
+
+          verifiedBy:
+            wasAlreadyVerified
+              ? user.expertProfile
+                  ?.verifiedBy ||
+                req.user._id
+              : req.user._id,
+        };
+      } else {
+        user.expertProfile = {
+          isVerified: false,
+          title: "",
+          area: "",
+          bio: "",
+          verifiedAt: null,
+          verifiedBy: null,
+        };
+      }
+
+      await user.save({
+        validateBeforeSave: false,
+      });
+
+      res.status(200).json({
+        success: true,
+
+        message: isVerified
+          ? "Kullanıcı doğrulanmış uzman olarak güncellendi."
+          : "Kullanıcının uzman doğrulaması kaldırıldı.",
+
+        data: {
+          user:
+            serializeAdminUser(
+              user
+            ),
+        },
+      });
+    }
+  );

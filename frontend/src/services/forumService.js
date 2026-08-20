@@ -10,15 +10,18 @@ export const getForumCategories = async () => {
 
 export const getForumTopics = async ({
   page = 1,
+  limit = 15,
   search = "",
   category = "",
   sort = "newest",
+  roadmapOnly = false,
 } = {}) => {
   const response = await api.get(
     "/forum-topics",
     {
       params: {
         page,
+        limit,
         sort,
 
         ...(search && {
@@ -27,6 +30,10 @@ export const getForumTopics = async ({
 
         ...(category && {
           category,
+        }),
+
+        ...(roadmapOnly && {
+          roadmapOnly: true,
         }),
       },
     }

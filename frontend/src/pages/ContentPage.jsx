@@ -5,6 +5,21 @@ import ButtonLink from "../components/common/ButtonLink";
 import Container from "../components/common/Container";
 import ContentCard from "../components/content/ContentCard";
 import { getPageBySlug } from "../services/pageService";
+import {
+  getForumTopics,
+} from "../services/forumService";
+
+const ideaStageLabels = {
+  submitted: "Fikir Alındı",
+  reviewing: "Değerlendiriliyor",
+  planned: "Planlandı",
+  in_progress:
+    "Üzerinde Çalışılıyor",
+  completed:
+    "Hayata Geçirildi",
+  not_planned:
+    "Şimdilik Planlanmıyor",
+};
 
 const setMetaDescription = (description = "") => {
   let meta = document.querySelector(
@@ -26,12 +41,38 @@ const ContentPage = ({ fixedSlug }) => {
 
   const pageQuery = useQuery({
     queryKey: ["page-content", slug],
-    queryFn: () => getPageBySlug(slug),
+    queryFn: () =>
+      getPageBySlug(slug),
     enabled: Boolean(slug),
     retry: false,
   });
 
-  const page = pageQuery.data?.data;
+  const roadmapIdeasQuery =
+    useQuery({
+      queryKey: [
+        "roadmap-community-ideas",
+      ],
+
+      queryFn: () =>
+        getForumTopics({
+          page: 1,
+          limit: 12,
+          sort: "newest",
+          roadmapOnly: true,
+        }),
+
+      enabled:
+        slug === "yol-haritasi",
+
+      retry: false,
+    });
+
+  const page =
+    pageQuery.data?.data;
+
+  const roadmapIdeas =
+    roadmapIdeasQuery.data
+      ?.topics || [];
 
   useEffect(() => {
     if (!page) {
@@ -168,7 +209,120 @@ const ContentPage = ({ fixedSlug }) => {
             }
 
             return null;
-          })}
+               })}
+
+          {slug ===
+            "yol-haritasi" && (
+            <section className="content-roadmap-ideas">
+              <div className="content-roadmap-ideas__heading">
+                <p>
+                  Topluluktan Yol Haritasına
+                </p>
+
+                <h2>
+                  Takip Edilen Fikirler
+                </h2>
+
+                <span>
+                  Toplulukta geliştirilen ve
+                  yönetim tarafından yol
+                  haritasına alınan fikirler.
+                </span>
+              </div>
+
+              {roadmapIdeasQuery
+                .isLoading ? (
+                <div className="content-roadmap-ideas__state">
+                  <span className="projects-loading__spinner" />
+
+                  <p>
+                    Fikirler yükleniyor...
+                  </p>
+                </div>
+              ) : roadmapIdeasQuery
+                  .isError ? (
+                <div className="content-roadmap-ideas__state">
+                  <p>
+                    Yol haritasındaki
+                    fikirler alınamadı.
+                  </p>
+                </div>
+              ) : roadmapIdeas.length >
+                0 ? (
+                <div className="content-roadmap-ideas__grid">
+                  {roadmapIdeas.map(
+                    (topic) => (
+                      <article
+                        className="content-roadmap-idea-card"
+                        key={topic._id}
+                      >
+                        <span>
+                          {ideaStageLabels[
+                            topic.ideaStage
+                          ] ||
+                            "Topluluk Fikri"}
+                        </span>
+
+                        <h3>
+                          {topic.title}
+                        </h3>
+
+                        <p>
+                          {topic.body
+                            ?.length > 180
+                            ? `${topic.body.slice(
+                                0,
+                                180
+                              )}…`
+                            : topic.body}
+                        </p>
+
+                        {topic.linkedProject && (
+                          <small>
+                            Bağlı proje:{" "}
+                            <strong>
+                              {
+                                topic
+                                  .linkedProject
+                                  .title
+                              }
+                            </strong>
+                          </small>
+                        )}
+
+                        <div className="content-roadmap-idea-card__actions">
+                          <ButtonLink
+                            to={`/forum/${topic.slug}`}
+                            size="small"
+                          >
+                            Fikri İncele
+                          </ButtonLink>
+
+                          {topic.linkedProject && (
+                            <ButtonLink
+                              to={`/projelerimiz/${topic.linkedProject.slug}`}
+                              variant="secondary"
+                              size="small"
+                            >
+                              Projeyi Gör
+                            </ButtonLink>
+                          )}
+                        </div>
+                      </article>
+                    )
+                  )}
+                </div>
+              ) : (
+                <div className="content-roadmap-ideas__state">
+                  <p>
+                    Henüz yol haritasına
+                    eklenen bir topluluk
+                    fikri bulunmuyor.
+                  </p>
+                </div>
+              )}
+            </section>
+          )}
         </Container>
       </section>
     </div>

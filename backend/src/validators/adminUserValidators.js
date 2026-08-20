@@ -23,3 +23,68 @@ export const updateUserRoleSchema = z.object({
     }
   ),
 });
+
+export const updateUserExpertProfileSchema =
+  z
+    .object({
+      isVerified: z.boolean(),
+
+      title: z
+        .string()
+        .trim()
+        .max(
+          120,
+          "Uzman unvanı en fazla 120 karakter olabilir."
+        )
+        .optional()
+        .default(""),
+
+      area: z
+        .string()
+        .trim()
+        .max(
+          180,
+          "Uzmanlık alanı en fazla 180 karakter olabilir."
+        )
+        .optional()
+        .default(""),
+
+      bio: z
+        .string()
+        .trim()
+        .max(
+          600,
+          "Uzman açıklaması en fazla 600 karakter olabilir."
+        )
+        .optional()
+        .default(""),
+    })
+    .superRefine(
+      (data, context) => {
+        if (
+          data.isVerified &&
+          data.title.length < 2
+        ) {
+          context.addIssue({
+            code:
+              z.ZodIssueCode.custom,
+            path: ["title"],
+            message:
+              "Doğrulanmış uzman için unvan zorunludur.",
+          });
+        }
+
+        if (
+          data.isVerified &&
+          data.area.length < 2
+        ) {
+          context.addIssue({
+            code:
+              z.ZodIssueCode.custom,
+            path: ["area"],
+            message:
+              "Doğrulanmış uzman için uzmanlık alanı zorunludur.",
+          });
+        }
+      }
+    );

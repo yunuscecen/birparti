@@ -93,3 +93,74 @@ export const resetPasswordSchema =
           "Şifreler birbiriyle eşleşmiyor.",
       }
     );
+
+
+    export const updateProfileSchema =
+  z.object({
+    firstName: z
+      .string()
+      .trim()
+      .min(
+        2,
+        "Ad en az 2 karakter olmalıdır."
+      )
+      .max(
+        50,
+        "Ad en fazla 50 karakter olabilir."
+      ),
+
+    lastName: z
+      .string()
+      .trim()
+      .min(
+        2,
+        "Soyad en az 2 karakter olmalıdır."
+      )
+      .max(
+        50,
+        "Soyad en fazla 50 karakter olabilir."
+      ),
+  });
+
+export const updateMarketingPreferenceSchema =
+  z.object({
+    acceptedMarketing:
+      z.boolean({
+        message:
+          "E-posta tercihi geçerli değil.",
+      }),
+  });
+
+export const changePasswordSchema =
+  z
+    .object({
+      currentPassword: z
+        .string()
+        .min(
+          1,
+          "Mevcut şifrenizi girin."
+        )
+        .max(
+          72,
+          "Mevcut şifre geçersiz."
+        ),
+
+      password:
+        passwordSchema,
+
+      passwordConfirm:
+        z.string(),
+    })
+    .refine(
+      (data) =>
+        data.password ===
+        data.passwordConfirm,
+      {
+        path: [
+          "passwordConfirm",
+        ],
+
+        message:
+          "Yeni şifreler birbiriyle eşleşmiyor.",
+      }
+    );

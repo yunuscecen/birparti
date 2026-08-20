@@ -369,6 +369,38 @@
   font-size: 0.85rem;
 }
 
+.account-expert-profile {
+  display: grid;
+  width: fit-content;
+  max-width: 480px;
+  gap: 6px;
+  margin-top: 13px;
+  padding: 12px 14px;
+  border: 1px solid
+    rgba(23, 134, 95, 0.14);
+  border-radius: 12px;
+  background:
+    rgba(23, 134, 95, 0.06);
+}
+
+.account-expert-profile
+  > strong {
+  color: #147452;
+  font-family:
+    var(--font-body);
+  font-size: 0.78rem;
+}
+
+.account-expert-profile
+  > small {
+  color:
+    var(--color-text-soft);
+  font-family:
+    var(--font-body);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
 .account-summary__status {
   display: grid;
   gap: 7px;

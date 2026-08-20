@@ -307,7 +307,134 @@
   font-family: var(--font-body);
 }
 
+.content-roadmap-ideas {
+  margin-top: 72px;
+  padding-top: 48px;
+  border-top: 1px solid
+    rgba(22, 64, 112, 0.11);
+}
+
+.content-roadmap-ideas__heading {
+  max-width: 720px;
+  margin-bottom: 28px;
+}
+
+.content-roadmap-ideas__heading > p {
+  margin: 0 0 8px;
+  color: var(--color-primary-600);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.content-roadmap-ideas__heading h2 {
+  margin: 0 0 10px;
+  color: var(--color-primary-950);
+  font-family: var(--font-heading);
+  font-size: clamp(
+    1.8rem,
+    4vw,
+    2.7rem
+  );
+}
+
+.content-roadmap-ideas__heading > span {
+  color: var(--color-text-soft);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.content-roadmap-ideas__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(260px, 1fr)
+    );
+  gap: 18px;
+}
+
+.content-roadmap-idea-card {
+  display: flex;
+  min-width: 0;
+  min-height: 290px;
+  flex-direction: column;
+  padding: 25px;
+  border: 1px solid
+    rgba(22, 64, 112, 0.1);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 15px 36px
+    rgba(21, 58, 101, 0.07);
+}
+
+.content-roadmap-idea-card > span {
+  align-self: flex-start;
+  margin-bottom: 14px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background:
+    rgba(199, 139, 31, 0.11);
+  color: #8b600f;
+  font-family: var(--font-body);
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.content-roadmap-idea-card h3 {
+  margin: 0 0 12px;
+  color: var(--color-primary-950);
+  font-family: var(--font-heading);
+  font-size: 1.16rem;
+  line-height: 1.35;
+}
+
+.content-roadmap-idea-card > p {
+  margin: 0 0 18px;
+  color: var(--color-text-soft);
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.content-roadmap-idea-card > small {
+  margin-bottom: 16px;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+}
+
+.content-roadmap-idea-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: auto;
+}
+
+.content-roadmap-ideas__state {
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 25px;
+  border: 1px dashed
+    rgba(22, 64, 112, 0.17);
+  border-radius: 16px;
+  background:
+    rgba(245, 249, 255, 0.75);
+  color: var(--color-text-soft);
+  font-family: var(--font-body);
+  text-align: center;
+}
+
 @media (max-width: 980px) {
+  
   .content-cards-grid {
     grid-template-columns: repeat(
       2,

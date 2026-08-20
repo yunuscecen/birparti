@@ -7,7 +7,6 @@ import {
   EyeOff,
   ExternalLink,
   MessageCircle,
-  Pin,
   RotateCcw,
   Trash2,
   XCircle,
@@ -35,6 +34,11 @@ import {
   updateAdminForumReplyModeration,
   updateAdminForumTopicModeration,
 } from "../../services/adminForumService";
+
+import {
+  getAdminProjects,
+} from "../../services/adminProjectService";
+
 const topicStatusLabels = {
   open: "Açık",
   locked: "Kilitli",
@@ -46,6 +50,19 @@ const approvalStatusLabels = {
   pending: "Onay Bekliyor",
   approved: "Onaylandı",
   rejected: "Reddedildi",
+};
+
+const ideaStageLabels = {
+  none: "Normal Forum Konusu",
+  submitted: "Fikir Alındı",
+  reviewing: "Değerlendiriliyor",
+  planned: "Planlandı",
+  in_progress:
+    "Üzerinde Çalışılıyor",
+  completed:
+    "Hayata Geçirildi",
+  not_planned:
+    "Şimdilik Planlanmıyor",
 };
 
 const replyStatusLabels = {
@@ -274,6 +291,22 @@ const AdminForumTopicModerationPage =
         retry: false,
       });
 
+      const projectsQuery =
+      useQuery({
+        queryKey: [
+          "admin-project-options",
+        ],
+
+        queryFn: () =>
+          getAdminProjects({
+            page: 1,
+            limit: 50,
+          }),
+
+        staleTime:
+          5 * 60 * 1000,
+      });
+
     const repliesQuery =
       useQuery({
         queryKey: [
@@ -387,8 +420,12 @@ const AdminForumTopicModerationPage =
         },
       });
 
-    const topic =
+       const topic =
       topicQuery.data?.topic;
+
+    const projects =
+      projectsQuery.data
+        ?.projects || [];
 
     const replies =
       repliesQuery.data
@@ -406,34 +443,52 @@ const AdminForumTopicModerationPage =
         deleted: 0,
       };
 
-const updateTopic = ({
-  status =
-    topic?.status,
-  isPinned =
-    topic?.isPinned,
-  approvalStatus,
-  rejectionReason = "",
-}) => {
-  if (!topic) {
-    return;
-  }
+      const updateTopic = ({
+      status = topic?.status,
+      isPinned = topic?.isPinned,
+      approvalStatus,
+      rejectionReason = "",
+      ideaStage,
+      ideaStageNote = "",
+      linkedProjectId,
+      isOnRoadmap,
+    }) => {
+      if (!topic) {
+        return;
+      }
 
-  topicMutation.mutate({
-    topicId:
-      topic._id,
+      topicMutation.mutate({
+        topicId: topic._id,
 
-    formData: {
-      status,
-      isPinned:
-        Boolean(isPinned),
+        formData: {
+          status,
+          isPinned:
+            Boolean(isPinned),
 
-      ...(approvalStatus && {
-        approvalStatus,
-        rejectionReason,
-      }),
-    },
-  });
-};
+          ...(approvalStatus !==
+            undefined && {
+            approvalStatus,
+            rejectionReason,
+          }),
+
+          ...(ideaStage !==
+            undefined && {
+            ideaStage,
+            ideaStageNote,
+          }),
+
+          ...(linkedProjectId !==
+            undefined && {
+            linkedProjectId,
+          }),
+
+          ...(isOnRoadmap !==
+            undefined && {
+            isOnRoadmap,
+          }),
+        },
+      });
+    };
 
 const approveTopic = () => {
   updateTopic({
@@ -474,6 +529,40 @@ const rejectTopic = () => {
 
     rejectionReason:
       reason.trim(),
+  });
+};
+
+const handleIdeaStageChange = (
+  nextIdeaStage
+) => {
+  if (
+    nextIdeaStage === "none"
+  ) {
+    updateTopic({
+      ideaStage: "none",
+      ideaStageNote: "",
+    });
+
+    return;
+  }
+
+  const note =
+    window.prompt(
+      "Bu aşama için üyeye gösterilecek yönetim notunu yazabilirsiniz:",
+      topic?.ideaStageNote ||
+        ""
+    );
+
+  if (note === null) {
+    return;
+  }
+
+  updateTopic({
+    ideaStage:
+      nextIdeaStage,
+
+    ideaStageNote:
+      note.trim(),
   });
 };
 
@@ -704,7 +793,149 @@ const rejectTopic = () => {
         Konuyu Reddet
       </button>
     </div>
+   </div>
+
+  <div className="admin-form-field">
+    <label>
+      Fikir ilerleme aşaması
+    </label>
+
+    <select
+      value={
+        topic.ideaStage ||
+        "none"
+      }
+      onChange={(event) =>
+        handleIdeaStageChange(
+          event.target.value
+        )
+      }
+      disabled={
+        topicMutation.isPending
+      }
+    >
+      <option value="none">
+        Normal Forum Konusu
+      </option>
+
+      <option value="submitted">
+        Fikir Alındı
+      </option>
+
+      <option value="reviewing">
+        Değerlendiriliyor
+      </option>
+
+      <option value="planned">
+        Planlandı
+      </option>
+
+      <option value="in_progress">
+        Üzerinde Çalışılıyor
+      </option>
+
+      <option value="completed">
+        Hayata Geçirildi
+      </option>
+
+      <option value="not_planned">
+        Şimdilik Planlanmıyor
+      </option>
+    </select>
+
+    <small>
+      {
+        ideaStageLabels[
+          topic.ideaStage ||
+            "none"
+        ]
+      }
+    </small>
+
+      {topic.ideaStageNote && (
+      <small>
+        Yönetim notu:{" "}
+        {topic.ideaStageNote}
+      </small>
+    )}
   </div>
+
+  <div className="admin-form-field">
+    <label>
+      Bağlı proje
+    </label>
+
+    <select
+      value={
+        topic.linkedProject
+          ?._id || ""
+      }
+      onChange={(event) =>
+        updateTopic({
+          linkedProjectId:
+            event.target.value,
+        })
+      }
+      disabled={
+        topicMutation.isPending ||
+        projectsQuery.isLoading
+      }
+    >
+      <option value="">
+        Herhangi bir projeye bağlı değil
+      </option>
+
+      {projects.map(
+        (project) => (
+          <option
+            value={project._id}
+            key={project._id}
+          >
+            {project.title}
+            {project.status !==
+            "published"
+              ? " — yayında değil"
+              : ""}
+          </option>
+        )
+      )}
+    </select>
+
+    <small>
+      Fikirden geliştirilen bir proje
+      varsa buradan seçin.
+    </small>
+  </div>
+
+  <label className="admin-form-checkbox admin-form-checkbox--boxed">
+    <input
+      type="checkbox"
+      checked={Boolean(
+        topic.isOnRoadmap
+      )}
+      onChange={(event) =>
+        updateTopic({
+          isOnRoadmap:
+            event.target.checked,
+        })
+      }
+      disabled={
+        topicMutation.isPending
+      }
+    />
+
+    <span>
+      <strong>
+        Yol haritasında göster
+      </strong>
+
+      <small>
+        Bu fikir Yol Haritası
+        sayfasındaki topluluk
+        fikirlerinde gösterilir.
+      </small>
+    </span>
+  </label>
 
   <div className="admin-form-field">
     <label>

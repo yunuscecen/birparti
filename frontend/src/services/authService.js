@@ -94,3 +94,41 @@ export const resendEmailVerification =
 
     return response.data;
   };
+
+
+  export const updateCurrentUserProfile =
+  async (formData) => {
+    const response =
+      await api.patch(
+        "/auth/me/profile",
+        formData
+      );
+
+    return response.data;
+  };
+
+export const updateCurrentUserMarketingPreference =
+  async (
+    acceptedMarketing
+  ) => {
+    const response =
+      await api.patch(
+        "/auth/me/email-preferences",
+        {
+          acceptedMarketing,
+        }
+      );
+
+    return response.data;
+  };
+
+export const changeCurrentUserPassword =
+  async (formData) => {
+    const response =
+      await api.patch(
+        "/auth/me/password",
+        formData
+      );
+
+    return response.data;
+  };

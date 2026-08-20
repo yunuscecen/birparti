@@ -43,6 +43,7 @@ export const deleteAdminProjectCategory =
 
 export const getAdminProjects = async ({
   page = 1,
+  limit = 12,
   search = "",
   status = "",
   category = "",
@@ -52,6 +53,7 @@ export const getAdminProjects = async ({
     {
       params: {
         page,
+        limit,
 
         ...(search && {
           search,

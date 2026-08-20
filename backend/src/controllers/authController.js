@@ -24,8 +24,40 @@ const serializeUser = (user) => ({
   role: user.role,
   permissions: user.permissions || [],
   status: user.status,
-  isEmailVerified: user.isEmailVerified,
+   isEmailVerified:
+    user.isEmailVerified,
+
   avatar: user.avatar,
+
+  expertProfile: {
+    isVerified: Boolean(
+      user.expertProfile
+        ?.isVerified
+    ),
+
+    title:
+      user.expertProfile
+        ?.title || "",
+
+    area:
+      user.expertProfile
+        ?.area || "",
+
+    bio:
+      user.expertProfile
+        ?.bio || "",
+
+    verifiedAt:
+      user.expertProfile
+        ?.verifiedAt || null,
+  },
+
+  marketingEmailsEnabled:
+    Boolean(
+      user.consents
+        ?.marketingAcceptedAt
+    ),
+
   createdAt: user.createdAt,
 });
 
@@ -346,3 +378,165 @@ export const getCurrentUser = asyncHandler(
     });
   }
 );
+
+export const updateCurrentUserProfile =
+  asyncHandler(
+    async (req, res) => {
+      const {
+        firstName,
+        lastName,
+      } = req.validatedBody;
+
+      req.user.firstName =
+        firstName;
+
+      req.user.lastName =
+        lastName;
+
+      await req.user.save({
+        validateBeforeSave:
+          false,
+      });
+
+      res.status(200).json({
+        success: true,
+
+        message:
+          "Profil bilgileriniz güncellendi.",
+
+        data: {
+          user:
+            serializeUser(
+              req.user
+            ),
+        },
+      });
+    }
+  );
+
+export const updateCurrentUserMarketingPreference =
+  asyncHandler(
+    async (req, res) => {
+      const {
+        acceptedMarketing,
+      } = req.validatedBody;
+
+      const now =
+        new Date();
+
+      if (
+        acceptedMarketing
+      ) {
+        req.user.consents
+          .marketingAcceptedAt =
+          req.user.consents
+            .marketingAcceptedAt ||
+          now;
+
+        req.user.consents
+          .marketingUnsubscribedAt =
+          null;
+      } else {
+        req.user.consents
+          .marketingAcceptedAt =
+          null;
+
+        req.user.consents
+          .marketingUnsubscribedAt =
+          now;
+      }
+
+      await req.user.save({
+        validateBeforeSave:
+          false,
+      });
+
+      res.status(200).json({
+        success: true,
+
+        message:
+          acceptedMarketing
+            ? "Duyuru e-postaları açıldı."
+            : "Duyuru e-postaları kapatıldı.",
+
+        data: {
+          user:
+            serializeUser(
+              req.user
+            ),
+        },
+      });
+    }
+  );
+
+export const changeCurrentUserPassword =
+  asyncHandler(
+    async (req, res) => {
+      const {
+        currentPassword,
+        password,
+      } = req.validatedBody;
+
+      const user =
+        await User.findById(
+          req.user._id
+        ).select("+password");
+
+      if (!user) {
+        throw new AppError(
+          "Kullanıcı hesabı bulunamadı.",
+          404
+        );
+      }
+
+      const isCurrentPasswordCorrect =
+        await user.comparePassword(
+          currentPassword
+        );
+
+      if (
+        !isCurrentPasswordCorrect
+      ) {
+        throw new AppError(
+          "Mevcut şifreniz yanlış.",
+          400
+        );
+      }
+
+      const isSamePassword =
+        await user.comparePassword(
+          password
+        );
+
+      if (isSamePassword) {
+        throw new AppError(
+          "Yeni şifreniz mevcut şifrenizden farklı olmalıdır.",
+          400
+        );
+      }
+
+      user.password =
+        password;
+
+      await user.save({
+        validateBeforeSave:
+          false,
+      });
+
+      await RefreshToken.deleteMany({
+        user: user._id,
+      });
+
+      res.clearCookie(
+        refreshCookieName,
+        getClearRefreshCookieOptions()
+      );
+
+      res.status(200).json({
+        success: true,
+
+        message:
+          "Şifreniz değiştirildi. Lütfen yeni şifrenizle tekrar giriş yapın.",
+      });
+    }
+  );

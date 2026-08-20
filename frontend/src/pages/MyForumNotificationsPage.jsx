@@ -4,6 +4,7 @@ import {
   CheckCheck,
   ChevronLeft,
   ChevronRight,
+  Lightbulb,
   Circle,
   ExternalLink,
   MessageCircle,
@@ -50,6 +51,15 @@ const notificationTypeLabels = {
 
   report_action_taken:
     "Bildiriminiz için işlem yapıldı",
+
+      topic_approved:
+    "Konunuz onaylandı",
+
+  topic_rejected:
+    "Konunuz reddedildi",
+
+  idea_stage_updated:
+    "Fikrinizin aşaması güncellendi",
 };
 
 const getNotificationIcon = (
@@ -60,6 +70,13 @@ const getNotificationIcon = (
     type === "reply_reply"
   ) {
     return MessageCircle;
+  }
+
+    if (
+    type ===
+    "idea_stage_updated"
+  ) {
+    return Lightbulb;
   }
 
   if (

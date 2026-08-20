@@ -37,55 +37,118 @@ export const adminForumCategorySchema = z.object({
     .min(0, "Sıralama değeri negatif olamaz."),
 });
 
-export const adminForumTopicModerationSchema = z
-  .object({
-    status: z.enum(
-      ["open", "locked", "archived", "hidden"],
-      {
-        message:
-          "Geçerli bir konu durumu seçilmelidir.",
-      }
-    ),
-
-    isPinned: z.boolean(),
-
-    approvalStatus: z
-      .enum(
+export const adminForumTopicModerationSchema =
+  z
+    .object({
+      status: z.enum(
         [
-          "pending",
-          "approved",
-          "rejected",
+          "open",
+          "locked",
+          "archived",
+          "hidden",
         ],
         {
           message:
-            "Geçerli bir onay durumu seçilmelidir.",
+            "Geçerli bir konu durumu seçilmelidir.",
         }
-      )
-      .optional(),
+      ),
 
-    rejectionReason: z
-      .string()
-      .trim()
-      .max(
-        1000,
-        "Ret nedeni en fazla 1000 karakter olabilir."
-      )
-      .optional()
-      .default(""),
-  })
-  .superRefine((data, context) => {
-    if (
-      data.approvalStatus === "rejected" &&
-      data.rejectionReason.length < 3
-    ) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["rejectionReason"],
-        message:
-          "Reddedilen konu için ret nedeni girilmelidir.",
-      });
-    }
-  });
+      isPinned: z.boolean(),
+
+      approvalStatus: z
+        .enum(
+          [
+            "pending",
+            "approved",
+            "rejected",
+          ],
+          {
+            message:
+              "Geçerli bir onay durumu seçilmelidir.",
+          }
+        )
+        .optional(),
+
+      rejectionReason: z
+        .string()
+        .trim()
+        .max(
+          1000,
+          "Ret nedeni en fazla 1000 karakter olabilir."
+        )
+        .optional()
+        .default(""),
+
+      ideaStage: z
+        .enum(
+          [
+            "none",
+            "submitted",
+            "reviewing",
+            "planned",
+            "in_progress",
+            "completed",
+            "not_planned",
+          ],
+          {
+            message:
+              "Geçerli bir fikir aşaması seçilmelidir.",
+          }
+        )
+        .optional(),
+
+          ideaStageNote: z
+        .string()
+        .trim()
+        .max(
+          1000,
+          "Fikir aşaması notu en fazla 1000 karakter olabilir."
+        )
+        .optional()
+        .default(""),
+
+      linkedProjectId: z
+        .union([
+          z
+            .string()
+            .trim()
+            .regex(
+              /^[a-f\d]{24}$/i,
+              "Geçerli bir proje seçilmelidir."
+            ),
+
+          z.literal(""),
+        ])
+        .optional(),
+
+      isOnRoadmap: z
+        .boolean()
+        .optional(),
+    })
+    .superRefine(
+      (data, context) => {
+        if (
+          data.approvalStatus ===
+            "rejected" &&
+          data.rejectionReason
+            .length < 3
+        ) {
+          context.addIssue({
+            code:
+              z.ZodIssueCode
+                .custom,
+
+            path: [
+              "rejectionReason",
+            ],
+
+            message:
+              "Reddedilen konu için ret nedeni girilmelidir.",
+          });
+        }
+      }
+    );
+  
 export const adminForumReplyModerationSchema = z.object({
   status: z.enum([
     "published",

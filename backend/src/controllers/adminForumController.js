@@ -4,9 +4,23 @@ import slugify from "slugify";
 import ForumCategory from "../models/ForumCategory.js";
 import ForumReply from "../models/ForumReply.js";
 import ForumTopic from "../models/ForumTopic.js";
+import Project from "../models/Project.js";
 import AppError from "../utils/AppError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import createForumNotification from "../services/forumNotificationService.js";
+
+const ideaStageLabels = {
+  none: "Normal Forum Konusu",
+  submitted: "Fikir Alındı",
+  reviewing: "Değerlendiriliyor",
+  planned: "Planlandı",
+  in_progress:
+    "Üzerinde Çalışılıyor",
+  completed:
+    "Hayata Geçirildi",
+  not_planned:
+    "Şimdilik Planlanmıyor",
+};
 
 const createSlug = (value = "") => {
   return slugify(value, {
@@ -666,9 +680,14 @@ export const getAdminForumTopicById = asyncHandler(
         path: "category",
         select: "name slug color isActive",
       })
-      .populate({
+         .populate({
         path: "author",
         select: "firstName lastName email role",
+      })
+      .populate({
+        path: "linkedProject",
+        select:
+          "title slug summary status",
       })
       .lean();
 
@@ -743,19 +762,35 @@ export const updateAdminForumTopicModeration =
       );
     }
 
-    const {
+       const {
       status,
       isPinned,
       approvalStatus,
       rejectionReason = "",
+      ideaStage,
+      ideaStageNote = "",
+      linkedProjectId,
+      isOnRoadmap,
     } = req.validatedBody;
 
-    const previousApprovalStatus =
+
+      const previousApprovalStatus =
       topic.approvalStatus ||
       "approved";
 
     const approvalStatusWasProvided =
       approvalStatus !== undefined;
+
+    const previousIdeaStage =
+      topic.ideaStage ||
+      "none";
+
+    const previousIdeaStageNote =
+      topic.ideaStageNote ||
+      "";
+
+    const ideaStageWasProvided =
+      ideaStage !== undefined;
 
     topic.status = status;
     topic.isPinned =
@@ -783,6 +818,66 @@ export const updateAdminForumTopicModeration =
           new Date();
       }
     }
+           if (ideaStageWasProvided) {
+      const nextIdeaStageNote =
+        ideaStage === "none"
+          ? ""
+          : ideaStageNote.trim();
+
+      topic.ideaStage =
+        ideaStage;
+
+      topic.ideaStageNote =
+        nextIdeaStageNote;
+
+      const ideaStageWasUpdated =
+        previousIdeaStage !==
+          ideaStage ||
+        previousIdeaStageNote !==
+          nextIdeaStageNote;
+
+      if (ideaStageWasUpdated) {
+        topic.ideaStageUpdatedBy =
+          req.user._id;
+
+        topic.ideaStageUpdatedAt =
+          new Date();
+      }
+    }
+
+    if (
+      linkedProjectId !== undefined
+    ) {
+      if (!linkedProjectId) {
+        topic.linkedProject = null;
+      } else {
+        ensureObjectId(
+          linkedProjectId
+        );
+
+        const linkedProjectExists =
+          await Project.exists({
+            _id: linkedProjectId,
+          });
+
+        if (!linkedProjectExists) {
+          throw new AppError(
+            "Bağlanacak proje bulunamadı.",
+            404
+          );
+        }
+
+        topic.linkedProject =
+          linkedProjectId;
+      }
+    }
+
+    if (
+      isOnRoadmap !== undefined
+    ) {
+      topic.isOnRoadmap =
+        Boolean(isOnRoadmap);
+    }
 
     if (
       topic.approvalStatus !==
@@ -797,6 +892,11 @@ export const updateAdminForumTopicModeration =
       approvalStatusWasProvided &&
       previousApprovalStatus !==
         topic.approvalStatus;
+
+    const ideaStageChanged =
+      ideaStageWasProvided &&
+      previousIdeaStage !==
+        topic.ideaStage;
 
     if (
       approvalChanged &&
@@ -836,13 +936,61 @@ export const updateAdminForumTopicModeration =
           ? `/forum/${topic.slug}`
           : "/hesabim/forum-hareketlerim",
 
-        uniqueKey:
+               uniqueKey:
           `forum-topic-review:${topic._id}:` +
           `${topic.approvalStatus}:` +
           `${topic.reviewedAt.getTime()}`,
       });
     }
 
+    if (
+      ideaStageChanged &&
+      topic.ideaStage !==
+        "none"
+    ) {
+      const stageLabel =
+        ideaStageLabels[
+          topic.ideaStage
+        ] ||
+        topic.ideaStage;
+
+      const stageNote =
+        topic.ideaStageNote
+          ? ` Yönetim notu: ${topic.ideaStageNote.slice(
+              0,
+              120
+            )}`
+          : "";
+
+      await createForumNotification({
+        recipient:
+          topic.author,
+
+        actor:
+          req.user?._id ||
+          req.user?.id,
+
+        type:
+          "idea_stage_updated",
+
+        topic:
+          topic._id,
+
+        title:
+          "Fikrinizin aşaması güncellendi",
+
+        message:
+          `“${topic.title}” başlıklı fikrinizin yeni aşaması: ${stageLabel}.${stageNote}`,
+
+        link:
+          `/forum/${topic.slug}`,
+
+        uniqueKey:
+          `forum-idea-stage:${topic._id}:` +
+          `${topic.ideaStage}:` +
+          `${topic.ideaStageUpdatedAt.getTime()}`,
+      });
+    }
     await topic.populate([
       {
         path: "category",
@@ -854,6 +1002,11 @@ export const updateAdminForumTopicModeration =
         select:
           "firstName lastName email role",
       },
+      {
+        path: "linkedProject",
+        select:
+          "title slug summary status",
+      },
     ]);
 
     const serializedTopic = {
@@ -864,13 +1017,15 @@ export const updateAdminForumTopicModeration =
 
     delete serializedTopic.author;
 
-    const responseMessage =
+      const responseMessage =
       approvalChanged
         ? topic.approvalStatus ===
           "approved"
           ? "Forum konusu onaylandı ve yayınlandı."
           : "Forum konusu reddedildi."
-        : "Forum konusu moderasyon ayarları güncellendi.";
+        : ideaStageChanged
+          ? "Fikrin ilerleme aşaması güncellendi."
+          : "Forum konusu moderasyon ayarları güncellendi.";
 
     res.status(200).json({
       success: true,

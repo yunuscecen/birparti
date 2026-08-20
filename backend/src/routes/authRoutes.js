@@ -1,11 +1,14 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
 import {
+  changeCurrentUserPassword,
   getCurrentUser,
   login,
   logout,
   refreshSession,
   register,
+  updateCurrentUserMarketingPreference,
+  updateCurrentUserProfile,
 } from "../controllers/authController.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";
@@ -22,10 +25,13 @@ import {
   resetPassword,
 } from "../controllers/passwordResetController.js";
 import {
+  changePasswordSchema,
   forgotPasswordSchema,
   loginSchema,
   registerSchema,
   resetPasswordSchema,
+  updateMarketingPreferenceSchema,
+  updateProfileSchema,
 } from "../validators/authValidators.js";
 
 const router = express.Router();
@@ -117,6 +123,34 @@ router.get(
   "/auth/me",
   requireAuth,
   getCurrentUser
+);
+
+router.patch(
+  "/auth/me/profile",
+  requireAuth,
+  validateRequest(
+    updateProfileSchema
+  ),
+  updateCurrentUserProfile
+);
+
+router.patch(
+  "/auth/me/email-preferences",
+  requireAuth,
+  validateRequest(
+    updateMarketingPreferenceSchema
+  ),
+  updateCurrentUserMarketingPreference
+);
+
+router.patch(
+  "/auth/me/password",
+  authLimiter,
+  requireAuth,
+  validateRequest(
+    changePasswordSchema
+  ),
+  changeCurrentUserPassword
 );
 
 router.get(

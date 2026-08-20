@@ -19,6 +19,7 @@ const serializeUser = (
       id: null,
       name: fallbackName,
       role: null,
+      expertProfile: null,
     };
   }
 
@@ -30,13 +31,34 @@ const serializeUser = (
     .join(" ")
     .trim();
 
+  const expertProfile =
+    user.expertProfile
+      ?.isVerified
+      ? {
+          isVerified: true,
+
+          title:
+            user.expertProfile
+              .title || "",
+
+          area:
+            user.expertProfile
+              .area || "",
+        }
+      : null;
+
   return {
     id: user._id,
+
     name:
       fullName ||
       fallbackName ||
       "Forum Üyesi",
-    role: user.role || "member",
+
+    role:
+      user.role || "member",
+
+    expertProfile,
   };
 };
 
@@ -137,9 +159,17 @@ export const getPublicForumTopics = asyncHandler(
       req.query.search || ""
     ).trim();
 
-    const categorySlug = String(
+      const categorySlug = String(
       req.query.category || ""
     ).trim();
+
+    const roadmapOnly =
+      String(
+        req.query.roadmapOnly ||
+          ""
+      )
+        .trim()
+        .toLowerCase() === "true";
 
     const requestedSort = String(
       req.query.sort || "newest"
@@ -163,13 +193,17 @@ export const getPublicForumTopics = asyncHandler(
         ? requestedSort
         : "newest";
 
-    const filter = {
+       const filter = {
       approvalStatus: "approved",
 
       status: {
         $in: publicTopicStatuses,
       },
     };
+
+    if (roadmapOnly) {
+      filter.isOnRoadmap = true;
+    }
 
     /*
      * Çözülenler seçildiğinde yalnızca
@@ -273,7 +307,7 @@ export const getPublicForumTopics = asyncHandler(
       topics,
       totalTopics,
     ] = await Promise.all([
-      ForumTopic.find(filter)
+            ForumTopic.find(filter)
         .populate({
           path: "category",
           select:
@@ -282,7 +316,15 @@ export const getPublicForumTopics = asyncHandler(
         .populate({
           path: "author",
           select:
-            "firstName lastName role",
+            "firstName lastName role expertProfile",
+        })
+        .populate({
+          path: "linkedProject",
+          select:
+            "title slug summary status",
+          match: {
+            status: "published",
+          },
         })
         .sort(
           sortOptions[selectedSort]
@@ -375,7 +417,7 @@ export const getPublicForumTopicBySlug = asyncHandler(
           new: true,
         }
       )
-        .populate({
+              .populate({
           path: "category",
           select:
             "name slug color",
@@ -383,7 +425,15 @@ export const getPublicForumTopicBySlug = asyncHandler(
         .populate({
           path: "author",
           select:
-            "firstName lastName role",
+            "firstName lastName role expertProfile",
+        })
+        .populate({
+          path: "linkedProject",
+          select:
+            "title slug summary status",
+          match: {
+            status: "published",
+          },
         })
         .lean();
 
@@ -410,7 +460,7 @@ export const getPublicForumTopicBySlug = asyncHandler(
     .populate({
       path: "author",
       select:
-        "firstName lastName role",
+        "firstName lastName role expertProfile",
     })
     .sort({
       createdAt: 1,
@@ -453,12 +503,12 @@ const childReplies =
         .populate({
           path: "author",
           select:
-            "firstName lastName role",
+            "firstName lastName role expertProfile",
         })
         .populate({
           path: "replyToUser",
           select:
-            "firstName lastName role",
+            "firstName lastName role expertProfile",
         })
         .sort({
           createdAt: 1,

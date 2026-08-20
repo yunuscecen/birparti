@@ -4,10 +4,13 @@ import {
   CheckCircle2,
   CornerUpLeft,
   Eye,
-  Flag,
+   Flag,
+  FolderKanban,
   Handshake,
   Lock,
+  Lightbulb,
   LogIn,
+  Route,
   MessageCircle,
   Pin,
   Send,
@@ -35,6 +38,7 @@ import {
 } from "react-router-dom";
 
 import Container from "../components/common/Container";
+import ExpertBadge from "../components/forum/ExpertBadge";
 import ForumReportModal from "../components/forum/ForumReportModal";
 import { useAuth } from "../context/AuthContext";
 
@@ -46,6 +50,18 @@ import {
   updateForumTopicSupport,
   updateForumTopicVote,
 } from "../services/forumService";
+
+const ideaStageLabels = {
+  submitted: "Fikir Alındı",
+  reviewing: "Değerlendiriliyor",
+  planned: "Planlandı",
+  in_progress:
+    "Üzerinde Çalışılıyor",
+  completed:
+    "Hayata Geçirildi",
+  not_planned:
+    "Şimdilik Planlanmıyor",
+};
 
 const formatDate = (date) => {
   if (!date) {
@@ -846,7 +862,7 @@ queryClient.invalidateQueries({
             Topluluğa Dön
           </Link>
 
-          <div className="forum-topic-card__badges">
+             <div className="forum-topic-card__badges">
             {topic.isPinned && (
               <span>
                 <Pin size={13} />
@@ -862,6 +878,21 @@ queryClient.invalidateQueries({
               </span>
             )}
 
+            {topic.ideaStage &&
+              topic.ideaStage !==
+                "none" && (
+                <span className="forum-topic-badge--idea">
+                  <Lightbulb
+                    size={13}
+                  />
+
+                  {ideaStageLabels[
+                    topic.ideaStage
+                  ] ||
+                    topic.ideaStage}
+                </span>
+              )}
+
             <span>
               {topic.category?.name}
             </span>
@@ -870,10 +901,20 @@ queryClient.invalidateQueries({
           <h1>{topic.title}</h1>
 
           <div className="forum-detail__meta">
-            <span>
-              {topic.authorInfo?.name ||
-                "Bir Parti"}
-            </span>
+           <div className="forum-author-identity">
+  <span>
+    {topic.authorInfo?.name ||
+      "Bir Parti"}
+  </span>
+
+  <ExpertBadge
+    profile={
+      topic.authorInfo
+        ?.expertProfile
+    }
+    compact
+  />
+</div>
 
             <span>
               {formatDate(
@@ -955,7 +996,61 @@ queryClient.invalidateQueries({
                   )
                 )}
                        </div>
+{topic.ideaStage &&
+  topic.ideaStage !==
+    "none" && (
+    <div className="forum-idea-stage-panel">
+      <span>
+        <Lightbulb size={19} />
+        Fikir ilerleme aşaması
+      </span>
 
+      <strong>
+        {ideaStageLabels[
+          topic.ideaStage
+        ] || topic.ideaStage}
+      </strong>
+
+      {topic.ideaStageNote && (
+        <p>
+          {topic.ideaStageNote}
+        </p>
+      )}
+
+      {(topic.linkedProject ||
+        topic.isOnRoadmap) && (
+        <div className="forum-idea-stage-panel__links">
+          {topic.linkedProject && (
+            <Link
+              to={`/projelerimiz/${topic.linkedProject.slug}`}
+            >
+              <FolderKanban
+                size={16}
+              />
+
+              {topic.linkedProject.title}
+            </Link>
+          )}
+
+          {topic.isOnRoadmap && (
+            <Link to="/yol-haritasi">
+              <Route size={16} />
+              Yol Haritasında Gör
+            </Link>
+          )}
+        </div>
+      )}
+
+      {topic.ideaStageUpdatedAt && (
+        <small>
+          Son güncelleme:{" "}
+          {formatDate(
+            topic.ideaStageUpdatedAt
+          )}
+        </small>
+      )}
+    </div>
+  )}
             <div className="forum-topic-interactions">
               {interactionError && (
                 <div className="forum-interaction-error">
@@ -1086,18 +1181,27 @@ queryClient.invalidateQueries({
   id={`yanit-${reply._id}`}
   className="forum-message"
 >
-                    <header>
-                      <strong>
-                        {reply.authorInfo
-                          ?.name ||
-                          "Forum Üyesi"}
-                      </strong>
+                   <header>
+  <div className="forum-message__author">
+    <strong>
+      {reply.authorInfo
+        ?.name ||
+        "Forum Üyesi"}
+    </strong>
 
-                      <span>
-                        {formatDate(
-                          reply.createdAt
-                        )}
-                      </span>
+    <ExpertBadge
+      profile={
+        reply.authorInfo
+          ?.expertProfile
+      }
+    />
+  </div>
+
+  <span>
+    {formatDate(
+      reply.createdAt
+    )}
+  </span>
                     </header>
 
                     <div className="forum-message__body">
@@ -1176,13 +1280,23 @@ queryClient.invalidateQueries({
   id={`yanit-${childReply._id}`}
   className="forum-message forum-message--child"
 >
-                           <header>
-  <strong>
-    {childReply
-      .authorInfo
-      ?.name ||
-      "Forum Üyesi"}
-  </strong>
+     <header>
+  <div className="forum-message__author">
+    <strong>
+      {childReply
+        .authorInfo
+        ?.name ||
+        "Forum Üyesi"}
+    </strong>
+
+    <ExpertBadge
+      profile={
+        childReply
+          .authorInfo
+          ?.expertProfile
+      }
+    />
+  </div>
 
   <span>
     {formatDate(

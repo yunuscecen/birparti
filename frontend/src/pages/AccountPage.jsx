@@ -6,6 +6,7 @@ import {
   MessageCircle,
   MessageSquareText,
   ShieldCheck,
+  Settings,
   UserRound,
 } from "lucide-react";
 
@@ -27,6 +28,7 @@ import {
 } from "react-router-dom";
 
 import Container from "../components/common/Container";
+import ExpertBadge from "../components/forum/ExpertBadge";
 import {
   useSiteSettings,
 } from "../context/SiteSettingsContext";
@@ -171,16 +173,44 @@ enabled:
             <UserRound size={31} />
           </div>
 
-          <div className="account-summary__identity">
-            <h2>
-              {user.fullName}
-            </h2>
+         <div className="account-summary__identity">
+  <h2>
+    {user.fullName}
+  </h2>
 
-            <p>
-              <Mail size={17} />
-              {user.email}
-            </p>
-          </div>
+  <p>
+    <Mail size={17} />
+    {user.email}
+  </p>
+
+  {user.expertProfile
+    ?.isVerified && (
+    <div className="account-expert-profile">
+      <ExpertBadge
+        profile={
+          user.expertProfile
+        }
+      />
+
+      <strong>
+        {
+          user.expertProfile
+            .area
+        }
+      </strong>
+
+      {user.expertProfile
+        .bio && (
+        <small>
+          {
+            user.expertProfile
+              .bio
+          }
+        </small>
+      )}
+    </div>
+  )}
+</div>
 
           <div className="account-summary__status">
             <span>
@@ -243,6 +273,26 @@ enabled:
         </div>
 
       <div className="account-navigation">
+        <Link
+  to="/hesabim/ayarlar"
+  className="account-navigation__item"
+>
+  <div className="account-navigation__icon">
+    <Settings size={23} />
+  </div>
+
+  <div>
+    <strong>
+      Hesap Ayarları
+    </strong>
+
+    <span>
+      Profilinizi, şifrenizi ve
+      e-posta tercihlerinizi
+      yönetin.
+    </span>
+  </div>
+</Link>
   <Link
     to="/hesabim/taleplerim"
     className="account-navigation__item"

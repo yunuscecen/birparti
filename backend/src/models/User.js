@@ -109,6 +109,56 @@ const userSchema = new mongoose.Schema(
 },
     },
 
+        expertProfile: {
+      isVerified: {
+        type: Boolean,
+        default: false,
+        index: true,
+      },
+
+      title: {
+        type: String,
+        trim: true,
+        maxlength: [
+          120,
+          "Uzman unvanı en fazla 120 karakter olabilir.",
+        ],
+        default: "",
+      },
+
+      area: {
+        type: String,
+        trim: true,
+        maxlength: [
+          180,
+          "Uzmanlık alanı en fazla 180 karakter olabilir.",
+        ],
+        default: "",
+      },
+
+      bio: {
+        type: String,
+        trim: true,
+        maxlength: [
+          600,
+          "Uzman açıklaması en fazla 600 karakter olabilir.",
+        ],
+        default: "",
+      },
+
+      verifiedAt: {
+        type: Date,
+        default: null,
+      },
+
+      verifiedBy: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+    },
+
     lastLoginAt: {
       type: Date,
       default: null,

@@ -102,6 +102,56 @@ const forumTopicSchema =
         type: Date,
         default: null,
       },
+            ideaStage: {
+        type: String,
+        enum: [
+          "none",
+          "submitted",
+          "reviewing",
+          "planned",
+          "in_progress",
+          "completed",
+          "not_planned",
+        ],
+        default: "none",
+        index: true,
+      },
+
+      ideaStageNote: {
+        type: String,
+        trim: true,
+        maxlength: [
+          1000,
+          "Fikir aşaması notu en fazla 1000 karakter olabilir.",
+        ],
+        default: "",
+      },
+
+      ideaStageUpdatedAt: {
+        type: Date,
+        default: null,
+      },
+
+            ideaStageUpdatedBy: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+
+      linkedProject: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: "Project",
+        default: null,
+        index: true,
+      },
+
+      isOnRoadmap: {
+        type: Boolean,
+        default: false,
+        index: true,
+      },
 
       isPinned: {
         type: Boolean,
@@ -254,6 +304,13 @@ forumTopicSchema.index({
   status: 1,
   isSolved: 1,
   solvedAt: -1,
+});
+
+forumTopicSchema.index({
+  approvalStatus: 1,
+  status: 1,
+  ideaStage: 1,
+  lastActivityAt: -1,
 });
 
 const ForumTopic = mongoose.model(

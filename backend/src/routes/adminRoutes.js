@@ -2,6 +2,7 @@ import express from "express";
 import {
   getAdminDashboard,
   getAdminUsers,
+  updateUserExpertProfile,
   updateUserRole,
   updateUserStatus,
 } from "../controllers/adminUserController.js";
@@ -11,6 +12,7 @@ import {
 } from "../middleware/authMiddleware.js";
 import validateRequest from "../middleware/validateRequest.js";
 import {
+  updateUserExpertProfileSchema,
   updateUserRoleSchema,
   updateUserStatusSchema,
 } from "../validators/adminUserValidators.js";
@@ -43,8 +45,18 @@ router.patch(
 router.patch(
   "/admin/users/:userId/role",
   requireRole("superAdmin"),
-  validateRequest(updateUserRoleSchema),
+  validateRequest(
+    updateUserRoleSchema
+  ),
   updateUserRole
+);
+
+router.patch(
+  "/admin/users/:userId/expert-profile",
+  validateRequest(
+    updateUserExpertProfileSchema
+  ),
+  updateUserExpertProfile
 );
 
 export default router;
