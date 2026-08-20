@@ -1,0 +1,957 @@
+/*
+ * Bir Parti müşteri branding teması
+ * Yalnızca renk, arka plan, kenarlık
+ * ve gölge özelliklerini değiştirir.
+ */
+
+:root {
+  --brand-page: #03142d;
+  --brand-surface: #071d3a;
+  --brand-surface-soft: #0b2447;
+  --brand-surface-hover: #102d55;
+
+  --brand-accent: #2f6cc8;
+  --brand-accent-light: #75a9e8;
+
+  --brand-text: #f4f7fc;
+  --brand-text-soft: #aebbd0;
+
+  --brand-border: rgba(139, 172, 214, 0.16);
+  --brand-border-strong: rgba(139, 172, 214, 0.28);
+}
+
+/* Header */
+
+.site-header {
+  border-bottom-color: var(--brand-border);
+  background: rgba(3, 20, 45, 0.94);
+  box-shadow: 0 12px 35px rgba(0, 8, 24, 0.18);
+}
+
+.site-header .site-logo__image,
+.site-footer .site-logo__image {
+  filter: brightness(0) invert(1);
+}
+
+.site-header .site-logo,
+.site-navigation__link,
+.site-header__login,
+.site-header__menu-button,
+.site-navigation__close {
+  color: var(--brand-text);
+}
+
+.site-navigation__link:hover,
+.site-navigation__link--active {
+  color: var(--brand-accent-light);
+}
+
+.site-navigation__link::after {
+  background: var(--brand-accent-light);
+}
+
+.site-header__admin,
+.site-header__notification {
+  border-color: var(--brand-border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--brand-text);
+  box-shadow: none;
+}
+
+.site-header__admin:hover,
+.site-header__notification:hover {
+  border-color: var(--brand-border-strong);
+  background: rgba(255, 255, 255, 0.11);
+  color: var(--brand-accent-light);
+}
+
+.site-header__donation {
+  border-color: rgba(117, 169, 232, 0.35);
+  background: linear-gradient(
+    135deg,
+    #2459a6,
+    var(--brand-accent)
+  );
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(18, 67, 137, 0.34);
+}
+
+.site-header__menu-button,
+.site-navigation__close {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Mobil menü */
+
+@media (max-width: 960px) {
+  .site-navigation {
+    background: var(--brand-surface);
+    box-shadow: -25px 0 70px rgba(0, 8, 24, 0.45);
+  }
+
+  .site-navigation__link {
+    border-bottom-color: var(--brand-border);
+    color: var(--brand-text);
+  }
+
+  .site-navigation__mobile-button {
+    border-color: var(--brand-border);
+    background: var(--brand-surface-soft);
+    color: var(--brand-text);
+  }
+
+  .site-navigation-overlay {
+    background: rgba(0, 8, 24, 0.72);
+  }
+}
+
+/* Ana sayfanın genel görünümü */
+
+.home-page,
+.home-how,
+.home-projects,
+.home-roadmap,
+.home-transparency,
+.home-join {
+  background: var(--brand-page);
+}
+
+.home-launch {
+  background:
+    radial-gradient(
+      circle at 82% 16%,
+      rgba(47, 108, 200, 0.28),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 15% 85%,
+      rgba(40, 91, 160, 0.14),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #020e22,
+      var(--brand-page) 55%,
+      #08244a
+    );
+}
+
+.home-opposition {
+  background: linear-gradient(
+    135deg,
+    #020e22,
+    var(--brand-surface)
+  );
+}
+
+.home-section-heading h2,
+.home-transparency__content h2,
+.home-join h2,
+.home-how-card h3,
+.home-project-card h3,
+.home-roadmap-card h3 {
+  color: var(--brand-text);
+}
+
+.home-section-heading > p,
+.home-transparency__content > p:not(.home-eyebrow),
+.home-how-card p,
+.home-project-card p,
+.home-roadmap-card p {
+  color: var(--brand-text-soft);
+}
+
+.home-eyebrow,
+.home-eyebrow--light {
+  color: var(--brand-accent-light);
+}
+
+/* Hero paneli */
+
+.home-launch__panel {
+  border-color: var(--brand-border);
+  background: rgba(7, 29, 58, 0.74);
+  box-shadow: 0 35px 80px rgba(0, 7, 21, 0.38);
+}
+
+.home-launch__statistics article {
+  border: 1px solid var(--brand-border);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.home-launch__statement {
+  background: rgba(2, 14, 34, 0.62);
+  color: var(--brand-accent-light);
+}
+
+/* Nasıl çalışıyoruz kartları */
+
+.home-how-card {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+}
+
+.home-how-card:hover {
+  box-shadow: 0 24px 55px rgba(0, 8, 24, 0.32);
+}
+
+.home-how-card__number {
+  color: rgba(117, 169, 232, 0.52);
+}
+
+.home-how-card a,
+.home-project-card__link,
+.home-opposition-card strong {
+  color: var(--brand-accent-light);
+}
+
+/* Proje kartları */
+
+.home-project-card {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  box-shadow: 0 16px 40px rgba(0, 8, 24, 0.22);
+}
+
+.home-project-card:hover {
+  box-shadow: 0 27px 65px rgba(0, 8, 24, 0.38);
+}
+
+.home-project-card__content small {
+  color: var(--brand-accent-light);
+}
+
+.home-project-card__visual {
+  background: linear-gradient(
+    135deg,
+    #123a70,
+    var(--brand-accent)
+  );
+}
+
+.home-empty-state {
+  border-color: var(--brand-border-strong);
+  color: var(--brand-text-soft);
+}
+
+/* Neye karşıyız kartları */
+
+.home-opposition-card {
+  border-color: var(--brand-border);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.home-opposition-card:hover {
+  background: rgba(255, 255, 255, 0.085);
+}
+
+.home-opposition-card > span {
+  color: var(--brand-accent-light);
+}
+
+/* Yol haritası */
+
+.home-roadmap__timeline::before {
+  background: var(--brand-border-strong);
+}
+
+.home-roadmap-card__marker {
+  border-color: var(--brand-page);
+  background: var(--brand-accent);
+  color: #ffffff;
+  box-shadow: 0 0 0 1px var(--brand-border-strong);
+}
+
+/* Şeffaflık */
+
+.home-finance-grid article {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+}
+
+.home-finance-grid svg {
+  color: var(--brand-accent-light);
+}
+
+.home-finance-grid span {
+  color: var(--brand-text-soft);
+}
+
+.home-finance-grid strong {
+  color: var(--brand-text);
+}
+
+.home-finance-card--balance {
+  background: linear-gradient(
+    135deg,
+    #0b2852,
+    var(--brand-accent)
+  ) !important;
+}
+
+/* Bir Damla Ol alanı */
+
+.home-join__card {
+  background:
+    radial-gradient(
+      circle at 88% 20%,
+      rgba(117, 169, 232, 0.23),
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      #061a38,
+      #0b3264
+    );
+}
+
+/* Ana sayfa butonları */
+
+.home-page .button-link--primary {
+  background: linear-gradient(
+    135deg,
+    #2459a6,
+    var(--brand-accent)
+  );
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(18, 67, 137, 0.32);
+}
+
+.home-page .button-link--secondary {
+  border-color: var(--brand-border-strong);
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--brand-text);
+  box-shadow: none;
+}
+
+.home-page .button-link--secondary:hover {
+  border-color: rgba(117, 169, 232, 0.45);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Footer */
+
+.site-footer {
+  background:
+    radial-gradient(
+      circle at 75% 25%,
+      rgba(47, 108, 200, 0.18),
+      transparent 27%
+    ),
+    linear-gradient(
+      145deg,
+      #020e22,
+      var(--brand-page) 55%,
+      #04132b
+    );
+}
+
+/* ==================================================
+ * PUBLIC İÇ SAYFALAR
+ * Projeler, içerik, blog, şeffaflık,
+ * iletişim ve bağış sayfaları
+ * ================================================== */
+
+:where(
+  .projects-page,
+  .project-detail-page,
+  .blog-page,
+  .blog-detail,
+  .transparency-page,
+  .contact-page,
+  .donation-page,
+  .content-page-hero,
+  .content-page-body,
+  .content-page-state
+) {
+  --color-background: var(--brand-page);
+  --color-surface: var(--brand-surface);
+  --color-surface-soft: var(--brand-surface-soft);
+
+  --color-text: var(--brand-text);
+  --color-text-soft: var(--brand-text-soft);
+  --color-text-muted: #899bb4;
+
+  --color-primary-100: rgba(117, 169, 232, 0.12);
+  --color-primary-200: #9bc1ed;
+  --color-primary-500: #4f86cf;
+  --color-primary-600: var(--brand-accent-light);
+  --color-primary-700: #8bb8eb;
+  --color-primary-800: #bad5f2;
+  --color-primary-950: var(--brand-text);
+
+  --gradient-primary: linear-gradient(
+    135deg,
+    #2459a6,
+    var(--brand-accent)
+  );
+
+  --shadow-small:
+    0 10px 25px rgba(0, 8, 24, 0.2);
+
+  --shadow-medium:
+    0 18px 45px rgba(0, 8, 24, 0.28);
+
+  --shadow-large:
+    0 26px 65px rgba(0, 8, 24, 0.36);
+
+  color: var(--brand-text);
+}
+
+/* Sayfa arka planları */
+
+.projects-page,
+.project-detail-page,
+.blog-page,
+.blog-detail,
+.transparency-page,
+.contact-page,
+.donation-page,
+.content-page-state {
+  background: var(--brand-page);
+}
+
+/* İç sayfa hero alanları */
+
+.projects-hero,
+.content-page-hero,
+.blog-hero,
+.blog-detail-hero,
+.transparency-hero,
+.contact-hero {
+  background:
+    radial-gradient(
+      circle at 84% 18%,
+      rgba(47, 108, 200, 0.22),
+      transparent 31%
+    ),
+    linear-gradient(
+      135deg,
+      #020e22,
+      var(--brand-page) 58%,
+      #08244a
+    );
+}
+
+.projects-hero h1,
+.content-page-hero h1,
+.blog-hero h1,
+.blog-detail-hero h1,
+.transparency-hero h1,
+.contact-hero h1 {
+  color: var(--brand-text);
+}
+
+.projects-hero__eyebrow,
+.content-page-hero__eyebrow,
+.blog-hero__eyebrow,
+.transparency-hero__eyebrow,
+.contact-hero__eyebrow {
+  color: var(--brand-accent-light);
+}
+
+.projects-hero__description,
+.content-page-hero__description,
+.blog-hero__description,
+.blog-detail__excerpt,
+.transparency-hero__description,
+.contact-hero__description {
+  color: var(--brand-text-soft);
+}
+
+/* ==================================================
+ * PROJELER
+ * ================================================== */
+
+.projects-content,
+.project-detail-content {
+  background: var(--brand-page);
+}
+
+.projects-search,
+.project-filter,
+.project-card,
+.projects-message,
+.project-detail-main,
+.project-detail-info-card {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.projects-search:focus-within,
+.project-filter:hover,
+.project-card__detail:hover {
+  border-color: var(--brand-border-strong);
+}
+
+.projects-search input {
+  color: var(--brand-text);
+}
+
+.projects-search input::placeholder {
+  color: #7f90a8;
+}
+
+.projects-toolbar__label,
+.projects-result-count,
+.project-card__summary,
+.projects-message p,
+.project-detail-body p,
+.project-detail-info-card__label {
+  color: var(--brand-text-soft);
+}
+
+.project-filter {
+  color: var(--brand-text-soft);
+}
+
+.project-filter:hover {
+  color: var(--brand-accent-light);
+}
+
+.project-filter--active {
+  border-color: transparent;
+  background: var(--brand-accent);
+  color: #ffffff;
+}
+
+.project-card {
+  box-shadow: 0 16px 40px rgba(0, 8, 24, 0.24);
+}
+
+.project-card:hover {
+  box-shadow: 0 27px 65px rgba(0, 8, 24, 0.38);
+}
+
+.project-card__title,
+.project-card__title a,
+.project-detail-info-card strong,
+.projects-message h2 {
+  color: var(--brand-text);
+}
+
+.project-card__title a:hover,
+.project-card__detail,
+.projects-result-count strong {
+  color: var(--brand-accent-light);
+}
+
+.project-card__detail {
+  border-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+  color: var(--brand-text-soft);
+}
+
+.project-detail-hero__overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(2, 14, 34, 0.94),
+    rgba(3, 20, 45, 0.74)
+  );
+}
+
+.project-detail-main,
+.project-detail-info-card {
+  box-shadow: 0 18px 45px rgba(0, 8, 24, 0.25);
+}
+
+.project-detail-tags span {
+  background: rgba(117, 169, 232, 0.12);
+  color: var(--brand-accent-light);
+}
+
+.project-detail-cta {
+  border-color: var(--brand-border);
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(117, 169, 232, 0.2),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #061a38,
+      #0b3264
+    );
+}
+
+.project-detail-state {
+  background: var(--brand-page);
+}
+
+.project-detail-state h1 {
+  color: var(--brand-text);
+}
+
+.project-detail-state p {
+  color: var(--brand-text-soft);
+}
+
+/* ==================================================
+ * MANİFESTO / YOL HARİTASI / NEYE KARŞIYIZ
+ * ================================================== */
+
+.content-page-body {
+  background: var(--brand-page);
+}
+
+.content-text-section h2,
+.content-cards-section__heading h2,
+.content-card h3,
+.content-roadmap-ideas__heading h2,
+.content-roadmap-idea-card h3,
+.content-page-state h1 {
+  color: var(--brand-text);
+}
+
+.content-text-section__paragraphs,
+.content-card,
+.content-roadmap-idea-card {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+}
+
+.content-text-section__paragraphs p,
+.content-cards-section__heading > p,
+.content-card p,
+.content-roadmap-ideas__heading > span,
+.content-roadmap-idea-card > p,
+.content-roadmap-idea-card > small,
+.content-roadmap-ideas__state,
+.content-page-state p {
+  color: var(--brand-text-soft);
+}
+
+.content-card {
+  box-shadow: 0 16px 40px rgba(0, 8, 24, 0.2);
+}
+
+.content-card:hover {
+  border-color: var(--brand-border-strong);
+  box-shadow: 0 24px 55px rgba(0, 8, 24, 0.34);
+}
+
+.content-card__symbol {
+  color: var(--brand-accent-light);
+}
+
+.content-card__link,
+.content-cards-section__heading > p,
+.content-roadmap-ideas__heading > p {
+  color: var(--brand-accent-light);
+}
+
+.content-roadmap-ideas {
+  border-top-color: var(--brand-border);
+}
+
+.content-roadmap-ideas__state {
+  border-color: var(--brand-border-strong);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* ==================================================
+ * BLOG
+ * ================================================== */
+
+.blog-content,
+.blog-detail-content {
+  background: var(--brand-page);
+}
+
+.blog-search,
+.blog-category-button,
+.blog-card,
+.blog-state,
+.blog-empty {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.blog-search input {
+  color: var(--brand-text);
+}
+
+.blog-search input::placeholder {
+  color: #7f90a8;
+}
+
+.blog-category-button {
+  color: var(--brand-text-soft);
+}
+
+.blog-category-button:hover {
+  border-color: var(--brand-border-strong);
+  color: var(--brand-accent-light);
+}
+
+.blog-category-button--active {
+  border-color: var(--brand-accent);
+  background: var(--brand-accent);
+  color: #ffffff;
+}
+
+.blog-card {
+  box-shadow: 0 16px 40px rgba(0, 8, 24, 0.22);
+}
+
+.blog-card h2,
+.blog-detail__section h2 {
+  color: var(--brand-text);
+}
+
+.blog-card p,
+.blog-detail__section p,
+.blog-card__meta span,
+.blog-detail__meta span {
+  color: var(--brand-text-soft);
+}
+
+.blog-card__link,
+.blog-detail__back {
+  color: var(--brand-accent-light);
+}
+
+.blog-detail__section + .blog-detail__section,
+.blog-detail__tags {
+  border-color: var(--brand-border);
+}
+
+.blog-detail__tags span {
+  background: rgba(117, 169, 232, 0.12);
+  color: var(--brand-accent-light);
+}
+
+/* ==================================================
+ * ŞEFFAFLIK
+ * ================================================== */
+
+.transparency-content {
+  background: var(--brand-page);
+}
+
+.transparency-toolbar,
+.transparency-summary-card,
+.transparency-breakdown > section,
+.transparency-records,
+.transparency-record,
+.transparency-empty,
+.transparency-state {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.transparency-toolbar select {
+  border-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+  color: var(--brand-text);
+}
+
+.transparency-toolbar select option {
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.transparency-toolbar > div,
+.transparency-summary-card p,
+.transparency-empty p,
+.transparency-record__content p,
+.transparency-record__content small {
+  color: var(--brand-text-soft);
+}
+
+.transparency-summary-card strong,
+.transparency-empty h2,
+.transparency-section-heading h2,
+.transparency-record__content h3,
+.transparency-record__amount strong {
+  color: var(--brand-text);
+}
+
+.transparency-category-list article {
+  background: var(--brand-surface-soft);
+  color: var(--brand-text);
+}
+
+.transparency-record__amount a {
+  color: var(--brand-accent-light);
+}
+
+/*
+ * Gelir/harcama renkleri bilinçli olarak
+ * değiştirilmedi. Yeşil ve kırmızı renkler
+ * finansal anlamlarını koruyor.
+ */
+
+/* ==================================================
+ * İLETİŞİM
+ * ================================================== */
+
+.contact-body {
+  background: var(--brand-page);
+}
+
+.contact-information,
+.contact-card {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text);
+  box-shadow: 0 18px 45px rgba(0, 8, 24, 0.24);
+}
+
+.contact-information__heading h2,
+.contact-card__heading h2,
+.contact-information__item strong,
+.contact-field label {
+  color: var(--brand-text);
+}
+
+.contact-information__heading p,
+.contact-card__heading > p,
+.contact-card__heading span,
+.contact-information__item span,
+.contact-checkbox {
+  color: var(--brand-text-soft);
+}
+
+.contact-information__item {
+  border-top-color: var(--brand-border);
+}
+
+.contact-information__item svg,
+.contact-input svg {
+  color: var(--brand-accent-light);
+}
+
+.contact-card__heading {
+  border-bottom-color: var(--brand-border);
+}
+
+.contact-input,
+.contact-textarea {
+  border-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+  color: var(--brand-text);
+}
+
+.contact-input input,
+.contact-input select {
+  background: transparent;
+  color: var(--brand-text);
+}
+
+.contact-input select option {
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.contact-input input::placeholder,
+.contact-textarea::placeholder {
+  color: #7f90a8;
+}
+
+.contact-input:focus-within,
+.contact-textarea:focus {
+  border-color: var(--brand-accent-light);
+}
+
+.contact-submit {
+  background: linear-gradient(
+    135deg,
+    #2459a6,
+    var(--brand-accent)
+  );
+  color: #ffffff;
+}
+
+/*
+ * Hata ve başarı mesajlarının kırmızı/yeşil
+ * renkleri özellikle korunuyor.
+ */
+
+/* ==================================================
+ * BAĞIŞ
+ * ================================================== */
+
+.donation-page {
+  background:
+    radial-gradient(
+      circle at 85% 12%,
+      rgba(47, 108, 200, 0.16),
+      transparent 28%
+    ),
+    var(--brand-page);
+}
+
+.donation-hero,
+.donation-feature-card,
+.donation-information,
+.donation-embed-card,
+.kreosus-embed,
+.kreosus-embed__state {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.donation-hero {
+  background:
+    radial-gradient(
+      circle at 85% 18%,
+      rgba(47, 108, 200, 0.2),
+      transparent 30%
+    ),
+    var(--brand-surface);
+}
+
+.donation-eyebrow {
+  color: var(--brand-accent-light);
+}
+
+.donation-hero h1,
+.donation-feature-card h2,
+.donation-information h2,
+.donation-embed-card h2 {
+  color: var(--brand-text);
+}
+
+.donation-hero__description,
+.donation-feature-card p,
+.donation-embed-card__heading > p:last-child,
+.kreosus-embed__state p {
+  color: var(--brand-text-soft);
+}
+
+.donation-feature-card > span {
+  background: rgba(117, 169, 232, 0.12);
+  color: var(--brand-accent-light);
+}
+
+.donation-text-link {
+  color: var(--brand-accent-light);
+}
+
+.donation-security-note {
+  border-color: rgba(72, 181, 132, 0.24);
+  background: rgba(38, 133, 91, 0.12);
+  color: #8dd8b4;
+}
+
+.donation-security-note p {
+  color: #a8d9c2;
+}
+
+.donation-external-button {
+  border-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+  color: var(--brand-text);
+}
+
+/*
+ * Kreosus iframe başka bir internet sitesinden
+ * geldiği için iframe içindeki beyaz alan CSS ile
+ * değiştirilemez. Bu normaldir.
+ */

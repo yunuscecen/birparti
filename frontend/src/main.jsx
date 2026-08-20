@@ -30,6 +30,7 @@ import "./styles/home.css";
 import "./styles/projects.css";
 import "./styles/content-pages.css";
 import "./styles/transparency.css";
+import "./styles/brand-theme.css";
 createRoot(
   document.getElementById("root")
 ).render(
@@ -49,3 +50,5 @@ createRoot(
     </QueryClientProvider>
   </StrictMode>
 );
+
+

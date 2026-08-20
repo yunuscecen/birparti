@@ -612,7 +612,7 @@
   padding: 34px 38px;
   border: 1px solid rgba(23, 35, 63, 0.07);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.72);
+  background: #091a33
   box-shadow: var(--shadow-small);
   backdrop-filter: blur(16px);
 }
@@ -897,4 +897,521 @@
   .project-filter {
     flex-shrink: 0;
   }
+}
+
+
+/* ==================================================
+ * TOPLULUK / FORUM DARK BRANDING
+ * Liste, detay, konu oluşturma ve cevap alanları
+ * ================================================== */
+
+:where(
+  .forum-page,
+  .forum-detail-page,
+  .forum-report-modal
+) {
+  --color-background: var(--brand-page);
+  --color-surface: var(--brand-surface);
+  --color-surface-soft: var(--brand-surface-soft);
+
+  --color-text: var(--brand-text);
+  --color-text-soft: var(--brand-text-soft);
+  --color-text-muted: #899bb4;
+
+  --color-primary-100: rgba(117, 169, 232, 0.12);
+  --color-primary-400: #669bdc;
+  --color-primary-500: #4f86cf;
+  --color-primary-600: var(--brand-accent-light);
+  --color-primary-700: #8bb8eb;
+  --color-primary-950: var(--brand-text);
+
+  --gradient-primary: linear-gradient(
+    135deg,
+    #2459a6,
+    var(--brand-accent)
+  );
+
+  --shadow-small:
+    0 10px 25px rgba(0, 8, 24, 0.2);
+
+  color: var(--brand-text);
+}
+
+/* Sayfa ve hero */
+
+.forum-page,
+.forum-detail-page {
+  background: var(--brand-page);
+  color: var(--brand-text);
+}
+
+.forum-hero,
+.forum-detail-hero {
+  background:
+    radial-gradient(
+      circle at 84% 18%,
+      rgba(47, 108, 200, 0.22),
+      transparent 31%
+    ),
+    linear-gradient(
+      135deg,
+      #020e22,
+      var(--brand-page) 58%,
+      #08244a
+    );
+}
+
+.forum-hero h1,
+.forum-detail-hero h1 {
+  color: var(--brand-text);
+}
+
+.forum-hero__eyebrow {
+  color: var(--brand-accent-light);
+}
+
+.forum-hero > div > p:last-child {
+  color: var(--brand-text-soft);
+}
+
+.forum-content,
+.forum-detail-content {
+  background: var(--brand-page);
+}
+
+/* Kategori alanı */
+
+.forum-sidebar {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  box-shadow: 0 14px 35px rgba(0, 8, 24, 0.2);
+}
+
+.forum-sidebar h2 {
+  color: var(--brand-text);
+}
+
+.forum-category {
+  border-top-color: var(--brand-border);
+  color: var(--brand-text-soft);
+}
+
+.forum-category:hover {
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--brand-text);
+}
+
+.forum-category strong {
+  background: rgba(117, 169, 232, 0.1);
+  color: var(--brand-text-soft);
+}
+
+.forum-category--active {
+  background: rgba(47, 108, 200, 0.18);
+  color: var(--brand-accent-light);
+}
+
+.forum-category--active strong {
+  background: rgba(117, 169, 232, 0.18);
+  color: var(--brand-accent-light);
+}
+
+/* Arama ve sıralama */
+
+.forum-search,
+.forum-sort-control {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text-soft);
+  box-shadow: 0 8px 24px rgba(0, 8, 24, 0.18);
+}
+
+.forum-search:focus-within,
+.forum-sort-control:focus-within {
+  border-color: var(--brand-accent-light);
+  box-shadow:
+    0 0 0 4px rgba(47, 108, 200, 0.16);
+}
+
+.forum-sort-control:hover {
+  border-color: var(--brand-border-strong);
+}
+
+.forum-search input,
+.forum-sort-select {
+  color: var(--brand-text);
+}
+
+.forum-search input::placeholder {
+  color: #7f90a8;
+}
+
+.forum-sort-control__label {
+  color: var(--brand-text-soft);
+}
+
+.forum-sort-select {
+  background-color: transparent;
+}
+
+.forum-sort-select option {
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.forum-search button,
+.forum-primary-button {
+  background: linear-gradient(
+    135deg,
+    #2459a6,
+    var(--brand-accent)
+  );
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(18, 67, 137, 0.3);
+}
+
+/* Konu listesi */
+
+.forum-topic-card {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  box-shadow: 0 12px 30px rgba(0, 8, 24, 0.2);
+}
+
+.forum-topic-card:hover {
+  border-color: var(--brand-border-strong);
+  background: var(--brand-surface-soft);
+}
+
+.forum-topic-card h2 {
+  color: var(--brand-text);
+}
+
+.forum-topic-card__content > p,
+.forum-topic-card__author,
+.forum-detail__meta {
+  color: var(--brand-text-soft);
+}
+
+.forum-topic-card__badges span {
+  background: rgba(117, 169, 232, 0.12);
+  color: var(--brand-accent-light);
+}
+
+.forum-topic-card__stats span {
+  border-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+  color: var(--brand-text-soft);
+}
+
+.forum-topic-card__stats svg {
+  color: var(--brand-accent-light);
+}
+
+/* Sayfalama ve boş durumlar */
+
+.forum-pagination button {
+  border: 1px solid var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-accent-light);
+}
+
+.forum-pagination button:hover:not(:disabled) {
+  border-color: var(--brand-border-strong);
+  background: var(--brand-surface-soft);
+}
+
+.forum-empty-replies,
+.forum-state {
+  color: var(--brand-text-soft);
+}
+
+.forum-empty-replies {
+  border-color: var(--brand-border-strong);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* Konu detay mesajları */
+
+.forum-detail__back {
+  color: var(--brand-accent-light);
+}
+
+.forum-message {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+}
+
+.forum-message header {
+  border-bottom-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+}
+
+.forum-message header strong {
+  color: var(--brand-text);
+}
+
+.forum-message header span,
+.forum-message__body p,
+.forum-replies-heading span {
+  color: var(--brand-text-soft);
+}
+
+.forum-replies-heading h2 {
+  color: var(--brand-text);
+}
+
+.forum-child-replies {
+  border-left-color: var(--brand-border-strong);
+}
+
+.forum-message--child {
+  border-color: var(--brand-border);
+  background: #081f3d;
+}
+
+.forum-message--child header {
+  background: #0a2648;
+}
+
+.forum-message__reply-button {
+  background: rgba(117, 169, 232, 0.1);
+  color: var(--brand-accent-light);
+}
+
+.forum-message__reply-button:hover {
+  background: rgba(117, 169, 232, 0.18);
+}
+
+.forum-reply-mention,
+.forum-reply-target {
+  background: rgba(117, 169, 232, 0.12);
+  color: var(--brand-accent-light);
+}
+
+/* Konu oluşturma ve yanıt formları */
+
+.forum-create-form,
+.forum-reply-form,
+.forum-permission-state,
+.forum-reply-notice {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  box-shadow: 0 14px 35px rgba(0, 8, 24, 0.2);
+}
+
+.forum-inline-reply-form {
+  border-color: var(--brand-border-strong);
+  background: var(--brand-surface-soft);
+}
+
+.forum-form-field label,
+.forum-permission-state h1,
+.forum-reply-form__heading h2,
+.forum-reply-notice strong {
+  color: var(--brand-text);
+}
+
+.forum-form-field input,
+.forum-form-field select,
+.forum-form-field textarea {
+  border-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+  color: var(--brand-text);
+}
+
+.forum-form-field input::placeholder,
+.forum-form-field textarea::placeholder {
+  color: #7f90a8;
+}
+
+.forum-form-field select option {
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.forum-form-field input:focus,
+.forum-form-field select:focus,
+.forum-form-field textarea:focus {
+  border-color: var(--brand-accent-light);
+  box-shadow:
+    0 0 0 4px rgba(47, 108, 200, 0.16);
+}
+
+.forum-form-field small,
+.forum-permission-state p,
+.forum-reply-notice p {
+  color: var(--brand-text-soft);
+}
+
+.forum-reply-form__heading p,
+.forum-reply-notice {
+  color: var(--brand-accent-light);
+}
+
+.forum-secondary-button {
+  border-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+  color: var(--brand-text);
+}
+
+.forum-secondary-button:hover {
+  border-color: var(--brand-border-strong);
+  background: var(--brand-surface-hover);
+}
+
+/* Konu etkileşim alanı */
+
+.forum-topic-interactions {
+  border-top-color: var(--brand-border);
+  background: var(--brand-surface-soft);
+}
+
+.forum-vote-control,
+.forum-support-button,
+.forum-solved-button {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text-soft);
+}
+
+.forum-interaction-button {
+  color: var(--brand-text-soft);
+}
+
+.forum-interaction-button:hover,
+.forum-interaction-button--active {
+  background: rgba(117, 169, 232, 0.12);
+  color: var(--brand-accent-light);
+}
+
+.forum-interaction-button--negative {
+  border-left-color: var(--brand-border);
+}
+
+.forum-support-button strong {
+  background: rgba(117, 169, 232, 0.1);
+}
+
+/* Çözüldü ve uzman renkleri anlamını koruyor */
+
+.forum-expert-badge {
+  border-color: rgba(121, 216, 174, 0.25);
+  background: rgba(43, 148, 103, 0.14);
+  color: #79d8ae !important;
+}
+
+.forum-support-button:hover,
+.forum-support-button--active,
+.forum-solved-button:hover,
+.forum-solved-button--active {
+  border-color: rgba(121, 216, 174, 0.3);
+  background: rgba(43, 148, 103, 0.14);
+  color: #79d8ae;
+}
+
+.forum-solved-badge {
+  background: rgba(43, 148, 103, 0.16);
+  color: #79d8ae;
+}
+
+.forum-topic-card__badges
+  .forum-topic-badge--solved {
+  background: rgba(43, 148, 103, 0.16);
+  color: #79d8ae;
+}
+
+/* Fikir aşaması */
+
+.forum-topic-card__badges
+  .forum-topic-badge--idea {
+  background: rgba(215, 157, 50, 0.16);
+  color: #e9bd68;
+}
+
+.forum-idea-stage-panel {
+  border-color: rgba(215, 157, 50, 0.25);
+  background: rgba(215, 157, 50, 0.1);
+}
+
+.forum-idea-stage-panel > span {
+  color: #e9bd68;
+}
+
+.forum-idea-stage-panel strong {
+  color: var(--brand-text);
+}
+
+.forum-idea-stage-panel p,
+.forum-idea-stage-panel small {
+  color: var(--brand-text-soft);
+}
+
+.forum-idea-stage-panel__links a {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-accent-light);
+}
+
+.forum-idea-stage-panel__links a:hover {
+  border-color: var(--brand-accent-light);
+}
+
+/* Bildir modalı */
+
+.forum-report-modal {
+  background: rgba(0, 8, 24, 0.78);
+}
+
+.forum-report-modal__dialog {
+  border-color: var(--brand-border-strong);
+  background: var(--brand-surface);
+  box-shadow: 0 28px 80px rgba(0, 5, 18, 0.5);
+}
+
+.forum-report-modal__close {
+  background: var(--brand-surface-soft);
+  color: var(--brand-text-soft);
+}
+
+.forum-report-modal__heading h2,
+.forum-report-success h2 {
+  color: var(--brand-text);
+}
+
+.forum-report-success p {
+  color: var(--brand-text-soft);
+}
+
+/* Hata, uyarı ve bildirme renkleri */
+
+.forum-form-error,
+.forum-interaction-error {
+  border-color: rgba(242, 138, 154, 0.24);
+  background: rgba(190, 38, 51, 0.13);
+  color: #f28a9a;
+}
+
+.forum-report-button {
+  background: rgba(190, 38, 51, 0.13);
+  color: #f28a9a;
+}
+
+.forum-report-button:hover {
+  background: rgba(190, 38, 51, 0.2);
+}
+
+.forum-report-modal__heading > span,
+.forum-reply-target__close {
+  background: rgba(190, 38, 51, 0.14);
+  color: #f28a9a;
+}
+
+.forum-report-modal__heading p {
+  color: #f28a9a;
+}
+
+.forum-report-warning {
+  background: rgba(215, 157, 50, 0.12);
+  color: #e9bd68;
 }
